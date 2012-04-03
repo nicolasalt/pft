@@ -8,6 +8,16 @@
         Name: {{ account.name|escape }},
         Currency: {{ account.currency|escape }},
         Balance: {{ account.balance }}
+        <br>
+        Transactions:
+        <ul>
+          {% for transaction in transactions if transaction.account_id == account.key().id() %}
+            <li>
+              Date: {{ transaction.date|escape }},
+              Amount: {{ transaction.amount|escape }}
+            </li>
+          {% endfor %}
+        </ul>
       </li>
     {% endfor %}
   </ul>
@@ -17,6 +27,20 @@
     <div>Name: <input name='name'/></div>
     <div>Currency: <input name='currency'/></div>
     <div><input type="submit" value="Add account" /></div>
+</form>
+
+<br>
+<div>Add transaction</div>
+<form action="/do/add_transaction" method="post">
+    <div>Account:
+      <select name='account_id'>
+        {% for account in accounts %}
+          <option value="{{ account.key().id() }}">{{ account.name|escape }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>Amount: <input name='amount'/></div>
+    <div><input type="submit" value="Add transaction" /></div>
 </form>
 
 {% endblock %}

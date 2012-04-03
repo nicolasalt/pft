@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+
+  <ul>
+    {% for account in accounts %}
+      <li>
+        Name: {{ account.name|escape }},
+        Currency: {{ account.currency|escape }},
+        Balance: {{ account.balance }}
+      </li>
+    {% endfor %}
+  </ul>
+
+<div>Add account</div>
+<form action="/do/add_account" method="post">
+    <div>Name: <input name='name'/></div>
+    <div>Currency: <input name='currency'/></div>
+    <div><input type="submit" value="Add account" /></div>
+</form>
+
+{% endblock %}

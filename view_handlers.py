@@ -54,7 +54,7 @@ class EditBudgetPage(webapp2.RequestHandler):
 
       for category in categories:
         if category.key.id() in cat_id_to_planned_expense:
-          category.planned_expense = cat_id_to_planned_expense[
+          category.planned_value = cat_id_to_planned_expense[
                category.key.id()]
 
     template_values = {

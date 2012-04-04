@@ -22,21 +22,43 @@
 
   <h3>Edit budget for {{ budget_name }}</h3>
 
-  <p>
-    {% if not budget %}
+  {% if not budget %}
+    <p>
       Budget is not planned yet.
-    {% endif %}
-  </p>
+    </p>
+  {% endif %}
 
   <form action="/do/edit_budget" method="post">
     <input type="hidden" name="budget_date" value="{{ budget_date }}"/>
+    <h5>Expenses</h5>
     {% for category in categories %}
       <label>
         {{ category.name|escape }}
-        <input name="category_{{ category.key.id() }}" value="{{ category.planned_expense }}" placeholder="Auto" />
+        <input name="category_{{ category.key.id() }}" value="{{ category.planned_value }}" placeholder="Auto" />
       </label>
       <br>
     {% endfor %}
+    <h5>Income</h5>
+    {% for income_item in budget.income %}
+      <label>
+        Income item name:
+        <input name="incomeitem_name_{{ loop.index0 }}" value="{{ income_item.name }}" />
+      </label>
+      <label>
+        Income item value:
+        <input name="incomeitem_value_{{ loop.index0 }}" value="{{ income_item.planned_value }}" />
+      </label>
+      <br>
+    {% endfor %}
+    <h6>Add new income item</h6>
+    <label>
+      Income item name:
+      <input name="new_incomeitem_name" />
+    </label>
+    <label>
+      Income item value:
+      <input name="new_incomeitem_value" />
+    </label>
     <div><input type="submit" value="Save" /></div>
   </form>
 

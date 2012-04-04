@@ -33,7 +33,7 @@ class Category(ndb.Model):
 
 class ExpenseItem(ndb.Model):
   category_id = ndb.IntegerProperty(required=True)
-  planned_value = ndb.FloatProperty(default=0.0)
+  planned_value = ndb.FloatProperty()
 
 
 class IncomeItem(ndb.Model):

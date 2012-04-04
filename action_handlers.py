@@ -117,6 +117,13 @@ class DoEditBudget(webapp2.RequestHandler):
     budget.expenses = [models.ExpenseItem(category_id=cat_id,
                                           planned_value=amount)
                        for cat_id, amount in category_id_and_amount]
+
+    if self.request.get('new_incomeitem_name'):
+      new_income_item_name = self.request.get('new_incomeitem_name')
+      new_income_item_value = float(self.request.get('new_incomeitem_value'))
+      budget.income.append(models.IncomeItem(
+          name=new_income_item_name, planned_value=new_income_item_value))
+
     budget.put()
 
     self.redirect('/edit_budget')

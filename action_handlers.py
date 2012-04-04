@@ -1,21 +1,15 @@
 import datetime
-import webapp2
 
 from google.appengine.ext import ndb
 from google.appengine.api import users
+from common_handlers import CommonHandler
 from datastore import models, lookup
 
 
-class DoAddAccount(webapp2.RequestHandler):
-  def post(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
-
+class DoAddAccount(CommonHandler):
+  def handle_post(self):
     account = models.Account(
-        parent=user_settings.key,
+        parent=self.user_settings.key,
         owner=users.get_current_user(),
         name=self.request.get('name'),
         currency= self.request.get('currency')).put()
@@ -41,13 +35,8 @@ def AddTransaction(user_settings, account_id, amount, date, category_id):
   account.put()
 
 
-class DoAddTransaction(webapp2.RequestHandler):
-  def post(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
+class DoAddTransaction(CommonHandler):
+  def handle_post(self):
     amount = float(self.request.get('amount'))
     account_id = int(self.request.get('account_id'))
     date = datetime.datetime.strptime(self.request.get('date'), '%m/%d/%Y')
@@ -56,51 +45,69 @@ class DoAddTransaction(webapp2.RequestHandler):
     if raw_category_id:
       category_id = int(raw_category_id)
 
-    AddTransaction(user_settings, account_id,
+    AddTransaction(self.user_settings, account_id,
                    amount, date, category_id)
 
     self.redirect('/')
 
 
-class DoEditUserSettings(webapp2.RequestHandler):
+class DoEditUserSettings(CommonHandler):
+  def handle_post(self):
+    main_currency = self.request.get('main_currency')
+    password = self.request.get('password')
+    if main_currency:
+      self.user_settings.main_currency = main_currency
+    if password:
+      self.user_settings.password = password
+
+    self.user_settings.put()
+
+    self.redirect('/user_settings')
+
+
+class DoCreateUser(CommonHandler):
   def post(self):
-    visitor = users.get_current_user()
-    if not visitor:
+    self.visitor = users.get_current_user()
+    if not self.visitor:
       self.redirect(users.create_login_url(self.request.uri))
 
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
-    main_currency = self.request.get('main_currency')
-    if main_currency:
-      user_settings.main_currency = main_currency
-      user_settings.put()
+    self.user_settings = lookup.GetUserSettings(self.visitor)
+    if self.user_settings:
+      self.redirect('/')
+
+    existing_account_email = self.request.get('existing_account_email')
+    if existing_account_email:
+      existing_account_password = self.request.get('existing_account_password')
+      existing_user = users.User(existing_account_email)
+      self.user_settings = lookup.GetUserSettings(existing_user)
+      if (not self.user_settings or
+          existing_account_password != self.user_settings.password):
+        self.redirect('/')
+        return
+
+    else:
+      self.user_settings = models.UserSettings(
+          id=self.visitor.user_id())
+
+    self.user_settings.users.append(self.visitor)
+    self.user_settings.put()
 
     self.redirect('/')
 
 
-class DoAddCategory(webapp2.RequestHandler):
-  def post(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
+class DoAddCategory(CommonHandler):
+  def handle_post(self):
     name = self.request.get('name')
 
     account = models.Category(
-      parent=user_settings.key,
+      parent=self.user_settings.key,
       name=name).put()
 
     self.redirect('/edit_budget')
 
 
-class DoEditBudget(webapp2.RequestHandler):
-  def post(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
-
+class DoEditBudget(CommonHandler):
+  def handle_post(self):
     budget_date = datetime.datetime.strptime(
       self.request.get('budget_date'), '%m.%Y')
 
@@ -113,7 +120,7 @@ class DoEditBudget(webapp2.RequestHandler):
 
     budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'))
     budget = models.Budget.get_or_insert(
-        budget_key.id(), parent=user_settings.key, date=budget_date)
+        budget_key.id(), parent=self.user_settings.key, date=budget_date)
     budget.expenses = [models.ExpenseItem(category_id=cat_id,
                                           planned_value=amount)
                        for cat_id, amount in category_id_and_amount]

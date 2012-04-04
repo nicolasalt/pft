@@ -60,16 +60,4 @@
     <div>Date: <input name="date" id="datepicker"/></div></div>
     <div><input type="submit" value="Add transaction" /></div>
 </form>
-
-<br>
-<br>
-<div>User settings</div>
-<form action="/do/edit_user_settings" method="post">
-  <div>
-    Main currency:
-    <input name="main_currency" value="{{ user_settings.main_currency }}"/>
-  </div>
-  <div><input type="submit" value="Save" /></div>
-</form>
-
 {% endblock %}

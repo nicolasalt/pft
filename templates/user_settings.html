@@ -1,0 +1,22 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+  <title>PFT: edit user settings</title>
+{% endblock %}
+
+{% block content %}
+
+<h2>User settings</h2>
+<form action="/do/edit_user_settings" method="post">
+  <div>
+    Main currency:
+    <input name="main_currency" value="{{ user_settings.main_currency }}"/>
+  </div>
+  <div>
+    Password to allow other users use the same account:
+    <input name="password" placeholder="********"/>
+  </div>
+  <div><input type="submit" value="Save" /></div>
+</form>
+
+{% endblock %}

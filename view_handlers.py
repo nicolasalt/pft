@@ -1,52 +1,35 @@
-import os
 import datetime
-from google.appengine.ext import ndb
-import webapp2
-import jinja2
-
 from google.appengine.api import users
+from google.appengine.ext import ndb
+
+from common_handlers import CommonHandler
 from datastore import models, lookup
 
-jinja_environment = jinja2.Environment(
-  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-
-class MainPage(webapp2.RequestHandler):
-  def get(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
+class MainPage(CommonHandler):
+  def handle_get(self):
 
     template_values = {
-        'user_settings': user_settings,
-        'accounts': lookup.GetAllAccounts(user_settings),
-        'transactions': lookup.GetAllTransactions(user_settings),
-        'categories': lookup.GetAllCategories(user_settings)
+        'self.user_settings': self.user_settings,
+        'accounts': lookup.GetAllAccounts(self.user_settings),
+        'transactions': lookup.GetAllTransactions(self.user_settings),
+        'categories': lookup.GetAllCategories(self.user_settings)
     }
 
-    template = jinja_environment.get_template('templates/index.html')
-    self.response.out.write(template.render(template_values))
+    self.write_to_template('templates/index.html', template_values)
 
 
-class EditBudgetPage(webapp2.RequestHandler):
-  def get(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
-
+class EditBudgetPage(CommonHandler):
+  def handle_get(self):
     raw_budget_date = self.request.get('date')
     budget_date = datetime.datetime.now()
     if raw_budget_date:
       budget_date = datetime.datetime.strptime(raw_budget_date, '%m.%d.%Y')
 
     budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'),
-                         parent=user_settings.key)
+                         parent=self.user_settings.key)
     budget = budget_key.get()
 
-    categories = lookup.GetAllCategories(user_settings)
+    categories = lookup.GetAllCategories(self.user_settings)
 
     if budget:
       cat_id_to_planned_expense = dict(
@@ -64,5 +47,27 @@ class EditBudgetPage(webapp2.RequestHandler):
       'budget': budget
     }
 
-    template = jinja_environment.get_template('templates/edit_budget.html')
-    self.response.out.write(template.render(template_values))
+    self.write_to_template('templates/edit_budget.html', template_values)
+
+
+class UserSettingsPage(CommonHandler):
+  def handle_get(self):
+    template_values = {
+      'user_settings': self.user_settings
+    }
+
+    self.write_to_template('templates/user_settings.html', template_values)
+
+
+class CreateUserPage(CommonHandler):
+  def get(self):
+    self.visitor = users.get_current_user()
+    if not self.visitor:
+      self.redirect(users.create_login_url(self.request.uri))
+      return
+
+    self.user_settings = lookup.GetUserSettings(self.visitor)
+    if self.user_settings:
+      self.redirect('/')
+
+    self.write_to_template('templates/create_user.html', {})

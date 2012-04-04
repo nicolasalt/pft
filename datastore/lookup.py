@@ -1,9 +1,12 @@
 from datastore import models
 
 
-def GetOrCreateUserSettings(user):
-  key = models.UserSettings.MakeKey(user.user_id())
-  return models.UserSettings.get_or_insert(key.id(), user=user)
+def GetUserSettings(user):
+  results = models.UserSettings.query().filter(
+      models.UserSettings.users == user).fetch(1)
+  if results and len(results) > 0:
+    return results[0]
+#  return models.UserSettings.MakeKey(user.user_id()).get()
 
 
 def GetAllAccounts(user_settings):

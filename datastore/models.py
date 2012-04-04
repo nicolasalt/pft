@@ -2,9 +2,10 @@ from google.appengine.ext import ndb
 
 
 class UserSettings(ndb.Model):
-  user = ndb.UserProperty(required=True)
+  users = ndb.UserProperty(repeated=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   main_currency = ndb.StringProperty(default='$')
+  password = ndb.StringProperty()
 
   @staticmethod
   def MakeKey(user_id):

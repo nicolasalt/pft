@@ -1,40 +1,9 @@
 import datetime
 import webapp2
-import jinja2
-import os
 
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from datastore import models, lookup
-
-jinja_environment = jinja2.Environment(
-  loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
-
-
-class MainPage(webapp2.RequestHandler):
-  def get(self):
-    visitor = users.get_current_user()
-    if not visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-
-    user_settings = lookup.GetOrCreateUserSettings(visitor)
-
-    account_query = models.Account.query(
-        ancestor=user_settings.key).order(-models.Account.date)
-    accounts = account_query.fetch(100)
-
-    transaction_query = models.Transaction.query(
-        ancestor=user_settings.key).order(-models.Transaction.date)
-    transactions = transaction_query.fetch(100)
-
-    template_values = {
-        'user_settings': user_settings,
-        'accounts': accounts,
-        'transactions': transactions
-    }
-
-    template = jinja_environment.get_template('templates/index.html')
-    self.response.out.write(template.render(template_values))
 
 
 class DoAddAccount(webapp2.RequestHandler):
@@ -55,13 +24,19 @@ class DoAddAccount(webapp2.RequestHandler):
 
 
 @ndb.transactional
-def AddTransaction(user_settings, account_id, amount, date):
+def AddTransaction(user_settings, account_id, amount, date, category_id):
   account = models.Account.get_by_id(account_id, parent=user_settings.key)
   transaction = models.Transaction(
     parent=user_settings.key,
     account_id=account.key.id(),
     amount=amount,
-    date=date).put()
+    date=date)
+  if category_id:
+    transaction.category_id = category_id
+    category = models.Category.get_by_id(category_id, parent=user_settings.key)
+    category.balance -= amount
+    category.put()
+  transaction.put()
   account.balance -= amount
   account.put()
 
@@ -75,9 +50,14 @@ class DoAddTransaction(webapp2.RequestHandler):
     user_settings = lookup.GetOrCreateUserSettings(visitor)
     amount = float(self.request.get('amount'))
     account_id = int(self.request.get('account_id'))
+    date = datetime.datetime.strptime(self.request.get('date'), '%m/%d/%Y')
+    raw_category_id = self.request.get('category_id')
+    category_id = None
+    if raw_category_id:
+      category_id = int(raw_category_id)
 
     AddTransaction(user_settings, account_id,
-                   amount, datetime.datetime.now())
+                   amount, date, category_id)
 
     self.redirect('/')
 
@@ -97,9 +77,17 @@ class DoEditUserSettings(webapp2.RequestHandler):
     self.redirect('/')
 
 
-app = webapp2.WSGIApplication([
-    ('/', MainPage),
-    ('/do/add_account', DoAddAccount),
-    ('/do/add_transaction', DoAddTransaction),
-    ('/do/edit_user_settings', DoEditUserSettings)],
-    debug=True)
+class DoAddCategory(webapp2.RequestHandler):
+  def post(self):
+    visitor = users.get_current_user()
+    if not visitor:
+      self.redirect(users.create_login_url(self.request.uri))
+
+    user_settings = lookup.GetOrCreateUserSettings(visitor)
+    name = self.request.get('name')
+
+    account = models.Category(
+      parent=user_settings.key,
+      name=name).put()
+
+    self.redirect('/edit_budget')

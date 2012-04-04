@@ -1,6 +1,14 @@
 {% extends "templates/base.html" %}
 
 {% block content %}
+  <script>
+    $(function(){
+      // Datepicker
+      $('#datepicker').datepicker({
+        inline: true
+      });
+    });
+  </script>
 
   <ul>
     {% for account in accounts %}
@@ -14,7 +22,8 @@
           {% for transaction in transactions if transaction.account_id == account.key.id() %}
             <li>
               Date: {{ transaction.date|escape }},
-              Amount: {{ transaction.amount|escape }}
+              Category: {{ transaction.category_id }},
+              Amount: {{ transaction.amount }}
             </li>
           {% endfor %}
         </ul>
@@ -39,7 +48,16 @@
         {% endfor %}
       </select>
     </div>
+    <div>Category:
+      <select name="category_id">
+        <option value="">None</option>
+        {% for category in categories %}
+          <option value="{{ category.key.id() }}">{{ category.name|escape }}</option>
+        {% endfor %}
+      </select>
+    </div>
     <div>Amount: <input name="amount"/></div>
+    <div>Date: <input name="date" id="datepicker"/></div></div>
     <div><input type="submit" value="Add transaction" /></div>
 </form>
 

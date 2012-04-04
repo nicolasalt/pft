@@ -1,0 +1,25 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+
+  <h3>Categories</h3>
+  <ul>
+    {% for category in categories %}
+      <li>
+        Name: {{ category.name|escape }},
+        Balance: {{ category.balance }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h4>Add category</h4>
+  <form action="/do/add_category" method="post">
+    <div>Name: <input name="name"/></div>
+    <div><input type="submit" value="Add" /></div>
+  </form>
+
+  <br><br>
+
+  <h3>Edit budget for {{ budget_name }}</h3>
+
+{% endblock %}

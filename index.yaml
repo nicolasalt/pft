@@ -16,6 +16,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: Category
+  ancestor: yes
+  properties:
+  - name: name
+    direction: desc
+
 - kind: Greeting
   ancestor: yes
   properties:

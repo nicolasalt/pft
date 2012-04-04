@@ -23,6 +23,7 @@ class Transaction(ndb.Model):
   account_id = ndb.IntegerProperty(required=True)
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
+  category_id = ndb.IntegerProperty()
 
 
 class Category(ndb.Model):

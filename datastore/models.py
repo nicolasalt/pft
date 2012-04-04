@@ -31,11 +31,17 @@ class Category(ndb.Model):
   balance = ndb.FloatProperty(default=0.0)
 
 
-class CategoryBudget(ndb.Model):
-  category = ndb.StringProperty(required=True)
-  planned_expense = ndb.FloatProperty()
+class ExpenseItem(ndb.Model):
+  category_id = ndb.IntegerProperty(required=True)
+  planned_value = ndb.FloatProperty(default=0.0)
+
+
+class IncomeItem(ndb.Model):
+  name = ndb.StringProperty(required=True)
+  planned_value = ndb.FloatProperty(default=0.0)
 
 
 class Budget(ndb.Model):
   date = ndb.DateTimeProperty(required=True)
-  categories = ndb.StructuredProperty(CategoryBudget, repeated=True)
+  expenses = ndb.StructuredProperty(ExpenseItem, repeated=True)
+  income = ndb.StructuredProperty(IncomeItem, repeated=True)

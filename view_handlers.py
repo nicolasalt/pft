@@ -1,5 +1,6 @@
 import os
 import datetime
+from google.appengine.ext import ndb
 import webapp2
 import jinja2
 
@@ -39,11 +40,28 @@ class EditBudgetPage(webapp2.RequestHandler):
     raw_budget_date = self.request.get('date')
     budget_date = datetime.datetime.now()
     if raw_budget_date:
-      budget_date = datetime.datetime.strptime(raw_budget_date, '%m/%d/%Y')
+      budget_date = datetime.datetime.strptime(raw_budget_date, '%m.%d.%Y')
+
+    budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'),
+                         parent=user_settings.key)
+    budget = budget_key.get()
+
+    categories = lookup.GetAllCategories(user_settings)
+
+    if budget:
+      cat_id_to_planned_expense = dict(
+          [(exp.category_id, exp.planned_value) for exp in budget.expenses])
+
+      for category in categories:
+        if category.key.id() in cat_id_to_planned_expense:
+          category.planned_expense = cat_id_to_planned_expense[
+               category.key.id()]
 
     template_values = {
-      'categories': lookup.GetAllCategories(user_settings),
-      'budget_name': budget_date.strftime('%m.%Y')
+      'categories': categories,
+      'budget_name': budget_date.strftime('%m.%Y'),
+      'budget_date': budget_date.strftime('%m.%Y'),
+      'budget': budget
     }
 
     template = jinja_environment.get_template('templates/edit_budget.html')

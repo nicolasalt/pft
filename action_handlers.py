@@ -91,3 +91,32 @@ class DoAddCategory(webapp2.RequestHandler):
       name=name).put()
 
     self.redirect('/edit_budget')
+
+
+class DoEditBudget(webapp2.RequestHandler):
+  def post(self):
+    visitor = users.get_current_user()
+    if not visitor:
+      self.redirect(users.create_login_url(self.request.uri))
+
+    user_settings = lookup.GetOrCreateUserSettings(visitor)
+
+    budget_date = datetime.datetime.strptime(
+      self.request.get('budget_date'), '%m.%Y')
+
+    category_id_and_amount = []
+    for arg in self.request.arguments():
+      if arg.startswith('category_') and self.request.get(arg):
+        category_id = int(arg[9:])
+        category_id_and_amount.append(
+            (category_id, float(self.request.get(arg))))
+
+    budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'))
+    budget = models.Budget.get_or_insert(
+        budget_key.id(), parent=user_settings.key, date=budget_date)
+    budget.expenses = [models.ExpenseItem(category_id=cat_id,
+                                          planned_value=amount)
+                       for cat_id, amount in category_id_and_amount]
+    budget.put()
+
+    self.redirect('/edit_budget')

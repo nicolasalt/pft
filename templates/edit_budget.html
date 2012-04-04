@@ -22,4 +22,22 @@
 
   <h3>Edit budget for {{ budget_name }}</h3>
 
+  <p>
+    {% if not budget %}
+      Budget is not planned yet.
+    {% endif %}
+  </p>
+
+  <form action="/do/edit_budget" method="post">
+    <input type="hidden" name="budget_date" value="{{ budget_date }}"/>
+    {% for category in categories %}
+      <label>
+        {{ category.name|escape }}
+        <input name="category_{{ category.key.id() }}" value="{{ category.planned_expense }}" placeholder="Auto" />
+      </label>
+      <br>
+    {% endfor %}
+    <div><input type="submit" value="Save" /></div>
+  </form>
+
 {% endblock %}

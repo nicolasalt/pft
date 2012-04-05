@@ -5,10 +5,35 @@
 
   <style type="text/css">
     .expense {
-      color: #008000;
+      color: #800000;
     }
     .income {
-      color: #800000;
+      color: #008000;
+    }
+    .day {
+      min-height: 20px;
+      border-top: 1px solid #eee;
+    }
+    .day .title {
+      color: #999;
+    }
+    .day .transaction {
+      cursor: pointer;
+    }
+    .day .transaction.expense {
+      text-align: right;
+      width: 200px;
+    }
+    .day .transaction.income {
+      margin: 0 0 0 200px;
+    }
+    .day .transaction .description {
+      color: #aaa;
+      font-size: 10px;
+    }
+    .day .transaction .category {
+      color: #679ce8;
+      font-size: 10px;
     }
   </style>
 {% endblock %}
@@ -19,18 +44,21 @@
   <h4>Transactions:</h4>
   {% for day in days %}
     <div class="day">
-      {{ day.date }}
-      <br>
+      <div class="title">{{ day.date.strftime('%a, %d %b') }}</div>
       {% for transaction in day.transactions %}
         {% if transaction.amount > 0 %}
           {% set transaction_class = 'expense' %}
         {% else %}
           {% set transaction_class = 'income' %}
         {% endif %}
-        <div class="{{ transaction_class }}">
-          Category: {{ transaction.category_id }},
-          Description: {{ transaction.description }},
-          Amount: {{ transaction.amount }}
+        <div class="transaction {{ transaction_class }}">
+          <div class="amount">{{ transaction.amount|abs }}</div>
+          {% if transaction.description %}
+            <span class="description">{{ transaction.description }}</span>
+          {% endif %}
+          {% if transaction.category %}
+            <span class="category">{{ transaction.category.name }}</span>
+          {% endif %}
         </div>
       {% endfor %}
     </div>

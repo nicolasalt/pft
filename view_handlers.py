@@ -32,6 +32,7 @@ class EditBudgetPage(CommonHandler):
     budget = budget_key.get()
 
     categories = lookup.GetAllCategories(self.profile)
+    id_to_cat = dict([(cat.key.id(), cat) for cat in categories])
 
     if budget:
       cat_id_to_planned_expense = dict(
@@ -56,6 +57,9 @@ class EditBudgetPage(CommonHandler):
       })
 
     for transaction in transactions:
+      if (transaction.category_id is not None and
+          transaction.category_id in id_to_cat):
+        transaction.category = id_to_cat[transaction.category_id]
       days[transaction.date.day - 1]['transactions'].append(transaction)
 
     template_values = {

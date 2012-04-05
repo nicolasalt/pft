@@ -1,0 +1,46 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+  <title>PFT: manage profile</title>
+
+  <style type="text/css">
+    span.active_profile {
+      color: green;
+    }
+  </style>
+{% endblock %}
+
+{% block content %}
+
+<h2>Your profiles:</h2>
+
+<ul>
+  {% for profile in profiles %}
+    <li>
+      <form action="/do/set_active_profile" method="post">
+        {{ profile.name }}
+        {% if visitor.active_profile_id == profile.key.id() %}
+          <span class="active_profile">Active</span>
+        {% else %}
+          <input type="hidden" name="id" value="profile.key.id()" />
+          <input type="submit" value="Select" />
+        {% endif %}
+      </form>
+    </li>
+  {% endfor %}
+</ul>
+
+
+<form action="/do/add_profile" method="post">
+  <input type="submit" value="Create a new profile" />
+</form>
+<br>
+<form action="/do/create_user" method="post">
+  <label>
+    Join existing profile by code:
+    <input name="connect_to_profile"/>
+  </label><br>
+  <input type="submit" value="Join" />
+</form>
+
+{% endblock %}

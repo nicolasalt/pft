@@ -9,18 +9,23 @@ jinja_environment = jinja2.Environment(
 
 class CommonHandler(webapp2.RequestHandler):
   def write_to_template(self, template_name, template_values):
+    template_values.extend({
+      'visitor': self.visitor,
+      'profile': self.profile
+    })
     template = jinja_environment.get_template(template_name)
     self.response.out.write(template.render(template_values))
 
-  def init_user_settings(self):
-    self.visitor = users.get_current_user()
-    if not self.visitor:
+  def init_user_and_profile(self, redirect_to_choose_profile=True):
+    self.google_user = users.get_current_user()
+    if not self.google_user:
       self.redirect(users.create_login_url(self.request.uri))
       return False
 
-    self.user_settings = lookup.GetUserSettings(self.visitor)
-    if not self.user_settings:
-      self.redirect('/create_user')
+    self.visitor = lookup.GetUser(self.google_user)
+    self.profile = lookup.GetActiveProfile(self.google_user)
+    if not self.profile and redirect_to_choose_profile:
+      self.redirect('/choose_profile')
       return False
 
     return True
@@ -30,12 +35,12 @@ class CommonHandler(webapp2.RequestHandler):
     pass
 
   def get(self):
-    if self.init_user_settings():
+    if self.init_user_and_profile():
       self.handle_get()
 
   def handle_post(self):
     pass
 
   def post(self):
-    if self.init_user_settings():
+    if self.init_user_and_profile():
       self.handle_post()

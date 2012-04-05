@@ -7,12 +7,14 @@ import view_handlers
 app = webapp2.WSGIApplication([
     ('/', view_handlers.MainPage),
     ('/edit_budget', view_handlers.EditBudgetPage),
-    ('/user_settings', view_handlers.UserSettingsPage),
-    ('/create_user', view_handlers.CreateUserPage),
-    ('/do/create_user', action_handlers.DoCreateUser),
+    ('/user_settings', view_handlers.EditProfile),
+    ('/manage_profiles', view_handlers.ManageProfilesPage),
+    ('/do/add_profile', action_handlers.DoAddProfile),
+    ('/do/connect_to_profile', action_handlers.DoConnectToProfile),
+    ('/do/set_active_profile', action_handlers.DoSetActiveProfile),
     ('/do/add_account', action_handlers.DoAddAccount),
     ('/do/add_category', action_handlers.DoAddCategory),
     ('/do/add_transaction', action_handlers.DoAddTransaction),
     ('/do/edit_budget', action_handlers.DoEditBudget),
-    ('/do/edit_user_settings', action_handlers.DoEditUserSettings)],
+    ('/do/edit_profile', action_handlers.DoEditProfile)],
     debug=True)

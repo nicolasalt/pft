@@ -3,36 +3,16 @@ import datetime
 from google.appengine.ext import ndb
 from google.appengine.api import users
 from common_handlers import CommonHandler
-from datastore import models, lookup
+from datastore import models, lookup, update
 
 
 class DoAddAccount(CommonHandler):
   def handle_post(self):
-    account = models.Account(
-        parent=self.user_settings.key,
-        owner=users.get_current_user(),
-        name=self.request.get('name'),
-        currency= self.request.get('currency')).put()
+    name = self.request.get('name')
+    currency = self.request.get('currency')
+    update.AddAccount(self.profile, name, currency)
 
     self.redirect('/')
-
-
-@ndb.transactional
-def AddTransaction(user_settings, account_id, amount, date, category_id):
-  account = models.Account.get_by_id(account_id, parent=user_settings.key)
-  transaction = models.Transaction(
-    parent=user_settings.key,
-    account_id=account.key.id(),
-    amount=amount,
-    date=date)
-  if category_id:
-    transaction.category_id = category_id
-    category = models.Category.get_by_id(category_id, parent=user_settings.key)
-    category.balance -= amount
-    category.put()
-  transaction.put()
-  account.balance -= amount
-  account.put()
 
 
 class DoAddTransaction(CommonHandler):
@@ -45,52 +25,66 @@ class DoAddTransaction(CommonHandler):
     if raw_category_id:
       category_id = int(raw_category_id)
 
-    AddTransaction(self.user_settings, account_id,
-                   amount, date, category_id)
+    update.AddTransaction(self.profile, account_id,
+                          amount, date, category_id)
 
     self.redirect('/')
 
 
-class DoEditUserSettings(CommonHandler):
+class DoEditProfile(CommonHandler):
   def handle_post(self):
     main_currency = self.request.get('main_currency')
     password = self.request.get('password')
-    if main_currency:
-      self.user_settings.main_currency = main_currency
-    if password:
-      self.user_settings.password = password
 
-    self.user_settings.put()
+    kw = {}
+    if main_currency:
+      kw['main_currency'] = main_currency
+    if password:
+      kw['password'] = password
+
+    update.UpdateProfile(self.profile, **kw)
 
     self.redirect('/user_settings')
 
 
-class DoCreateUser(CommonHandler):
+class DoAddProfile(CommonHandler):
   def post(self):
-    self.visitor = users.get_current_user()
-    if not self.visitor:
-      self.redirect(users.create_login_url(self.request.uri))
+    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+      return
 
-    self.user_settings = lookup.GetUserSettings(self.visitor)
-    if self.user_settings:
-      self.redirect('/')
+    profile_name = self.request.get('profile_name')
 
-    existing_account_email = self.request.get('existing_account_email')
-    if existing_account_email:
-      existing_account_password = self.request.get('existing_account_password')
-      existing_user = users.User(existing_account_email)
-      self.user_settings = lookup.GetUserSettings(existing_user)
-      if (not self.user_settings or
-          existing_account_password != self.user_settings.password):
-        self.redirect('/')
-        return
+    self.profile = update.AddProfile(self.google_user, profile_name)
 
+    self.redirect('/')
+
+
+class DoConnectToProfile(CommonHandler):
+  def post(self):
+    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+      return
+
+    profile_code = self.request.get('profile_code')
+
+    if profile_code:
+      self.profile = lookup.GetProfileByCode(profile_code)
+      if self.profile:
+        update.AddUserToProfile(self.profile, self.google_user)
+
+    self.redirect('/')
+
+
+class DoSetActiveProfile(CommonHandler):
+  def post(self):
+    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+      return
+
+    profile_id = int(self.request.get('id'))
+
+    if lookup.GetProfileById(profile_id):
+      update.UpdateUser(self.visitor, active_profile_id=profile_id)
     else:
-      self.user_settings = models.UserSettings(
-          id=self.visitor.user_id())
-
-    self.user_settings.users.append(self.visitor)
-    self.user_settings.put()
+      raise Exception('Profile with id %r does not exist' % profile_id)
 
     self.redirect('/')
 
@@ -100,7 +94,7 @@ class DoAddCategory(CommonHandler):
     name = self.request.get('name')
 
     account = models.Category(
-      parent=self.user_settings.key,
+      parent=self.profile.key,
       name=name).put()
 
     self.redirect('/edit_budget')
@@ -120,7 +114,7 @@ class DoEditBudget(CommonHandler):
 
     budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'))
     budget = models.Budget.get_or_insert(
-        budget_key.id(), parent=self.user_settings.key, date=budget_date)
+        budget_key.id(), parent=self.profile.key, date=budget_date)
     budget.expenses = [models.ExpenseItem(category_id=cat_id,
                                           planned_value=amount)
                        for cat_id, amount in category_id_and_amount]

@@ -9,10 +9,10 @@ class MainPage(CommonHandler):
   def handle_get(self):
 
     template_values = {
-        'self.user_settings': self.user_settings,
-        'accounts': lookup.GetAllAccounts(self.user_settings),
-        'transactions': lookup.GetAllTransactions(self.user_settings),
-        'categories': lookup.GetAllCategories(self.user_settings)
+        'profile': self.profile,
+        'accounts': lookup.GetAllAccounts(self.profile),
+        'transactions': lookup.GetAllTransactions(self.profile),
+        'categories': lookup.GetAllCategories(self.profile)
     }
 
     self.write_to_template('templates/index.html', template_values)
@@ -26,10 +26,10 @@ class EditBudgetPage(CommonHandler):
       budget_date = datetime.datetime.strptime(raw_budget_date, '%m.%d.%Y')
 
     budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'),
-                         parent=self.user_settings.key)
+                         parent=self.profile.key)
     budget = budget_key.get()
 
-    categories = lookup.GetAllCategories(self.user_settings)
+    categories = lookup.GetAllCategories(self.profile)
 
     if budget:
       cat_id_to_planned_expense = dict(
@@ -50,24 +50,12 @@ class EditBudgetPage(CommonHandler):
     self.write_to_template('templates/edit_budget.html', template_values)
 
 
-class UserSettingsPage(CommonHandler):
+class EditProfile(CommonHandler):
   def handle_get(self):
-    template_values = {
-      'user_settings': self.user_settings
-    }
-
-    self.write_to_template('templates/user_settings.html', template_values)
+    self.write_to_template('templates/edit_profile.html', template_values)
 
 
-class CreateUserPage(CommonHandler):
+class ManageProfilesPage(CommonHandler):
   def get(self):
-    self.visitor = users.get_current_user()
-    if not self.visitor:
-      self.redirect(users.create_login_url(self.request.uri))
-      return
-
-    self.user_settings = lookup.GetUserSettings(self.visitor)
-    if self.user_settings:
-      self.redirect('/')
-
-    self.write_to_template('templates/create_user.html', {})
+    if self.init_user_and_profile(redirect_to_choose_profile=False):
+      self.write_to_template('templates/manage_profiles.html', {})

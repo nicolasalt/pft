@@ -12,12 +12,11 @@ class User(ndb.Model):
 
 
 class Profile(ndb.Model):
-  name = ndb.UserProperty(required=True)
+  name = ndb.StringProperty(required=True)
   owner = ndb.UserProperty(required=True)
   users = ndb.UserProperty(repeated=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   main_currency = ndb.StringProperty(default='$')
-  password = ndb.StringProperty()
 
 
 class Account(ndb.Model):

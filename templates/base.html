@@ -9,13 +9,21 @@
   {% block head %}
     <title>Personal Finance Tracker</title>
   {% endblock %}
+
+  <style type="text/css">
+    .active_profile_name {
+      color: #999;
+    }
+  </style>
 </head>
 <body>
 <header>
   <a href="/">Home</a> |
   <a href="/edit_budget">Edit budget</a> |
   <a href="/edit_profile">Profile settings</a> |
-  <a href="/manage_profiles">Change profile</a></header>
+  <a href="/manage_profiles">Change profile</a>
+  <span class="active_profile_name">({{ profile.name }})</span>
+</header>
 
 {% block content %}{% endblock %}
 

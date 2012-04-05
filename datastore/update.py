@@ -29,17 +29,17 @@ def AddTransaction(profile, account_id, amount, date, category_id):
 
 def UpdateProfile(profile, **kw):
   for key, value in kw.iteritems():
-    profile[key] = value
+    setattr(profile, key, value)
   profile.put()
 
 
 def AddProfile(owner, name, **kw):
-  if 'name' in kw or owner in kw:
+  if 'name' in kw or 'owner' in kw:
     raise AttributeError('kw must not contain name or owner.')
 
   profile = models.Profile(name=name, owner=owner)
   for key, value in kw.iteritems():
-    profile[key] = value
+    setattr(profile, key, value)
   profile.users.append(owner)
 
   profile.put()
@@ -53,5 +53,5 @@ def AddUserToProfile(profile, google_user):
 
 def UpdateUser(user, **kw):
   for key, value in kw.iteritems():
-    user[key] = value
+    setattr(user, key, value)
   user.put()

@@ -9,7 +9,7 @@ jinja_environment = jinja2.Environment(
 
 class CommonHandler(webapp2.RequestHandler):
   def write_to_template(self, template_name, template_values):
-    template_values.extend({
+    template_values.update({
       'visitor': self.visitor,
       'profile': self.profile
     })
@@ -25,7 +25,7 @@ class CommonHandler(webapp2.RequestHandler):
     self.visitor = lookup.GetUser(self.google_user)
     self.profile = lookup.GetActiveProfile(self.google_user)
     if not self.profile and redirect_to_choose_profile:
-      self.redirect('/choose_profile')
+      self.redirect('/manage_profiles')
       return False
 
     return True

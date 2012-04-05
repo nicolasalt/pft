@@ -52,9 +52,10 @@ class DoAddProfile(CommonHandler):
     if not self.init_user_and_profile(redirect_to_choose_profile=False):
       return
 
-    profile_name = self.request.get('profile_name')
+    profile_name = self.request.get('name')
 
     self.profile = update.AddProfile(self.google_user, profile_name)
+    update.UpdateUser(self.visitor, active_profile_id=self.profile.key.id())
 
     self.redirect('/')
 
@@ -70,6 +71,7 @@ class DoConnectToProfile(CommonHandler):
       self.profile = lookup.GetProfileByCode(profile_code)
       if self.profile:
         update.AddUserToProfile(self.profile, self.google_user)
+        update.UpdateUser(self.visitor, active_profile_id=self.profile.key.id())
 
     self.redirect('/')
 

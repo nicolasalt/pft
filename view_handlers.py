@@ -57,5 +57,11 @@ class EditProfile(CommonHandler):
 
 class ManageProfilesPage(CommonHandler):
   def get(self):
-    if self.init_user_and_profile(redirect_to_choose_profile=False):
-      self.write_to_template('templates/manage_profiles.html', {})
+    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+      return
+
+    template_values = {
+      'profiles': lookup.GetAllProfiles(self.google_user),
+    }
+
+    self.write_to_template('templates/manage_profiles.html', template_values)

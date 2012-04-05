@@ -5,7 +5,7 @@ from datastore import models
 def GetUser(google_user):
   user = models.User.MakeKey(google_user.user_id()).get()
   if not user:
-    user = models.User(google_user=google_user)
+    user = models.User(id=google_user.user_id(), google_user=google_user)
   return user
 
 

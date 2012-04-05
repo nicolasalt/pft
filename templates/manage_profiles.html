@@ -4,8 +4,13 @@
   <title>PFT: manage profile</title>
 
   <style type="text/css">
-    span.active_profile {
+    .active_profile {
       color: green;
+    }
+
+    .profile_code {
+      font-size: 11px;
+      color: #999;
     }
   </style>
 {% endblock %}
@@ -22,23 +27,29 @@
         {% if visitor.active_profile_id == profile.key.id() %}
           <span class="active_profile">Active</span>
         {% else %}
-          <input type="hidden" name="id" value="profile.key.id()" />
+          <input type="hidden" name="id" value="{{ profile.key.id() }}" />
           <input type="submit" value="Select" />
         {% endif %}
+        <div class="profile_code">Profile code: {{ profile.key.urlsafe() }}</div>
       </form>
     </li>
   {% endfor %}
 </ul>
 
+<h3>Add a new profile or join an existing one</h3>
 
 <form action="/do/add_profile" method="post">
+  <label>
+    Name
+    <input name="name"/>
+  </label>
   <input type="submit" value="Create a new profile" />
 </form>
 <br>
-<form action="/do/create_user" method="post">
+<form action="/do/connect_to_profile" method="post">
   <label>
     Join existing profile by code:
-    <input name="connect_to_profile"/>
+    <input name="profile_code"/>
   </label><br>
   <input type="submit" value="Join" />
 </form>

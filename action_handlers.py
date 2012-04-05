@@ -7,7 +7,7 @@ from datastore import models, lookup, update
 
 
 class DoAddAccount(CommonHandler):
-  def handle_post(self):
+  def HandlePost(self):
     name = self.request.get('name')
     currency = self.request.get('currency')
     update.AddAccount(self.profile, name, currency)
@@ -16,8 +16,9 @@ class DoAddAccount(CommonHandler):
 
 
 class DoAddTransaction(CommonHandler):
-  def handle_post(self):
+  def HandlePost(self):
     amount = float(self.request.get('amount'))
+    description = self.request.get('description')
     account_id = int(self.request.get('account_id'))
     date = datetime.datetime.strptime(self.request.get('date'), '%m/%d/%Y')
     raw_category_id = self.request.get('category_id')
@@ -26,13 +27,13 @@ class DoAddTransaction(CommonHandler):
       category_id = int(raw_category_id)
 
     update.AddTransaction(self.profile, account_id,
-                          amount, date, category_id)
+                          amount, date, category_id, description)
 
     self.redirect('/')
 
 
 class DoEditProfile(CommonHandler):
-  def handle_post(self):
+  def HandlePost(self):
     main_currency = self.request.get('main_currency')
     password = self.request.get('password')
 
@@ -49,7 +50,7 @@ class DoEditProfile(CommonHandler):
 
 class DoAddProfile(CommonHandler):
   def post(self):
-    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
       return
 
     profile_name = self.request.get('name')
@@ -62,7 +63,7 @@ class DoAddProfile(CommonHandler):
 
 class DoConnectToProfile(CommonHandler):
   def post(self):
-    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
       return
 
     profile_code = self.request.get('profile_code')
@@ -78,7 +79,7 @@ class DoConnectToProfile(CommonHandler):
 
 class DoSetActiveProfile(CommonHandler):
   def post(self):
-    if not self.init_user_and_profile(redirect_to_choose_profile=False):
+    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
       return
 
     profile_id = int(self.request.get('id'))
@@ -92,7 +93,7 @@ class DoSetActiveProfile(CommonHandler):
 
 
 class DoAddCategory(CommonHandler):
-  def handle_post(self):
+  def HandlePost(self):
     name = self.request.get('name')
 
     account = models.Category(
@@ -103,7 +104,7 @@ class DoAddCategory(CommonHandler):
 
 
 class DoEditBudget(CommonHandler):
-  def handle_post(self):
+  def HandlePost(self):
     budget_date = datetime.datetime.strptime(
       self.request.get('budget_date'), '%m.%Y')
 

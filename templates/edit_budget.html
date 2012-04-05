@@ -1,6 +1,44 @@
 {% extends "templates/base.html" %}
 
+{% block head %}
+  <title>PFT: edit budget</title>
+
+  <style type="text/css">
+    .expense {
+      color: #008000;
+    }
+    .income {
+      color: #800000;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
+  <h3>Viewing {{ budget_name }}</h3>
+
+  <h4>Transactions:</h4>
+  {% for day in days %}
+    <div class="day">
+      {{ day.date }}
+      <br>
+      {% for transaction in day.transactions %}
+        {% if transaction.amount > 0 %}
+          {% set transaction_class = 'expense' %}
+        {% else %}
+          {% set transaction_class = 'income' %}
+        {% endif %}
+        <div class="{{ transaction_class }}">
+          Category: {{ transaction.category_id }},
+          Description: {{ transaction.description }},
+          Amount: {{ transaction.amount }}
+        </div>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <h4>Total:</h4>
+  <div class="expense">{{ total_expenses }}</div>
+  <div class="income">{{ total_income }}</div>
 
   <h3>Categories</h3>
   <ul>

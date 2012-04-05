@@ -30,20 +30,34 @@ def GetProfileById(profile_id):
   return ndb.Key(models.Profile, profile_id).get()
 
 
-def GetAllAccounts(user_settings):
+def GetAllAccounts(profile):
   account_query = models.Account.query(
-    ancestor=user_settings.key).order(-models.Account.date)
+    ancestor=profile.key).order(-models.Account.date)
   return account_query.fetch(1000)
 
 
-def GetAllTransactions(user_settings):
+def GetAllTransactions(profile):
   transaction_query = models.Transaction.query(
-    ancestor=user_settings.key).order(-models.Transaction.date)
+    ancestor=profile.key).order(-models.Transaction.date)
   return transaction_query.fetch(1000)
 
 
-def GetAllCategories(user_settings):
+def GetAllCategories(profile):
   category_query = models.Category.query(
-    ancestor=user_settings.key).order(-models.Category.name)
+    ancestor=profile.key).order(-models.Category.name)
   return category_query.fetch(1000)
 
+
+def GetTransactionsForBudget(profile, budget):
+  start_date, end_date = budget.GetDateRange()
+  return models.Transaction.query(ancestor=profile.key).filter(
+      models.Transaction.date >= start_date,
+      models.Transaction.date < end_date).fetch(1000)
+
+
+def GetAccountById(profile, account_id):
+  return models.Account.get_by_id(account_id, parent=profile.key)
+
+
+def GetCategoryById(profile, category_id):
+  return models.Category.get_by_id(category_id, parent=profile.key)

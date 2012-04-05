@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta
 from google.appengine.ext import ndb
 
 
@@ -11,6 +12,8 @@ class User(ndb.Model):
     return ndb.Key(User, user_id)
 
 
+# TODO: add accounts and categories to the profile model as structured
+# properties.
 class Profile(ndb.Model):
   name = ndb.StringProperty(required=True)
   owner = ndb.UserProperty(required=True)
@@ -20,7 +23,6 @@ class Profile(ndb.Model):
 
 
 class Account(ndb.Model):
-  owner = ndb.UserProperty(required=True)
   name = ndb.StringProperty(required=True)
   currency = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
@@ -29,9 +31,12 @@ class Account(ndb.Model):
 
 class Transaction(ndb.Model):
   account_id = ndb.IntegerProperty(required=True)
+  category_id = ndb.IntegerProperty()
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
-  category_id = ndb.IntegerProperty()
+  description = ndb.StringProperty()
+  dest_account_id = ndb.IntegerProperty()
+  dest_category_id = ndb.IntegerProperty()
 
 
 class Category(ndb.Model):
@@ -42,14 +47,26 @@ class Category(ndb.Model):
 class ExpenseItem(ndb.Model):
   category_id = ndb.IntegerProperty(required=True)
   planned_value = ndb.FloatProperty()
+  transaction_id = ndb.IntegerProperty()
 
 
 class IncomeItem(ndb.Model):
   name = ndb.StringProperty(required=True)
-  planned_value = ndb.FloatProperty(default=0.0)
+  planned_value = ndb.FloatProperty()
+  transaction_id = ndb.IntegerProperty()
 
 
 class Budget(ndb.Model):
   date = ndb.DateTimeProperty(required=True)
   expenses = ndb.StructuredProperty(ExpenseItem, repeated=True)
   income = ndb.StructuredProperty(IncomeItem, repeated=True)
+
+  def GetDateRange(self):
+    month = self.date.month
+    year = self.date.year
+    start = datetime(year, month, 1)
+    if month == 12:
+      end = datetime(year + 1, 1, 1)
+    else:
+      end = datetime(year, month + 1, 1)
+    return start, end

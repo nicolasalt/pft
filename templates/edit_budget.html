@@ -12,22 +12,27 @@
     .income {
       color: #008000;
     }
-    .day {
-      min-height: 20px;
-      border-top: 1px solid #eee;
+    table.days {
+      table-layout: fixed;
     }
-    .day .title {
+    .day td {
+      height: 20px;
+      border-top: 1px solid #eee;
+      vertical-align: top;
+    }
+    .day .title_cell {
+      width: 100px;
       color: #999;
     }
     .day .transaction {
       cursor: pointer;
     }
-    .day .transaction.expense {
+    .day .expense_cell {
       text-align: right;
       width: 200px;
     }
     .day .transaction.income {
-      margin: 0 0 0 200px;
+      width: 200px;
     }
     .day .transaction .description {
       color: #aaa;
@@ -58,31 +63,39 @@
   </script>
 {% endblock %}
 
+{% macro render_transaction(transaction) -%}
+  {% if transaction.amount > 0 %}
+    {% set transaction_class = 'expense' %}
+  {% else %}
+    {% set transaction_class = 'income' %}
+  {% endif %}
+  <div class="transaction {{ transaction_class }}" transaction_id="{{ transaction.key.id() }}">
+    <div class="amount">{{ transaction.amount|abs }}</div>
+    {% if transaction.description %}
+      <span class="description">{{ transaction.description }}</span>
+    {% endif %}
+    {% if transaction.category %}
+      <span class="category">{{ transaction.category.name }}</span>
+    {% endif %}
+  </div>
+{%- endmacro %}
+
 {% block content %}
   <h3>Viewing {{ budget_name }}</h3>
 
   <h4>Transactions:</h4>
-  {% for day in days %}
-    <div class="day">
-      <div class="title">{{ day.date.strftime('%a, %d %b') }}</div>
-      {% for transaction in day.transactions %}
-        {% if transaction.amount > 0 %}
-          {% set transaction_class = 'expense' %}
-        {% else %}
-          {% set transaction_class = 'income' %}
-        {% endif %}
-        <div class="transaction {{ transaction_class }}" transaction_id="{{ transaction.key.id() }}">
-          <div class="amount">{{ transaction.amount|abs }}</div>
-          {% if transaction.description %}
-            <span class="description">{{ transaction.description }}</span>
-          {% endif %}
-          {% if transaction.category %}
-            <span class="category">{{ transaction.category.name }}</span>
-          {% endif %}
-        </div>
-      {% endfor %}
-    </div>
-  {% endfor %}
+  <table class="days" cellpadding="0" cellspacing="0">
+    {% for day in days %}
+      <tr class="day">
+        <td class="title_cell">{{ day.date.strftime('%a, %d %b') }}</td>
+        <td class="expense_cell">
+          {% for transaction in day.transactions %}
+            {{ render_transaction(transaction) }}
+          {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+  </table>
 
   <h4>Total:</h4>
   <div class="expense">{{ total_expenses }}</div>

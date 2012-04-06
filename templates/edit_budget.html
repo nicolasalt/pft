@@ -82,9 +82,9 @@
 
 {% block content %}
   <h3>
-    <a href="/">Previous</a>
-    Viewing {{ budget_name }}
-    <a href="/">Next</a>
+    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Previous</a>
+    Viewing {{ budget.GetStrDate() }}
+    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Next</a>
   </h3>
 
   <h4>Transactions:</h4>
@@ -143,7 +143,7 @@
 
   <br><br>
 
-  <h3>Edit budget for {{ budget_name }}</h3>
+  <h3>Edit budget for {{ budget.date.strftime('%m.%Y') }}</h3>
 
   {% if not budget %}
     <p>
@@ -152,7 +152,7 @@
   {% endif %}
 
   <form action="/do/edit_budget" method="post">
-    <input type="hidden" name="budget_date" value="{{ budget_date }}"/>
+    <input type="hidden" name="budget.GetStrDate()" value="{{ budget.GetStrDate() }}"/>
     <h5>Expenses</h5>
     {% for category in categories %}
       <label>

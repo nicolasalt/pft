@@ -61,6 +61,8 @@ class Budget(ndb.Model):
   expenses = ndb.StructuredProperty(ExpenseItem, repeated=True)
   income = ndb.StructuredProperty(IncomeItem, repeated=True)
 
+  DATE_FORMAT = '%m.%Y'
+
   def GetDateRange(self):
     month = self.date.month
     year = self.date.year
@@ -70,3 +72,14 @@ class Budget(ndb.Model):
     else:
       end = datetime(year, month + 1, 1)
     return start, end
+
+  @staticmethod
+  def DateToStr(date):
+    return date.strftime(Budget.DATE_FORMAT)
+
+  def GetStrDate(self):
+    return Budget.DateToStr(self.date)
+
+  @staticmethod
+  def ParseDate(str_date):
+    return datetime.strptime(str_date, Budget.DATE_FORMAT)

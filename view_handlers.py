@@ -25,9 +25,9 @@ class EditBudgetPage(CommonHandler):
     raw_budget_date = self.request.get('date')
     budget_date = datetime.now()
     if raw_budget_date:
-      budget_date = datetime.strptime(raw_budget_date, '%m.%Y')
+      budget_date = models.Budget.ParseDate(raw_budget_date)
 
-    budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'),
+    budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date),
                          parent=self.profile.key)
     budget = budget_key.get()
     if not budget:

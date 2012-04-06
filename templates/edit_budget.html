@@ -3,6 +3,8 @@
 {% block head %}
   <title>PFT: edit budget</title>
 
+  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
+
   <style type="text/css">
     .expense {
       color: #800000;
@@ -36,6 +38,24 @@
       font-size: 10px;
     }
   </style>
+
+  <script type="text/javascript">
+    // Init.
+
+    {% for transaction in transactions %}
+      pf.state.UpdateTransaction({
+        'id': {{ transaction.key.id() }},
+        'account_id': {{ transaction.account_id }},
+        'category_id': {{ transaction.category_id or 'null' }},
+        'dest_account_id': {{ transaction.dest_account_id or 'null' }},
+        'dest_category_id': {{ transaction.dest_category_id or 'null' }},
+        'amount': {{ transaction.amount }},
+        'date': '{{ transaction.date.strftime('%d.%m.%Y') }}',
+        'description': '{{ transaction.description or '' }}'
+      });
+    {% endfor %}
+
+  </script>
 {% endblock %}
 
 {% block content %}
@@ -51,7 +71,7 @@
         {% else %}
           {% set transaction_class = 'income' %}
         {% endif %}
-        <div class="transaction {{ transaction_class }}">
+        <div class="transaction {{ transaction_class }}" transaction_id="{{ transaction.key.id() }}">
           <div class="amount">{{ transaction.amount|abs }}</div>
           {% if transaction.description %}
             <span class="description">{{ transaction.description }}</span>
@@ -67,6 +87,26 @@
   <h4>Total:</h4>
   <div class="expense">{{ total_expenses }}</div>
   <div class="income">{{ total_income }}</div>
+
+  <div id="transaction-dialog" class="transaction_dialog">
+    <div id="transaction-dialog-datepicker"></div>
+    Amount:
+    <input id="transaction-dialog-amount" />
+    <br/>
+
+    <div id="transaction-dialog-categories">
+      {% for category in categories -%}
+        <input type="radio" name="radio" category_id='{{ category.key.id() }}'
+            id="transaction-dialog-category-{{ category.key.id() }}"
+        /><label for="transaction-dialog-category-{{ category.key.id() }}">
+          {{ category.name|escape }}
+        </label>
+      {%- endfor %}
+    </div>
+    <br/>
+    <textarea id="transaction-dialog-description" ></textarea>
+    <br/>
+  </div>
 
   <h3>Categories</h3>
   <ul>

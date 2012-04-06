@@ -9,3 +9,7 @@ form {
   display: inline-block;
   margin: 10px 0;
 }
+
+.transaction_dialog {
+  display: none;
+}

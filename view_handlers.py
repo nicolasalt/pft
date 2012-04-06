@@ -25,11 +25,13 @@ class EditBudgetPage(CommonHandler):
     raw_budget_date = self.request.get('date')
     budget_date = datetime.now()
     if raw_budget_date:
-      budget_date = datetime.strptime(raw_budget_date, '%m.%d.%Y')
+      budget_date = datetime.strptime(raw_budget_date, '%m.%Y')
 
     budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'),
                          parent=self.profile.key)
     budget = budget_key.get()
+    if not budget:
+      budget = models.Budget(parent=self.profile.key, date=budget_date)
 
     categories = lookup.GetAllCategories(self.profile)
     id_to_cat = dict([(cat.key.id(), cat) for cat in categories])

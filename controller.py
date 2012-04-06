@@ -15,6 +15,7 @@ app = webapp2.WSGIApplication([
     ('/do/add_account', action_handlers.DoAddAccount),
     ('/do/add_category', action_handlers.DoAddCategory),
     ('/do/add_transaction', action_handlers.DoAddTransaction),
+    ('/do/add_transactions_from_csv', action_handlers.DoAddTransactionsFromCsv),
     ('/do/edit_budget', action_handlers.DoEditBudget),
     ('/do/edit_profile', action_handlers.DoEditProfile)],
     debug=True)

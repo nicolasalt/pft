@@ -1,4 +1,6 @@
-import datetime
+import csv
+from datetime import datetime
+import io
 
 from google.appengine.ext import ndb
 from google.appengine.api import users
@@ -20,7 +22,7 @@ class DoAddTransaction(CommonHandler):
     amount = float(self.request.get('amount'))
     description = self.request.get('description')
     account_id = int(self.request.get('account_id'))
-    date = datetime.datetime.strptime(self.request.get('date'), '%m/%d/%Y')
+    date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
     raw_category_id = self.request.get('category_id')
     category_id = None
     if raw_category_id:
@@ -30,6 +32,28 @@ class DoAddTransaction(CommonHandler):
                           amount, date, category_id, description)
 
     self.redirect('/')
+
+
+class DoAddTransactionsFromCsv(CommonHandler):
+  def HandlePost(self):
+    account_id = int(self.request.get('account_id'))
+    raw_csv = self.request.get('csv')
+    schema = ['date', 'description', None, None, 'debit', 'credit']
+
+    for row in csv.DictReader(raw_csv.splitlines(), schema):
+      try:
+        date = datetime.strptime(row['date'], '%d.%m.%Y')
+        if row['debit'] or row['credit']:
+          if row['debit']:
+            amount = float(row['debit'])
+          else:
+            amount = -float(row['credit'])
+          update.AddTransaction(self.profile, account_id,
+                                amount, date, None, row['description'])
+      except ValueError:
+        pass
+
+#    self.redirect('/')
 
 
 class DoEditProfile(CommonHandler):
@@ -105,7 +129,7 @@ class DoAddCategory(CommonHandler):
 
 class DoEditBudget(CommonHandler):
   def HandlePost(self):
-    budget_date = datetime.datetime.strptime(
+    budget_date = datetime.strptime(
       self.request.get('budget_date'), '%m.%Y')
 
     category_id_and_amount = []

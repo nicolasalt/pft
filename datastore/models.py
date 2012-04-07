@@ -83,3 +83,17 @@ class Budget(ndb.Model):
   @staticmethod
   def ParseDate(str_date):
     return datetime.strptime(str_date, Budget.DATE_FORMAT)
+
+
+class ImportedFileTransaction(ndb.Model):
+  date = ndb.DateTimeProperty(required=True)
+  amount = ndb.FloatProperty(required=True)
+  description = ndb.StringProperty()
+
+
+class ImportedFile(ndb.Model):
+  account_id = ndb.IntegerProperty(required=True)
+  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  schema = ndb.StringProperty()
+  source_file = ndb.TextProperty()
+  parsed_transactions = ndb.StructuredProperty(ImportedFileTransaction, repeated=True)

@@ -7,6 +7,8 @@ import view_handlers
 app = webapp2.WSGIApplication([
     ('/', view_handlers.MainPage),
     ('/edit_budget', view_handlers.EditBudgetPage),
+    ('/import_from_file', view_handlers.ImportFromFilePage),
+    ('/edit_imported_file', view_handlers.EditImportedFilePage),
     ('/user_settings', view_handlers.EditProfile),
     ('/manage_profiles', view_handlers.ManageProfilesPage),
     ('/do/add_profile', action_handlers.DoAddProfile),

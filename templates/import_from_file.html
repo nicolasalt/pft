@@ -1,0 +1,35 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+  <h2>Import expenses and income from file</h2>
+
+  <form action="/do/add_transactions_from_csv" method="post" enctype="multipart/form-data">
+    <div>Account:
+      <select name="account_id">
+        {% for account in accounts %}
+          <option value="{{ account.key.id() }}">{{ account.name|escape }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <input type="file" name="csv" /><br>
+    <input type="submit" value="Submit" />
+  </form>
+
+  <h3>Edit previous imports</h3>
+
+  {% for imported_file in imported_files %}
+    <div>
+      <p>Date: {{ imported_file.date }}</p>
+{#      <table>#}
+{#        <th>#}
+{#          #}
+{#        </th>#}
+{#      </table>#}
+      <p>Schema: &quot;{{ imported_file.schema }}&quot;</p>
+      Header:
+      <p>
+        {{ imported_file.source_file }}
+      </p>
+    </div>
+  {% endfor %}
+{% endblock %}

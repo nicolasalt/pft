@@ -11,13 +11,34 @@ class MainPage(CommonHandler):
   def HandleGet(self):
 
     template_values = {
-        'profile': self.profile,
-        'accounts': lookup.GetAllAccounts(self.profile),
-        'transactions': lookup.GetAllTransactions(self.profile),
-        'categories': lookup.GetAllCategories(self.profile)
+      'accounts': lookup.GetAllAccounts(self.profile),
+      'transactions': lookup.GetAllTransactions(self.profile),
+      'categories': lookup.GetAllCategories(self.profile)
     }
 
     self.WriteToTemplate('templates/index.html', template_values)
+
+
+class ImportFromFilePage(CommonHandler):
+  def HandleGet(self):
+
+    template_values = {
+      'accounts': lookup.GetAllAccounts(self.profile),
+      'imported_files': lookup.GetImportedFiles(self.profile, 10)
+    }
+
+    self.WriteToTemplate('templates/import_from_file.html', template_values)
+
+
+class EditImportedFilePage(CommonHandler):
+  def HandleGet(self):
+    raw_imported_file_id = self.request.get('imported_file_id')
+    imported_file_id = None
+    if raw_imported_file_id:
+      imported_file_id = int(raw_imported_file_id)
+
+    if imported_file_id:
+      imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
 
 
 class EditBudgetPage(CommonHandler):
@@ -66,8 +87,6 @@ class EditBudgetPage(CommonHandler):
 
     template_values = {
       'categories': categories,
-      'budget_name': budget_date.strftime('%m.%Y'),
-      'budget_date': budget_date.strftime('%m.%Y'),
       'budget': budget,
       'transactions': transactions,
       'days': days,

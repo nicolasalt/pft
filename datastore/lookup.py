@@ -61,3 +61,13 @@ def GetAccountById(profile, account_id):
 
 def GetCategoryById(profile, category_id):
   return models.Category.get_by_id(category_id, parent=profile.key)
+
+
+def GetImportedFileById(profile, imported_file_id):
+  models.ImportedFile.get_by_id(imported_file_id, parent=profile.key)
+
+
+def GetImportedFiles(profile, limit):
+  query = models.ImportedFile.query(
+    ancestor=profile.key).order(-models.ImportedFile.date)
+  return query.fetch(limit)

@@ -38,7 +38,13 @@ class DoAddTransactionsFromCsv(CommonHandler):
   def HandlePost(self):
     account_id = int(self.request.get('account_id'))
     raw_csv = self.request.get('csv')
-    schema = ['date', 'description', None, None, 'debit', 'credit']
+    schema = ['date', 'description', '', '', 'debit', 'credit']
+
+    imported_file = models.ImportedFile(
+        parent=self.profile.key,
+        account_id=account_id)
+    imported_file.source_file = raw_csv
+    imported_file.schema = ','.join(schema)
 
     for row in csv.DictReader(raw_csv.splitlines(), schema):
       try:
@@ -48,12 +54,15 @@ class DoAddTransactionsFromCsv(CommonHandler):
             amount = float(row['debit'])
           else:
             amount = -float(row['credit'])
-          update.AddTransaction(self.profile, account_id,
-                                amount, date, None, row['description'])
+          imported_file.parsed_transactions.append(
+              models.ImportedFileTransaction(date=date, amount=amount,
+                                             description=row['description']))
       except ValueError:
         pass
 
-#    self.redirect('/')
+    imported_file.put()
+
+    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
 
 class DoEditProfile(CommonHandler):

@@ -17,19 +17,13 @@
 
   <h3>Edit previous imports</h3>
 
-  {% for imported_file in imported_files %}
-    <div>
-      <p>Date: {{ imported_file.date }}</p>
-{#      <table>#}
-{#        <th>#}
-{#          #}
-{#        </th>#}
-{#      </table>#}
-      <p>Schema: &quot;{{ imported_file.schema }}&quot;</p>
-      Header:
-      <p>
-        {{ imported_file.source_file }}
-      </p>
-    </div>
-  {% endfor %}
+  <ul>
+    {% for imported_file in imported_files %}
+      <li>
+        <a href="/edit_imported_file?id={{ imported_file.key.id() }}">
+          {{ imported_file.date }}
+        </a>
+      </li>
+    {% endfor %}
+  </ul>
 {% endblock %}

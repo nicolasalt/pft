@@ -1,0 +1,17 @@
+{% extends "templates/base.html" %}
+
+{% block content %}
+  <div>
+    <p>Date: {{ imported_file.date }}</p>
+{#      <table>#}
+{#        <th>#}
+{#          #}
+{#        </th>#}
+{#      </table>#}
+    <p>Schema: &quot;{{ imported_file.schema }}&quot;</p>
+    Header:
+    <p>
+      {{ imported_file.source_file }}
+    </p>
+  </div>
+{% endblock %}

@@ -64,7 +64,7 @@ def GetCategoryById(profile, category_id):
 
 
 def GetImportedFileById(profile, imported_file_id):
-  models.ImportedFile.get_by_id(imported_file_id, parent=profile.key)
+  return models.ImportedFile.get_by_id(imported_file_id, parent=profile.key)
 
 
 def GetImportedFiles(profile, limit):

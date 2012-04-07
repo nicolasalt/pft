@@ -28,6 +28,12 @@ indexes:
   - name: date
     direction: desc
 
+- kind: ImportedFile
+  ancestor: yes
+  properties:
+  - name: date
+    direction: desc
+
 - kind: Transaction
   ancestor: yes
   properties:

@@ -32,13 +32,14 @@ class ImportFromFilePage(CommonHandler):
 
 class EditImportedFilePage(CommonHandler):
   def HandleGet(self):
-    raw_imported_file_id = self.request.get('imported_file_id')
-    imported_file_id = None
-    if raw_imported_file_id:
-      imported_file_id = int(raw_imported_file_id)
+    imported_file_id = int(self.request.get('id'))
+    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
 
-    if imported_file_id:
-      imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
+    template_values = {
+      'imported_file': imported_file
+    }
+
+    self.WriteToTemplate('templates/edit_imported_file.html', template_values)
 
 
 class EditBudgetPage(CommonHandler):
@@ -99,7 +100,7 @@ class EditBudgetPage(CommonHandler):
 
 class EditProfile(CommonHandler):
   def HandleGet(self):
-    self.WriteToTemplate('templates/edit_profile.html', template_values)
+    self.WriteToTemplate('templates/edit_profile.html', {})
 
 
 class ManageProfilesPage(CommonHandler):

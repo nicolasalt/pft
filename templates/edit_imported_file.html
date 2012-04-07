@@ -19,6 +19,7 @@
 
   <div>
     <p>Date: {{ imported_file.date }}</p>
+
     {% if not imported_file.parsed %}
       <p>
         Select schema:
@@ -65,6 +66,16 @@
         <input type="hidden" name="id" value="{{ imported_file.key.id() }}">
         <input type="submit" value="Parse">
       </form>
+    {% else %}
+      <ul>
+        {% for transaction in imported_file.parsed_transactions %}
+          <li>
+            Date: {{ transaction.date }},
+            Amount: {{ transaction.amount }},
+            Description: {{ transaction.description }}
+          </li>
+        {% endfor %}
+      </ul>
     {% endif %}
   </div>
 {% endblock %}

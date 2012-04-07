@@ -1,11 +1,9 @@
-import csv
 from datetime import datetime
-import io
 
 from google.appengine.ext import ndb
-from google.appengine.api import users
 from common_handlers import CommonHandler
 from datastore import models, lookup, update
+import parse_csv
 
 
 class DoAddAccount(CommonHandler):
@@ -158,19 +156,13 @@ class DoAddTransactionsFromCsv(CommonHandler):
       account_id=account_id)
     imported_file.source_file = raw_csv
 
-    #    for row in csv.DictReader(raw_csv.splitlines(), schema):
-    #      try:
-    #        date = datetime.strptime(row['date'], '%d.%m.%Y')
-    #        if row['debit'] or row['credit']:
-    #          if row['debit']:
-    #            amount = float(row['debit'])
-    #          else:
-    #            amount = -float(row['credit'])
-    #          imported_file.parsed_transactions.append(
-    #              models.ImportedFileTransaction(date=date, amount=amount,
-    #                                             description=row['description']))
-    #      except ValueError:
-    #        pass
+    schemas = [s.schema for s in self.profile.parse_schemas]
+    schema, parsed_transactions = parse_csv.AutoDetectSchema(schemas, raw_csv)
+
+    if schema:
+      imported_file.parsed = True
+      imported_file.schema = schema
+      imported_file.parsed_transactions = parsed_transactions
 
     imported_file.put()
 
@@ -194,7 +186,9 @@ class DoMarkImportFileAsParsed(CommonHandler):
     import_file_id = int(self.request.get('id'))
 
     imported_file = lookup.GetImportedFileById(self.profile, import_file_id)
-#    imported_file.parsed = True
+    imported_file.parsed = True
+    imported_file.parsed_transactions = parse_csv.ParseCsv(
+        imported_file.schema, imported_file.source_file)
     imported_file.put()
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())

@@ -48,7 +48,7 @@
     // Init.
 
     {% for transaction in transactions %}
-      pf.state.UpdateTransaction({
+      pft.state.UpdateTransaction({
         'id': {{ transaction.key.id() }},
         'account_id': {{ transaction.account_id }},
         'category_id': {{ transaction.category_id or 'null' }},

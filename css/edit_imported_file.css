@@ -1,0 +1,60 @@
+.add_schema_input {
+  width: 500px;
+}
+.preview_table {
+  border-collapse: collapse;
+}
+.preview_table td {
+  border: 1px solid #eee;
+  padding: 3px;
+}
+.preview_table tr:first-of-type {
+  font-weight: bold;
+}
+
+table.imported_transactions {
+  table-layout: fixed;
+}
+.imported_transaction td {
+  height: 20px;
+  border-top: 1px solid #eee;
+  vertical-align: top;
+  padding: 0 5px;
+  color: #666;
+}
+.imported_transaction .date_cell {
+  width: 100px;
+}
+.imported_transaction .description_cell {
+  width: 400px;
+}
+.imported_transaction .amount_cell.credit {
+  color: #008000;
+}
+.imported_transaction .amount_cell.debit {
+  color: #800000;
+}
+.imported_transaction .category {
+  display: inline-block;
+  margin: 0 5px 0 0;
+}
+.imported_transaction .category.selected {
+  color: black;
+  text-decoration: none;
+}
+.imported_transaction .cancel_button {
+  display: none;
+}
+
+.imported_transaction.processed {
+  opacity: 0.25;
+}
+.imported_transaction.processed .category {
+  display: none;
+}
+.imported_transaction.processed .category.selected {
+  display: inline-block;
+}
+.imported_transaction.processed:hover .cancel_button {
+  display: inline-block;
+}

@@ -1,7 +1,7 @@
-pf.transactionDialog = {};
+pft.transactionDialog = {};
 
-pf.transactionDialog.open = function(transaction_id) {
-  var transaction = pf.state.GetTransaction(transaction_id);
+pft.transactionDialog.open = function(transaction_id) {
+  var transaction = pft.state.GetTransaction(transaction_id);
   if (!transaction) return;
 
   $('#transaction-dialog-description').val(transaction['description']);
@@ -34,6 +34,6 @@ $(function() {
 
 
   $('[transaction_id]').live('click', function() {
-    pf.transactionDialog.open($(this).attr('transaction_id'));
+    pft.transactionDialog.open($(this).attr('transaction_id'));
   });
 });

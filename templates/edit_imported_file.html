@@ -1,45 +1,27 @@
 {% extends "templates/base.html" %}
 
+{% block head %}
+  <title>PFT: process imported file</title>
+
+
+  <link type="text/css" rel="stylesheet" href="/css/edit_imported_file.css" />
+
+  <script type="text/javascript" src="/js/edit_imported_file.js"></script>
+
+  <script type="text/javascript">
+    // Init.
+
+    {% for category in categories %}
+      pft.state.UpdateCategory({
+          'id': {{ loop.index0 }},
+          'name': '{{ category.name }}'
+      });
+    {% endfor %}
+
+  </script>
+{% endblock %}
+
 {% block content %}
-  <style>
-    .add_schema_input {
-      width: 500px;
-    }
-    .preview_table {
-      border-collapse: collapse;
-    }
-    .preview_table td {
-      border: 1px solid #eee;
-      padding: 3px;
-    }
-    .preview_table tr:first-of-type {
-      font-weight: bold;
-    }
-
-    table.imported_transactions {
-      table-layout: fixed;
-    }
-    .imported_transaction td {
-      height: 20px;
-      border-top: 1px solid #eee;
-      vertical-align: top;
-      padding: 0 5px;
-    }
-    .imported_transaction .date_cell {
-      color: #999;
-      width: 100px;
-    }
-    .imported_transaction .description_cell {
-      width: 400px;
-    }
-    .imported_transaction .amount_cell.credit {
-      color: #008000;
-    }
-    .imported_transaction .amount_cell.debit {
-      color: #800000;
-    }
-  </style>
-
   <div>
     <p>Date: {{ imported_file.date }}</p>
 
@@ -105,6 +87,8 @@
             {% else %}
               <td class="amount_cell debit">{{ transaction.amount }}</td>
             {% endif %}
+            <td parsed_transaction_index={{ loop.index0 }}>
+            </td>
           </tr>
         {% endfor %}
       </table>

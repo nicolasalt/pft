@@ -15,6 +15,29 @@
     .preview_table tr:first-of-type {
       font-weight: bold;
     }
+
+    table.imported_transactions {
+      table-layout: fixed;
+    }
+    .imported_transaction td {
+      height: 20px;
+      border-top: 1px solid #eee;
+      vertical-align: top;
+      padding: 0 5px;
+    }
+    .imported_transaction .date_cell {
+      color: #999;
+      width: 100px;
+    }
+    .imported_transaction .description_cell {
+      width: 200px;
+    }
+    .imported_transaction .amount_cell.credit {
+      color: #008000;
+    }
+    .imported_transaction .amount_cell.debit {
+      color: #800000;
+    }
   </style>
 
   <div>
@@ -67,15 +90,25 @@
         <input type="submit" value="Parse">
       </form>
     {% else %}
-      <ul>
+
+      <table class="imported_transactions" cellpadding="0" cellspacing="0">
         {% for transaction in imported_file.parsed_transactions %}
-          <li>
-            Date: {{ transaction.date }},
-            Amount: {{ transaction.amount }},
-            Description: {{ transaction.description }}
-          </li>
+          <tr class="imported_transaction">
+            <td class="date_cell">
+              {{ transaction.date.strftime('%a, %d %b') }}
+            </td>
+            <td class="description_cell">
+              {{ transaction.description }}
+            </td>
+            {% if transaction.amount < 0 %}
+              <td class="amount_cell credit">{{ transaction.amount|abs }}</td>
+            {% else %}
+              <td class="amount_cell debit">{{ transaction.amount }}</td>
+            {% endif %}
+          </tr>
         {% endfor %}
-      </ul>
+      </table>
+
     {% endif %}
   </div>
 {% endblock %}

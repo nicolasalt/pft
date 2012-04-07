@@ -154,6 +154,11 @@ class DoAddTransactionsFromCsv(CommonHandler):
     imported_file = models.ImportedFile(
       parent=self.profile.key,
       account_id=account_id)
+    try:
+      raw_csv.decode('utf-8')
+    except UnicodeDecodeError:
+      raw_csv = raw_csv.decode('cp1252').encode('utf-8')
+
     imported_file.source_file = raw_csv
 
     schemas = [s.schema for s in self.profile.parse_schemas]

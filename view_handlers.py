@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from common_handlers import CommonHandler
 from datastore import models, lookup
 import budget_util
+import parse_csv
 
 class MainPage(CommonHandler):
   def HandleGet(self):
@@ -33,18 +34,18 @@ class ImportFromFilePage(CommonHandler):
 
 class EditImportedFilePage(CommonHandler):
   def HandleGet(self):
+
     imported_file_id = int(self.request.get('id'))
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
 
-    formatted_parsed_lines = []
-    for row in csv.reader([imported_file.schema] +
-                          imported_file.source_file.splitlines()):
-      formatted_parsed_lines.append(row)
-
+    source_file_lines = imported_file.source_file.splitlines()
+    if imported_file.schema:
+      source_file_lines = [imported_file.schema] + source_file_lines
 
     template_values = {
       'imported_file': imported_file,
-      'formatted_parsed_lines': formatted_parsed_lines[:13]
+      'formatted_parsed_lines':
+        parse_csv.ParseCsvToPreview(source_file_lines)[:13]
     }
 
     self.WriteToTemplate('templates/edit_imported_file.html', template_values)

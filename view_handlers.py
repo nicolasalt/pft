@@ -26,7 +26,8 @@ class ImportFromFilePage(CommonHandler):
 
     template_values = {
       'accounts': lookup.GetAllAccounts(self.profile),
-      'imported_files': lookup.GetImportedFiles(self.profile, 10)
+      'imported_file_descriptions':
+          lookup.GetOrCreateImportedFileList(self.profile).imported_files
     }
 
     self.WriteToTemplate('templates/import_from_file.html', template_values)

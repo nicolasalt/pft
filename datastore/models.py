@@ -105,3 +105,14 @@ class ImportedFile(ndb.Model):
   parsed = ndb.BooleanProperty(default=False)
   parsed_transactions = ndb.StructuredProperty(ImportedFileTransaction,
                                                repeated=True, indexed=False)
+
+
+class ImportedFileDescription(ndb.Model):
+  imported_file_id = ndb.IntegerProperty(required=True)
+  date = ndb.DateTimeProperty(required=True)
+
+
+# Single per user
+class ImportedFileList(ndb.Model):
+  imported_files = ndb.StructuredProperty(ImportedFileDescription,
+                                          repeated=True)

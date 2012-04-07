@@ -157,7 +157,7 @@ class DoAddTransactionsFromCsv(CommonHandler):
     try:
       raw_csv.decode('utf-8')
     except UnicodeDecodeError:
-      raw_csv = raw_csv.decode('cp1252').encode('utf-8')
+      raw_csv = raw_csv.decode('cp1252')
 
     imported_file.source_file = raw_csv
 
@@ -170,6 +170,12 @@ class DoAddTransactionsFromCsv(CommonHandler):
       imported_file.parsed_transactions = parsed_transactions
 
     imported_file.put()
+
+    imported_file_list = lookup.GetOrCreateImportedFileList(self.profile)
+    imported_file_list.imported_files.append(models.ImportedFileDescription(
+        imported_file_id=imported_file.key.id(),
+        date=imported_file.date))
+    imported_file_list.put()
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 

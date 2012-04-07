@@ -53,8 +53,6 @@ def ParseCsv(raw_schema, raw_csv):
 
 def AutoDetectSchema(schemas, raw_csv):
   for schema in schemas:
-
-
     parsed_transactions = ParseCsv(schema, raw_csv)
     if len(parsed_transactions) >= 2:
       return schema, parsed_transactions

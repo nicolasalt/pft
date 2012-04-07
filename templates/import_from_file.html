@@ -18,10 +18,10 @@
   <h3>Edit previous imports</h3>
 
   <ul>
-    {% for imported_file in imported_files %}
+    {% for imported_file_description in imported_file_descriptions %}
       <li>
-        <a href="/edit_imported_file?id={{ imported_file.key.id() }}">
-          {{ imported_file.date }}
+        <a href="/edit_imported_file?id={{ imported_file_description.imported_file_id }}">
+          {{ imported_file_description.date }}
         </a>
       </li>
     {% endfor %}

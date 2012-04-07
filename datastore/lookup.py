@@ -67,7 +67,10 @@ def GetImportedFileById(profile, imported_file_id):
   return models.ImportedFile.get_by_id(imported_file_id, parent=profile.key)
 
 
-def GetImportedFiles(profile, limit):
-  query = models.ImportedFile.query(
-    ancestor=profile.key).order(-models.ImportedFile.date)
-  return query.fetch(limit)
+def GetOrCreateImportedFileList(profile):
+  imported_file_list = models.ImportedFileList.get_by_id(
+      'imported_file_list', parent=profile.key)
+  if not imported_file_list:
+    imported_file_list = models.ImportedFileList(
+        id='imported_file_list', parent=profile.key)
+  return imported_file_list

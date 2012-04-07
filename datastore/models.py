@@ -12,6 +12,11 @@ class User(ndb.Model):
     return ndb.Key(User, user_id)
 
 
+class ParseSchema(ndb.Model):
+  name = ndb.StringProperty(required=True)
+  schema = ndb.StringProperty(required=True)
+
+
 # TODO: add accounts and categories to the profile model as structured
 # properties.
 class Profile(ndb.Model):
@@ -20,6 +25,7 @@ class Profile(ndb.Model):
   users = ndb.UserProperty(repeated=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   main_currency = ndb.StringProperty(default='$')
+  parse_schemas = ndb.StructuredProperty(ParseSchema, repeated=True, indexed=False)
 
 
 class Account(ndb.Model):
@@ -96,4 +102,6 @@ class ImportedFile(ndb.Model):
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   schema = ndb.StringProperty()
   source_file = ndb.TextProperty()
-  parsed_transactions = ndb.StructuredProperty(ImportedFileTransaction, repeated=True)
+  parsed = ndb.BooleanProperty(default=False)
+  parsed_transactions = ndb.StructuredProperty(ImportedFileTransaction,
+                                               repeated=True, indexed=False)

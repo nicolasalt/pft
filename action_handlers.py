@@ -34,37 +34,6 @@ class DoAddTransaction(CommonHandler):
     self.redirect('/')
 
 
-class DoAddTransactionsFromCsv(CommonHandler):
-  def HandlePost(self):
-    account_id = int(self.request.get('account_id'))
-    raw_csv = self.request.get('csv')
-    schema = ['date', 'description', '', '', 'debit', 'credit']
-
-    imported_file = models.ImportedFile(
-        parent=self.profile.key,
-        account_id=account_id)
-    imported_file.source_file = raw_csv
-    imported_file.schema = ','.join(schema)
-
-    for row in csv.DictReader(raw_csv.splitlines(), schema):
-      try:
-        date = datetime.strptime(row['date'], '%d.%m.%Y')
-        if row['debit'] or row['credit']:
-          if row['debit']:
-            amount = float(row['debit'])
-          else:
-            amount = -float(row['credit'])
-          imported_file.parsed_transactions.append(
-              models.ImportedFileTransaction(date=date, amount=amount,
-                                             description=row['description']))
-      except ValueError:
-        pass
-
-    imported_file.put()
-
-    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
-
-
 class DoEditProfile(CommonHandler):
   def HandlePost(self):
     main_currency = self.request.get('main_currency')
@@ -164,3 +133,68 @@ class DoEditBudget(CommonHandler):
     budget.put()
 
     self.redirect('/edit_budget')
+
+
+class DoAddParseSchema(CommonHandler):
+  def HandlePost(self):
+    name = self.request.get('name')
+    schema = self.request.get('schema')
+
+    self.profile.parse_schemas.append(
+      models.ParseSchema(name=name, schema=schema))
+    self.profile.put()
+
+    # TODO: redirect to a correct url
+    self.redirect('/')
+
+
+class DoAddTransactionsFromCsv(CommonHandler):
+  def HandlePost(self):
+    account_id = int(self.request.get('account_id'))
+    raw_csv = self.request.get('csv')
+
+    imported_file = models.ImportedFile(
+      parent=self.profile.key,
+      account_id=account_id)
+    imported_file.source_file = raw_csv
+
+    #    for row in csv.DictReader(raw_csv.splitlines(), schema):
+    #      try:
+    #        date = datetime.strptime(row['date'], '%d.%m.%Y')
+    #        if row['debit'] or row['credit']:
+    #          if row['debit']:
+    #            amount = float(row['debit'])
+    #          else:
+    #            amount = -float(row['credit'])
+    #          imported_file.parsed_transactions.append(
+    #              models.ImportedFileTransaction(date=date, amount=amount,
+    #                                             description=row['description']))
+    #      except ValueError:
+    #        pass
+
+    imported_file.put()
+
+    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
+
+
+class DoApplyParseSchemaToImportFile(CommonHandler):
+  def HandlePost(self):
+    import_file_id = int(self.request.get('id'))
+    schema = self.request.get('schema')
+
+    imported_file = lookup.GetImportedFileById(self.profile, import_file_id)
+    imported_file.schema = schema
+    imported_file.put()
+
+    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
+
+
+class DoMarkImportFileAsParsed(CommonHandler):
+  def HandlePost(self):
+    import_file_id = int(self.request.get('id'))
+
+    imported_file = lookup.GetImportedFileById(self.profile, import_file_id)
+#    imported_file.parsed = True
+    imported_file.put()
+
+    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())

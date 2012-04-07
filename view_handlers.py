@@ -1,4 +1,5 @@
 import calendar
+import csv
 from datetime import datetime
 from google.appengine.api import users
 from google.appengine.ext import ndb
@@ -35,8 +36,15 @@ class EditImportedFilePage(CommonHandler):
     imported_file_id = int(self.request.get('id'))
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
 
+    formatted_parsed_lines = []
+    for row in csv.reader([imported_file.schema] +
+                          imported_file.source_file.splitlines()):
+      formatted_parsed_lines.append(row)
+
+
     template_values = {
-      'imported_file': imported_file
+      'imported_file': imported_file,
+      'formatted_parsed_lines': formatted_parsed_lines[:13]
     }
 
     self.WriteToTemplate('templates/edit_imported_file.html', template_values)

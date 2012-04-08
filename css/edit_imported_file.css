@@ -38,6 +38,11 @@ table.imported_transactions {
   display: inline-block;
   margin: 0 5px 0 0;
 }
+.imported_transaction .drop_button {
+  margin-left: 10px;
+  padding-left: 10px;
+  border-left: 1px solid #ccc;
+}
 .imported_transaction .category.selected {
   color: black;
   text-decoration: none;

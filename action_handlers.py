@@ -212,15 +212,19 @@ class DoResolveParsedTransaction(CommonHandler):
   def HandlePost(self):
     imported_file_id = int(self.request.get('imported_file_id'))
     transaction_index = int(self.request.get('transaction_index'))
-    category_id = int(self.request.get('category_id'))
+    category_id = None
+    if self.request.get('category_id'):
+      category_id = int(self.request.get('category_id'))
+    drop = self.request.get('drop') == '1'
 
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     parsed_transaction = imported_file.parsed_transactions[transaction_index]
     imported_file.parsed_transactions[transaction_index].resolved = True
     imported_file.put()
 
-    update.AddTransaction(self.profile, imported_file.account_id,
-                          parsed_transaction.amount, parsed_transaction.date,
-                          category_id, parsed_transaction.description)
+    if not drop:
+      update.AddTransaction(self.profile, imported_file.account_id,
+                            parsed_transaction.amount, parsed_transaction.date,
+                            category_id, parsed_transaction.description)
 
     self.response.set_status(200)

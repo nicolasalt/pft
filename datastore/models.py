@@ -95,6 +95,7 @@ class ImportedFileTransaction(ndb.Model):
   date = ndb.DateTimeProperty(required=True)
   amount = ndb.FloatProperty(required=True)
   description = ndb.StringProperty()
+  resolved = ndb.BooleanProperty(default=False)
 
 
 class ImportedFile(ndb.Model):

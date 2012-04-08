@@ -46,6 +46,7 @@ class EditImportedFilePage(CommonHandler):
     template_values = {
       'imported_file': imported_file,
       'categories': lookup.GetAllCategories(self.profile),
+      'account': lookup.GetAccountById(self.profile, imported_file.account_id),
       'formatted_parsed_lines':
         parse_csv.ParseCsvToPreview(source_file_lines)[:13]
     }

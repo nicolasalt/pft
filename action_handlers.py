@@ -180,26 +180,46 @@ class DoAddTransactionsFromCsv(CommonHandler):
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
 
-class DoApplyParseSchemaToImportFile(CommonHandler):
+class DoApplyParseSchemaToImportedFile(CommonHandler):
   def HandlePost(self):
-    import_file_id = int(self.request.get('id'))
+    imported_file_id = int(self.request.get('id'))
     schema = self.request.get('schema')
 
-    imported_file = lookup.GetImportedFileById(self.profile, import_file_id)
+    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     imported_file.schema = schema
     imported_file.put()
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
 
-class DoMarkImportFileAsParsed(CommonHandler):
+class DoMarkImportedFileAsParsed(CommonHandler):
   def HandlePost(self):
-    import_file_id = int(self.request.get('id'))
+    imported_file_id = int(self.request.get('id'))
 
-    imported_file = lookup.GetImportedFileById(self.profile, import_file_id)
+    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     imported_file.parsed = True
     imported_file.parsed_transactions = parse_csv.ParseCsv(
         imported_file.schema, imported_file.source_file)
+    # For future performance
+    imported_file.source_file = None
     imported_file.put()
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
+
+
+class DoResolveParsedTransaction(CommonHandler):
+  def HandlePost(self):
+    imported_file_id = int(self.request.get('imported_file_id'))
+    transaction_index = int(self.request.get('transaction_index'))
+    category_id = int(self.request.get('category_id'))
+
+    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
+    parsed_transaction = imported_file.parsed_transactions[transaction_index]
+    imported_file.parsed_transactions[transaction_index].resolved = True
+    imported_file.put()
+
+    update.AddTransaction(self.profile, imported_file.account_id,
+                          parsed_transaction.amount, parsed_transaction.date,
+                          category_id, parsed_transaction.description)
+
+    self.response.set_status(200)

@@ -168,6 +168,7 @@ class DoAddTransactionsFromCsv(CommonHandler):
       imported_file.parsed = True
       imported_file.schema = schema
       imported_file.parsed_transactions = parsed_transactions
+      imported_file.source_file = None
 
     imported_file.put()
 

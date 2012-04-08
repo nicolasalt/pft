@@ -39,17 +39,18 @@ class EditImportedFilePage(CommonHandler):
     imported_file_id = int(self.request.get('id'))
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
 
-    source_file_lines = imported_file.source_file.splitlines()
-    if imported_file.schema:
-      source_file_lines = [imported_file.schema] + source_file_lines
 
     template_values = {
       'imported_file': imported_file,
       'categories': lookup.GetAllCategories(self.profile),
-      'account': lookup.GetAccountById(self.profile, imported_file.account_id),
-      'formatted_parsed_lines':
-        parse_csv.ParseCsvToPreview(source_file_lines)[:13]
+      'account': lookup.GetAccountById(self.profile, imported_file.account_id)
     }
+    if imported_file.source_file:
+      source_file_lines = imported_file.source_file.splitlines()
+      if imported_file.schema:
+        source_file_lines = [imported_file.schema] + source_file_lines
+      template_values['formatted_parsed_lines'] = parse_csv.ParseCsvToPreview(
+          source_file_lines)[:13]
 
     self.WriteToTemplate('templates/edit_imported_file.html', template_values)
 

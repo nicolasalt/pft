@@ -25,7 +25,7 @@ class Profile(ndb.Model):
   users = ndb.UserProperty(repeated=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   main_currency = ndb.StringProperty(default='$')
-  parse_schemas = ndb.StructuredProperty(ParseSchema, repeated=True, indexed=False)
+  parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
 
 
 class Account(ndb.Model):
@@ -64,8 +64,8 @@ class IncomeItem(ndb.Model):
 
 class Budget(ndb.Model):
   date = ndb.DateTimeProperty(required=True)
-  expenses = ndb.StructuredProperty(ExpenseItem, repeated=True)
-  income = ndb.StructuredProperty(IncomeItem, repeated=True)
+  expenses = ndb.LocalStructuredProperty(ExpenseItem, repeated=True)
+  income = ndb.LocalStructuredProperty(IncomeItem, repeated=True)
 
   DATE_FORMAT = '%m.%Y'
 
@@ -104,8 +104,8 @@ class ImportedFile(ndb.Model):
   schema = ndb.StringProperty()
   source_file = ndb.TextProperty()
   parsed = ndb.BooleanProperty(default=False)
-  parsed_transactions = ndb.StructuredProperty(ImportedFileTransaction,
-                                               repeated=True, indexed=False)
+  parsed_transactions = ndb.LocalStructuredProperty(
+      ImportedFileTransaction, repeated=True)
 
 
 class ImportedFileDescription(ndb.Model):
@@ -115,5 +115,5 @@ class ImportedFileDescription(ndb.Model):
 
 # Single per user
 class ImportedFileList(ndb.Model):
-  imported_files = ndb.StructuredProperty(ImportedFileDescription,
-                                          repeated=True)
+  imported_files = ndb.LocalStructuredProperty(
+      ImportedFileDescription, repeated=True)

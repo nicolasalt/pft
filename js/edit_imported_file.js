@@ -8,15 +8,14 @@ pft.ParsedTransactionProcessor = function(element, transactionIndex) {
   this.transaction_ = pft.state.GetImportedTransaction(transactionIndex);
 
   this.selectors_ = [];
-  this.createSelector_(null, 'No category');
-  for (var catId in pft.state.GetCategories()) {
-    var category = pft.state.GetCategory(catId);
-    this.createSelector_(catId, category['name']);
-  }
+  var me = this;
+  pft.state.GetCategoriesArray().forEach(function(category){
+    me.createSelector_(category);
+  });
 
   this.dropTransactionSelector_ = $('<a/>').attr('href', 'javascript:void(0)').
       addClass('selector drop_button').text('Drop');
-  this.dropTransactionSelector_.click(this.handleCategoryClicked.bind(
+  this.dropTransactionSelector_.click(this.handleCategoryClicked_.bind(
       this, null, this.dropTransactionSelector_, true));
   this.element_.append(this.dropTransactionSelector_);
 
@@ -26,7 +25,10 @@ pft.ParsedTransactionProcessor = function(element, transactionIndex) {
       this.handleSplitButtonClicked_.bind(this));
   this.element_.append(this.splitTransactionSelector_);
 
-  this.cancelButton_ = $('<a/>').attr('href', 'javascript:void()').
+  this.processedView_ = $('<div/>').addClass('processed_view');
+  this.element_.append(this.processedView_);
+
+  this.cancelButton_ = $('<a/>').attr('href', 'javascript:void(0)').
       addClass('cancel_button').text('Change');
   this.cancelButton_.click(this.handleCancelButtonClicked.bind(this));
   this.element_.append(this.cancelButton_);
@@ -40,7 +42,7 @@ pft.ParsedTransactionProcessor.prototype.handleSplitPerformed_ =
     function(transactionIndex, catToAmount) {
   if (this.transactionIndex_ != transactionIndex) return;
 
-  alert(transactionIndex + '' + JSON.stringify(catToAmount));
+  this.processTransaction_(catToAmount, false);
 };
 
 
@@ -52,11 +54,11 @@ pft.ParsedTransactionProcessor.prototype.handleSplitButtonClicked_ =
 
 
 pft.ParsedTransactionProcessor.prototype.createSelector_ =
-    function(catId, catName) {
+    function(category) {
   var categorySelector = $('<a/>').attr('href', 'javascript:void(0)').
-      addClass('selector').text(catName);
-  categorySelector.click(this.handleCategoryClicked.bind(
-      this, catId, categorySelector, false));
+      addClass('selector').text(category['name']);
+  categorySelector.click(this.handleCategoryClicked_.bind(
+      this, category['id'], false));
   this.element_.append(categorySelector);
   this.selectors_.push(categorySelector);
 };
@@ -65,14 +67,42 @@ pft.ParsedTransactionProcessor.prototype.createSelector_ =
 pft.ParsedTransactionProcessor.IMPORTED_FILE_ID = null;
 
 
-pft.ParsedTransactionProcessor.prototype.handleCategoryClicked =
-    function(catId, selector, drop) {
+pft.ParsedTransactionProcessor.prototype.handleCategoryClicked_ =
+    function(catId, drop) {
+  var catToAmount = {};
+  catToAmount[catId || ''] = this.transaction_['amount'];
+  this.processTransaction_(catToAmount, drop);
+};
+
+
+pft.ParsedTransactionProcessor.prototype.processTransaction_ =
+    function(catToAmount, drop) {
   this.element_.parent().addClass('processed');
-  selector.addClass('selected');
+  this.processedView_.empty();
+
+  var categoriesToSend = [];
+  var amountsToSend = [];
+  var showAmounts = Object.keys(catToAmount).length > 1;
+  for (var catId in catToAmount) {
+    var categoryText = $('<span/>').addClass('category').
+        text(pft.state.GetCategory(catId)['name']);
+    var amountText = $('<span/>').text(catToAmount[catId]);
+    var plusSign = $('<span/>').addClass('plus_sign').text('+');
+    if (showAmounts) {
+      this.processedView_.append(amountText);
+    }
+    this.processedView_.append(categoryText).append(plusSign);
+
+
+    categoriesToSend.push(catId);
+    amountsToSend.push(catToAmount[catId]);
+  }
+
   var data = {
     'imported_file_id': pft.ParsedTransactionProcessor.IMPORTED_FILE_ID,
     'transaction_index': this.transactionIndex_,
-    'category_id': catId || ''};
+    'categories': categoriesToSend.join(','),
+    'amounts': amountsToSend.join(',')};
   if (drop) {
     data['drop'] = '1';
   }
@@ -101,12 +131,12 @@ $(function() {
 pft.SplitTransactionDialog = function() {
   this.element_ = $('#split-transaction-dialog');
 
+  var me = this;
+
   this.categoryElements_ = [];
-  this.createCategoryElement_(null, 'No category');
-  for (var catId in pft.state.GetCategories()) {
-    var category = pft.state.GetCategory(catId);
-    this.createCategoryElement_(catId, category['name']);
-  }
+  pft.state.GetCategoriesArray().forEach(function(category){
+    me.createCategoryElement_(category);
+  });
 
   var totalAmountDiv = $('<div/>').addClass('total_amount');
   totalAmountDiv.append(
@@ -118,15 +148,12 @@ pft.SplitTransactionDialog = function() {
   this.errorDiv_ = $('<div/>').addClass('error');
   this.element_.append(this.errorDiv_);
 
-  var me = this;
   this.element_.dialog({
     autoOpen: false,
     resizable: false,
     title: 'Split expense',
     buttons: {
-      'Ok': function() {
-        me.reportTransactionSplit_();
-      },
+      'Ok': this.reportTransactionSplit_.bind(this),
       'Cancel': function() {
         $(this).dialog('close');
       }
@@ -150,18 +177,28 @@ pft.SplitTransactionDialog.prototype.showErrorMessage_ = function(message) {
 
 
 pft.SplitTransactionDialog.prototype.createCategoryElement_ =
-    function(catId, catName) {
+    function(category) {
   var categoryElement = $('<div/>').addClass('category_splitter');
 
-  var label = $('<span/>').addClass('category first_column').append(catName);
+  var label = $('<span/>').addClass('category first_column').
+      append(category['name']);
   categoryElement.append(label);
 
   var amountInput = $('<input/>').addClass('amount').
-      attr('category_id', catId || '').attr('placeholder', 'None');
+      attr('category_id', category['id'] || '').attr('placeholder', 'None');
+  amountInput.keydown(this.handleAmountInputKeyDown_.bind(this));
   categoryElement.append(amountInput);
 
   this.element_.append(categoryElement);
   this.categoryElements_.push(categoryElement);
+};
+
+
+pft.SplitTransactionDialog.prototype.handleAmountInputKeyDown_ =
+    function(event) {
+  if (event.which == 13) {
+    this.reportTransactionSplit_();
+  }
 };
 
 
@@ -209,6 +246,9 @@ pft.SplitTransactionDialog.prototype.open = function(transactionIndex, amount) {
   this.amount_ = amount;
   this.transactionIndex_ = transactionIndex;
   this.totalAmount_.text(amount);
+  this.element_.find('[category_id]').val('');
+  this.errorDiv_.empty();
+
   this.element_.dialog('open');
 };
 

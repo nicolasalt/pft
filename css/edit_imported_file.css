@@ -48,6 +48,16 @@ table.imported_transactions {
 .imported_transaction .cancel_button {
   display: none;
 }
+.imported_transaction .processed_view {
+  display: none;
+}
+.imported_transaction .processed_view span {
+  display: inline-block;
+  padding-right: 5px;
+}
+.imported_transaction .processed_view .plus_sign:last-of-type {
+  display: none;
+}
 
 .imported_transaction.processed {
   opacity: 0.25;
@@ -55,7 +65,7 @@ table.imported_transactions {
 .imported_transaction.processed .selector {
   display: none;
 }
-.imported_transaction.processed .selector.selected {
+.imported_transaction.processed .processed_view {
   display: inline-block;
 }
 .imported_transaction.processed:hover .cancel_button {

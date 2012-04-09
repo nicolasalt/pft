@@ -210,11 +210,18 @@ class DoMarkImportedFileAsParsed(CommonHandler):
 
 class DoResolveParsedTransaction(CommonHandler):
   def HandlePost(self):
+    def _AddTransaction(cat_id, amount):
+      update.AddTransaction(self.profile, imported_file.account_id,
+                            amount, parsed_transaction.date,
+                            cat_id, parsed_transaction.description)
+
+
     imported_file_id = int(self.request.get('imported_file_id'))
     transaction_index = int(self.request.get('transaction_index'))
-    category_id = None
-    if self.request.get('category_id'):
-      category_id = int(self.request.get('category_id'))
+    category_ids = [int(raw_cat_id) if raw_cat_id else None
+      for raw_cat_id in self.request.get('categories').split(',')]
+    amounts = [int(raw_amount) if raw_amount else None
+      for raw_amount in self.request.get('amounts').split(',')]
     drop = self.request.get('drop') == '1'
 
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
@@ -223,8 +230,10 @@ class DoResolveParsedTransaction(CommonHandler):
     imported_file.put()
 
     if not drop:
-      update.AddTransaction(self.profile, imported_file.account_id,
-                            parsed_transaction.amount, parsed_transaction.date,
-                            category_id, parsed_transaction.description)
+      if len(category_ids) == 1:
+        _AddTransaction(category_ids[0], parsed_transaction.amount)
+      else:
+        for cat_id, amount in zip(category_ids, amounts):
+          _AddTransaction(cat_id, amount)
 
     self.response.set_status(200)

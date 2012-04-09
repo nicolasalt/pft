@@ -43,6 +43,18 @@ pft.state.GetCategories = function() {
   return pft.state.State['categories'];
 };
 
+// For ordered lists. First item is 'No category'.
+pft.state.GetCategoriesArray = function() {
+  var result = [];
+  result.push(pft.state.GetCategory(''));
+  for (var catId in pft.state.GetCategories()) {
+    if (catId) {
+      result.push(pft.state.GetCategory(catId));
+    }
+  }
+  return result;
+};
+
 
 pft.state.UpdateImportedTransaction = function(importedTransaction) {
   pft.state.UpdateEntity(importedTransaction, 'imported_transactions');
@@ -51,3 +63,11 @@ pft.state.UpdateImportedTransaction = function(importedTransaction) {
 pft.state.GetImportedTransaction = function(transactionId) {
   return pft.state.GetEntity(transactionId, 'imported_transactions');
 };
+
+
+$(function() {
+  // Adding empty category.
+  pft.state.UpdateCategory({
+    'id': '',
+    'name': 'No category'});
+});

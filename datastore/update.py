@@ -43,6 +43,7 @@ def AddTransaction(profile, account_id, amount, date, category_id,
     dest_category.put()
 
   transaction.put()
+  return transaction
 
 
 def UpdateProfile(profile, **kw):

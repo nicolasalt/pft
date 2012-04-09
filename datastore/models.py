@@ -92,10 +92,17 @@ class Budget(ndb.Model):
 
 
 class ImportedFileTransaction(ndb.Model):
+  class ResolvedTransaction(ndb.Model):
+    transaction_id = ndb.IntegerProperty(required=True)
+    amount = ndb.FloatProperty(required=True)
+    category_id = ndb.IntegerProperty()
+    description = ndb.StringProperty()
+
   date = ndb.DateTimeProperty(required=True)
   amount = ndb.FloatProperty(required=True)
   description = ndb.StringProperty()
-  resolved = ndb.BooleanProperty(default=False)
+  resolutions = ndb.LocalStructuredProperty(ResolvedTransaction, repeated=True)
+  dropped = ndb.BooleanProperty(default=False)
 
 
 class ImportedFile(ndb.Model):

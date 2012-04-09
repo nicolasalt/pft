@@ -18,16 +18,11 @@
       });
     {% endfor %}
 
-    {% for transaction in imported_file.parsed_transactions %}
-      pft.state.UpdateImportedTransaction({
-          'id': {{ loop.index0 }},
-          'date': '{{ transaction.date }}',
-          'amount': {{ transaction.amount }},
-          'description': '{{ transaction.description|e }}',
-          'resolved': '{{ transaction.resolved }}' == 'True'
-      });
+    {% for transaction in imported_transactions_json %}
+      var transaction = {{ transaction }};
+      transaction['id'] = {{ loop.index0 }};
+      pft.state.UpdateImportedTransaction(transaction);
     {% endfor %}
-
 
     pft.ParsedTransactionProcessor.IMPORTED_FILE_ID =
         {{ imported_file.key.id() }};
@@ -102,8 +97,7 @@
             {% else %}
               <td class="amount_cell debit">{{ transaction.amount }}</td>
             {% endif %}
-            <td parsed_transaction_index={{ loop.index0 }}>
-            </td>
+            <td parsed_transaction_index={{ loop.index0 }}></td>
           </tr>
         {% endfor %}
       </table>

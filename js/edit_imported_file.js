@@ -35,6 +35,18 @@ pft.ParsedTransactionProcessor = function(element, transactionIndex) {
 
   amplify.subscribe(pft.SplitTransactionDialog.Events.SPLIT,
                     this.handleSplitPerformed_.bind(this));
+
+  if (this.transaction_['resolutions'].length > 0 ||
+      this.transaction_['dropped']) {
+    // The transaction has already been processed, showing that in the UI.
+
+    var catToAmount = {};
+    this.transaction_['resolutions'].forEach(function(resolvedTransaction){
+      var catId = resolvedTransaction['category_id'] || '';
+      catToAmount[catId] = resolvedTransaction['amount'];
+    });
+    this.updateView_(catToAmount, this.transaction_['dropped']);
+  }
 };
 
 
@@ -77,36 +89,51 @@ pft.ParsedTransactionProcessor.prototype.handleCategoryClicked_ =
 
 pft.ParsedTransactionProcessor.prototype.processTransaction_ =
     function(catToAmount, drop) {
-  this.element_.parent().addClass('processed');
-  this.processedView_.empty();
-
-  var categoriesToSend = [];
-  var amountsToSend = [];
-  var showAmounts = Object.keys(catToAmount).length > 1;
-  for (var catId in catToAmount) {
-    var categoryText = $('<span/>').addClass('category').
-        text(pft.state.GetCategory(catId)['name']);
-    var amountText = $('<span/>').text(catToAmount[catId]);
-    var plusSign = $('<span/>').addClass('plus_sign').text('+');
-    if (showAmounts) {
-      this.processedView_.append(amountText);
-    }
-    this.processedView_.append(categoryText).append(plusSign);
-
-
-    categoriesToSend.push(catId);
-    amountsToSend.push(catToAmount[catId]);
-  }
+  this.updateView_(catToAmount, drop);
 
   var data = {
     'imported_file_id': pft.ParsedTransactionProcessor.IMPORTED_FILE_ID,
-    'transaction_index': this.transactionIndex_,
-    'categories': categoriesToSend.join(','),
-    'amounts': amountsToSend.join(',')};
+    'transaction_index': this.transactionIndex_};
+
   if (drop) {
     data['drop'] = '1';
+  } else {
+    var categoriesToSend = [];
+    var amountsToSend = [];
+    var showAmounts = Object.keys(catToAmount).length > 1;
+    for (var catId in catToAmount) {
+      categoriesToSend.push(catId);
+      amountsToSend.push(catToAmount[catId]);
+    }
+
+    data['categories'] = categoriesToSend.join(',');
+    data['amounts'] = amountsToSend.join(',');
   }
+
   $.post('/do/resolve_parsed_transaction', data);
+};
+
+
+pft.ParsedTransactionProcessor.prototype.updateView_ =
+    function(catToAmount, drop) {
+  this.element_.parent().addClass('processed');
+  this.processedView_.empty();
+
+  if (drop) {
+    this.processedView_.append('Dropped');
+  } else {
+    var showAmounts = Object.keys(catToAmount).length > 1;
+    for (var catId in catToAmount) {
+      var categoryText = $('<span/>').addClass('category').
+          text(pft.state.GetCategory(catId)['name']);
+      var amountText = $('<span/>').text(catToAmount[catId]);
+      var plusSign = $('<span/>').addClass('plus_sign').text('+');
+      if (showAmounts) {
+        this.processedView_.append(amountText);
+      }
+      this.processedView_.append(categoryText).append(plusSign);
+    }
+  }
 };
 
 

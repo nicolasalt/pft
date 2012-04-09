@@ -8,6 +8,7 @@ from common_handlers import CommonHandler
 from datastore import models, lookup
 import budget_util
 import parse_csv
+from util import ndb_json
 
 class MainPage(CommonHandler):
   def HandleGet(self):
@@ -42,6 +43,8 @@ class EditImportedFilePage(CommonHandler):
 
     template_values = {
       'imported_file': imported_file,
+      'imported_transactions_json': [
+          ndb_json.encode(t) for t in imported_file.parsed_transactions],
       'categories': lookup.GetAllCategories(self.profile),
       'account': lookup.GetAccountById(self.profile, imported_file.account_id)
     }

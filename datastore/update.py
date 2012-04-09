@@ -41,13 +41,15 @@ def _UpdateTransactionRelations(profile, transaction, amount):
 # TODO: make 'transaction' module
 @ndb.transactional
 def AddTransaction(profile, account_id, amount, date, category_id,
-                   description, dest_account_id=None, dest_category_id=None):
+                   description, dest_account_id=None, dest_category_id=None,
+                   source='unknown'):
   transaction = models.Transaction(
     parent=profile.key,
     account_id=account_id,
     amount=amount,
     date=date,
-    description=description)
+    description=description,
+    source=source)
 
   if category_id:
     transaction.category_id = category_id

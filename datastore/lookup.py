@@ -1,3 +1,5 @@
+from datetime import timedelta, time
+from datetime import datetime
 from google.appengine.ext import ndb
 from datastore import models
 
@@ -74,3 +76,15 @@ def GetOrCreateImportedFileList(profile):
     imported_file_list = models.ImportedFileList(
         id='imported_file_list', parent=profile.key)
   return imported_file_list
+
+
+def GetTransactionsForDay(profile, date, account_id):
+  beginning_of_day = datetime.combine(date.date(), time(0))
+  query = (models.Transaction.
+      query(ancestor=profile.key).
+      filter(models.Transaction.date >= beginning_of_day).
+      filter(models.Transaction.date < beginning_of_day + timedelta(days=1)).
+      order(-models.Transaction.date))
+  if account_id:
+    query.filter(models.Transaction.account_id == account_id)
+  return query.fetch(1000)

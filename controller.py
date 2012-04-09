@@ -14,7 +14,6 @@ app = webapp2.WSGIApplication([
     ('/do/add_profile', action_handlers.DoAddProfile),
     ('/do/add_parse_schema', action_handlers.DoAddParseSchema),
     ('/do/apply_parse_schema_to_import_file', action_handlers.DoApplyParseSchemaToImportedFile),
-    ('/do/mark_import_file_as_parsed', action_handlers.DoMarkImportedFileAsParsed),
     ('/do/connect_to_profile', action_handlers.DoConnectToProfile),
     ('/do/set_active_profile', action_handlers.DoSetActiveProfile),
     ('/do/resolve_parsed_transaction', action_handlers.DoResolveParsedTransaction),

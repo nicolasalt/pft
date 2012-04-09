@@ -169,6 +169,7 @@ class DoAddTransactionsFromCsv(CommonHandler):
       imported_file.schema = schema
       imported_file.parsed_transactions = parsed_transactions
       imported_file.source_file = None
+      _FindResolvedTransactions(self.profile, imported_file)
 
     imported_file.put()
 
@@ -181,6 +182,38 @@ class DoAddTransactionsFromCsv(CommonHandler):
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
 
+def _FindMatchingTransactions(amount, transactions):
+  amounts = [t.amount for t in transactions]
+  for i1, t1 in enumerate([0] + amounts):
+    for i2, t2 in enumerate([0] + amounts):
+      for i3, t3 in enumerate([0] + amounts):
+        if abs(sum([t1, t2, t3]) - amount) < 0.001:
+          results = []
+          if i1 > 0: results.append(transactions[i1 - 1])
+          if i2 > 0: results.append(transactions[i2 - 1])
+          if i3 > 0: results.append(transactions[i3 - 1])
+          return results
+
+  return []
+
+
+def _FindResolvedTransactions(profile, imported_file):
+  # Looking for existing transactions from previous imports
+  for parsed_transaction in imported_file.parsed_transactions:
+    transactions = lookup.GetTransactionsForDay(
+        profile, parsed_transaction.date,
+        account_id=imported_file.account_id)
+    import_transactions = [t for t in transactions if t.source == 'import']
+    resolved_transactions = _FindMatchingTransactions(
+        parsed_transaction.amount, import_transactions)
+    for resolved_transaction in resolved_transactions:
+      parsed_transaction.resolutions.append(
+          models.ImportedFileTransaction.ResolvedTransaction(
+              transaction_id=resolved_transaction.key.id(),
+              amount=resolved_transaction.amount,
+              category_id=resolved_transaction.category_id))
+
+
 class DoApplyParseSchemaToImportedFile(CommonHandler):
   def HandlePost(self):
     imported_file_id = int(self.request.get('id'))
@@ -188,19 +221,12 @@ class DoApplyParseSchemaToImportedFile(CommonHandler):
 
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     imported_file.schema = schema
-    imported_file.put()
-
-    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
-
-
-class DoMarkImportedFileAsParsed(CommonHandler):
-  def HandlePost(self):
-    imported_file_id = int(self.request.get('id'))
-
-    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     imported_file.parsed = True
     imported_file.parsed_transactions = parse_csv.ParseCsv(
         imported_file.schema, imported_file.source_file)
+
+    _FindResolvedTransactions(self.profile, imported_file)
+
     # For future performance
     imported_file.source_file = None
     imported_file.put()
@@ -231,7 +257,8 @@ class DoResolveParsedTransaction(CommonHandler):
     def _AddTransaction(cat_id, amount):
       transaction = update.AddTransaction(
           self.profile, imported_file.account_id, amount,
-          parsed_transaction.date, cat_id, parsed_transaction.description)
+          parsed_transaction.date, cat_id, parsed_transaction.description,
+          source='import')
       parsed_transaction.resolutions.append(
           models.ImportedFileTransaction.ResolvedTransaction(
               transaction_id=transaction.key.id(),

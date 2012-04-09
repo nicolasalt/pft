@@ -11,6 +11,7 @@ app = webapp2.WSGIApplication([
     ('/edit_imported_file', view_handlers.EditImportedFilePage),
     ('/edit_profile', view_handlers.EditProfile),
     ('/manage_profiles', view_handlers.ManageProfilesPage),
+    ('/detailed_expenses', view_handlers.DetailedExpensesPage),
     ('/do/add_profile', action_handlers.DoAddProfile),
     ('/do/add_parse_schema', action_handlers.DoAddParseSchema),
     ('/do/apply_parse_schema_to_import_file', action_handlers.DoApplyParseSchemaToImportedFile),

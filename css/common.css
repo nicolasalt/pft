@@ -10,14 +10,25 @@ form {
   margin: 10px 0;
 }
 
-.transaction_dialog {
-  display: none;
-}
-
 .category {
   color: #679ce8;
 }
 
 .error {
   color: #c00000;
+}
+
+.fast_access_bar {
+  margin: 10px 0;
+}
+
+.add_expense_button {
+  width: 90px;
+  height: 21px;
+  background: url(/img/add_expense_button.png) transparent no-repeat 0 0;
+  font-size: 12px;
+  color: white;
+  text-align: center;
+  padding-top: 5px;
+  cursor: pointer;
 }

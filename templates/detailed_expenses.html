@@ -1,0 +1,107 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+  <title>PFT: edit budget</title>
+
+  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
+
+  <style type="text/css">
+    table.days {
+      table-layout: fixed;
+    }
+    .day td {
+      height: 20px;
+      border-top: 1px solid #eee;
+      vertical-align: top;
+    }
+    .day .title_cell {
+      width: 100px;
+      color: #999;
+    }
+    .day .transaction {
+      cursor: pointer;
+    }
+    .day .expense_cell {
+      text-align: right;
+      width: 200px;
+      color: #800000;
+    }
+    .day .income_cell {
+      text-align: left;
+      width: 210px;
+      color: #008000;
+      padding-left: 10px;
+    }
+    .day .transaction .description {
+      color: #aaa;
+      font-size: 10px;
+    }
+    .day .transaction .category {
+      font-size: 10px;
+    }
+  </style>
+
+  <script type="text/javascript">
+    // Init.
+
+    {% for transaction in transactions %}
+      pft.state.UpdateTransaction({
+        'id': {{ transaction.key.id() }},
+        'account_id': {{ transaction.account_id }},
+        'category_id': {{ transaction.category_id or 'null' }},
+        'dest_account_id': {{ transaction.dest_account_id or 'null' }},
+        'dest_category_id': {{ transaction.dest_category_id or 'null' }},
+        'amount': {{ transaction.amount }},
+        'date': '{{ transaction.date.strftime('%d.%m.%Y') }}',
+        'description': '{{ transaction.description or '' }}'
+      });
+    {% endfor %}
+
+  </script>
+{% endblock %}
+
+{% macro render_transaction(transaction) -%}
+  <div class="transaction" transaction_id="{{ transaction.key.id() }}">
+    <div class="amount">{{ transaction.amount|abs }}</div>
+    {% if transaction.description %}
+      <span class="description">{{ transaction.description }}</span>
+    {% endif %}
+    {% if transaction.category %}
+      <span class="category">{{ transaction.category.name }}</span>
+    {% endif %}
+  </div>
+{%- endmacro %}
+
+{% block content %}
+  <h3>
+    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Previous</a>
+    Viewing {{ budget.GetStrDate() }}
+    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Next</a>
+  </h3>
+
+  <h4>Transactions:</h4>
+  <table class="days" cellpadding="0" cellspacing="0">
+    {% for day in days %}
+      <tr class="day">
+        <td class="title_cell">{{ day.date.strftime('%a, %d %b') }}</td>
+        <td class="expense_cell">
+          {% for transaction in day.transactions if transaction.amount > 0 %}
+            {{ render_transaction(transaction) }}
+          {% endfor %}
+        <td class="income_cell">
+          {% for transaction in day.transactions if transaction.amount < 0 %}
+            {{ render_transaction(transaction) }}
+          {% endfor %}
+        </td>
+      </tr>
+    {% endfor %}
+
+    <tr class="day">
+      <td class="title_cell">Total:</td>
+      <td class="expense_cell">{{ total_expenses }}</td>
+      <td class="income_cell">{{ total_income }}</td>
+    </tr>
+  </table>
+
+  {% include "templates/include/transaction_dialog.html" %}
+{% endblock %}

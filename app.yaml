@@ -9,6 +9,8 @@ handlers:
   static_dir: css
 - url: /js
   static_dir: js
+- url: /img
+  static_dir: img
 - url: /.*
   script: controller.app
 

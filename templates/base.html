@@ -22,11 +22,18 @@
 <header>
   <a href="/">Home</a> |
   <a href="/edit_budget">Edit budget</a> |
+  <a href="/detailed_expenses">View detailed expenses</a> |
   <a href="/import_from_file">Import from file</a> |
   <a href="/edit_profile">Profile settings</a> |
   <a href="/manage_profiles">Change profile</a>
   <span class="active_profile_name">({{ profile.name }})</span>
 </header>
+
+<div class="fast_access_bar">
+  <div class="add_expense_button" transaction_id="">
+    Add expense
+  </div>
+</div>
 
 {% block content %}{% endblock %}
 

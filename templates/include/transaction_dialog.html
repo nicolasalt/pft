@@ -1,0 +1,60 @@
+<style>
+
+  .transaction_dialog {
+    display: none;
+  }
+  .transaction_dialog .properties,
+  .transaction_dialog .datepicker {
+    display: inline-block;
+    vertical-align: top;
+  }
+  .transaction_dialog .expense_input_help {
+    color: #999;
+    font-size: 11px;
+  }
+  .transaction_dialog .properties {
+    margin-right: 10px;
+  }
+  .transaction_dialog .categories,
+  .transaction_dialog .accounts {
+    margin-top: 5px;
+  }
+  .transaction_dialog .input_area {
+    width: 300px;
+    height: 60px;
+    resize: none;
+  }
+
+</style>
+
+<div id="transaction-dialog" class="transaction_dialog">
+  <div class="properties">
+    <div class="expense_input_help">
+      For example: 13.5 products in Coop
+    </div>
+    <textarea id="transaction-dialog-input-area"
+        class="input_area"></textarea>
+
+    <div id="transaction-dialog-categories" class="categories">
+      {% for category in categories -%}
+        <input type="radio" name="category" category_id='{{ category.key.id() }}'
+            id="transaction-dialog-category-{{ category.key.id() }}"
+        /><label for="transaction-dialog-category-{{ category.key.id() }}">
+          {{ category.name|escape }}
+        </label>
+      {%- endfor %}
+    </div>
+
+    <div id="transaction-dialog-accounts" class="accounts">
+      {% for account in accounts -%}
+        <input type="radio" name="account" account_id='{{ account.key.id() }}'
+            id="transaction-dialog-account-{{ account.key.id() }}"
+        /><label for="transaction-dialog-account-{{ account.key.id() }}">
+          {{ account.name|escape }}
+        </label>
+      {%- endfor %}
+    </div>
+
+  </div>
+  <div id="transaction-dialog-datepicker" class="datepicker"></div>
+</div>

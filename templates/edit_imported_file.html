@@ -19,13 +19,13 @@
     {% endfor %}
 
     {% for transaction in imported_file.parsed_transactions %}
-      pft.state.UpdateEntity({
+      pft.state.UpdateImportedTransaction({
           'id': {{ loop.index0 }},
           'date': '{{ transaction.date }}',
           'amount': {{ transaction.amount }},
           'description': '{{ transaction.description|e }}',
           'resolved': '{{ transaction.resolved }}' == 'True'
-      }, 'parsed_transactions');
+      });
     {% endfor %}
 
 
@@ -107,6 +107,8 @@
           </tr>
         {% endfor %}
       </table>
+
+      <div id="split-transaction-dialog" class="split_transaction_dialog"></div>
 
     {% endif %}
   </div>

@@ -13,3 +13,11 @@ form {
 .transaction_dialog {
   display: none;
 }
+
+.category {
+  color: #679ce8;
+}
+
+.error {
+  color: #c00000;
+}

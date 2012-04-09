@@ -43,6 +43,8 @@ class Transaction(ndb.Model):
   description = ndb.StringProperty()
   dest_account_id = ndb.IntegerProperty()
   dest_category_id = ndb.IntegerProperty()
+  source = ndb.StringProperty(choices=['unknown', 'import', 'manual'],
+                              default='unknown')
 
 
 class Category(ndb.Model):

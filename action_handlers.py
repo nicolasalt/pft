@@ -221,6 +221,13 @@ class DoResolveParsedTransaction(CommonHandler):
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
     parsed_transaction = imported_file.parsed_transactions[transaction_index]
 
+    # Dropping old transactions
+    if parsed_transaction.resolutions:
+      transaction_ids = [t.transaction_id
+                         for t in parsed_transaction.resolutions]
+      update.DeleteTransactions(self.profile, transaction_ids)
+      parsed_transaction.resolutions = []
+
     def _AddTransaction(cat_id, amount):
       transaction = update.AddTransaction(
           self.profile, imported_file.account_id, amount,

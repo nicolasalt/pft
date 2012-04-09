@@ -37,8 +37,8 @@
 
     <div id="transaction-dialog-categories" class="categories">
       {% for category in categories -%}
-        <input type="radio" name="category" category_id="{{ category.key.id() }}"
-            id="tdc-{{ category.key.id() }}"
+        <input type="radio" name="category_id" category_id="{{ category.key.id() }}"
+            id="tdc-{{ category.key.id() }}" value="{{ category.key.id() }}"
           /><label for="tdc-{{ category.key.id() }}">
           {{ category.name|escape }}
         </label>
@@ -47,8 +47,8 @@
 
     <div id="transaction-dialog-accounts" class="accounts">
       {% for account in accounts -%}
-        <input type="radio" name="account" account_id='{{ account.key.id() }}'
-            id="tda-{{ account.key.id() }}"
+        <input type="radio" name="account_id" account_id="{{ account.key.id() }}"
+            id="tda-{{ account.key.id() }}" value="{{ account.key.id() }}"
         /><label for="tda-{{ account.key.id() }}">
           {{ account.name|escape }}
         </label>

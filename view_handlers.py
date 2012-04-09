@@ -1,5 +1,6 @@
 import calendar
 from datetime import datetime
+import json
 from google.appengine.ext import ndb
 
 from common_handlers import CommonHandler
@@ -153,6 +154,9 @@ class DetailedExpensesPage(CommonHandler):
     id_to_cat = dict([(cat.key.id(), cat) for cat in categories])
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
+    for transaction in transactions:
+      transaction.id = transaction.key.id()
+
     total_income = 0
     total_expenses = 0
     for transaction in transactions:
@@ -182,6 +186,7 @@ class DetailedExpensesPage(CommonHandler):
       'accounts': lookup.GetAllAccounts(self.profile),
       'budget': budget,
       'transactions': transactions,
+      'transactions_json': [ndb_json.encode(t) for t in transactions],
       'days': days,
       'total_income': total_income,
       'total_expenses': total_expenses

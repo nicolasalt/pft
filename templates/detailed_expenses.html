@@ -44,19 +44,9 @@
   <script type="text/javascript">
     // Init.
 
-    {% for transaction in transactions %}
-      pft.state.UpdateTransaction({
-        'id': {{ transaction.key.id() }},
-        'account_id': {{ transaction.account_id }},
-        'category_id': {{ transaction.category_id or 'null' }},
-        'dest_account_id': {{ transaction.dest_account_id or 'null' }},
-        'dest_category_id': {{ transaction.dest_category_id or 'null' }},
-        'amount': {{ transaction.amount }},
-        'date': '{{ transaction.date.strftime('%d.%m.%Y') }}',
-        'description': '{{ transaction.description or '' }}'
-      });
+    {% for transaction in transactions_json %}
+      pft.state.UpdateTransaction({{ transaction }});
     {% endfor %}
-
   </script>
 {% endblock %}
 

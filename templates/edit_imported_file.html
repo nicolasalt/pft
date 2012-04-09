@@ -18,8 +18,9 @@
       });
     {% endfor %}
 
+    var transaction;
     {% for transaction in imported_transactions_json %}
-      var transaction = {{ transaction }};
+      transaction = {{ transaction }};
       transaction['id'] = {{ loop.index0 }};
       pft.state.UpdateImportedTransaction(transaction);
     {% endfor %}

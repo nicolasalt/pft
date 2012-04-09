@@ -45,7 +45,10 @@ class ModelEncoder(json.JSONEncoder):
     """Tests the input object, obj, to encode as JSON."""
 
     if hasattr(obj, 'to_dict'):
-      return getattr(obj, 'to_dict')()
+      dict = getattr(obj, 'to_dict')()
+      if hasattr(obj, 'key') and getattr(obj, 'key') is not None:
+        dict['id'] = getattr(obj, 'key').id()
+      return dict
 
     if isinstance(obj, query.Query):
       return list(obj)
@@ -66,7 +69,7 @@ class ModelEncoder(json.JSONEncoder):
     elif isinstance(obj, model.Key):
       return obj.get()
 
-    return simplejson.JSONEncoder.default(self, obj)
+    return json.JSONEncoder.default(self, obj)
 
 
 def encode(input):

@@ -28,7 +28,7 @@
 </style>
 
 <div id="transaction-dialog" class="transaction_dialog">
-  <div class="properties">
+  <form id="transaction-dialog-form" class="properties">
     <div class="expense_input_help">
       For example: 13.5 products in Coop
     </div>
@@ -37,9 +37,9 @@
 
     <div id="transaction-dialog-categories" class="categories">
       {% for category in categories -%}
-        <input type="radio" name="category" category_id='{{ category.key.id() }}'
-            id="transaction-dialog-category-{{ category.key.id() }}"
-        /><label for="transaction-dialog-category-{{ category.key.id() }}">
+        <input type="radio" name="category" category_id="{{ category.key.id() }}"
+            id="tdc-{{ category.key.id() }}"
+          /><label for="tdc-{{ category.key.id() }}">
           {{ category.name|escape }}
         </label>
       {%- endfor %}
@@ -48,13 +48,13 @@
     <div id="transaction-dialog-accounts" class="accounts">
       {% for account in accounts -%}
         <input type="radio" name="account" account_id='{{ account.key.id() }}'
-            id="transaction-dialog-account-{{ account.key.id() }}"
-        /><label for="transaction-dialog-account-{{ account.key.id() }}">
+            id="tda-{{ account.key.id() }}"
+        /><label for="tda-{{ account.key.id() }}">
           {{ account.name|escape }}
         </label>
       {%- endfor %}
     </div>
 
-  </div>
+  </form>
   <div id="transaction-dialog-datepicker" class="datepicker"></div>
 </div>

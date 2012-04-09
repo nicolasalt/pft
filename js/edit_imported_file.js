@@ -144,14 +144,6 @@ pft.ParsedTransactionProcessor.prototype.handleCancelButtonClicked =
 };
 
 
-$(function() {
-  $('[parsed_transaction_index]').each(function() {
-    new pft.ParsedTransactionProcessor(
-        $(this), $(this).attr('parsed_transaction_index'));
-  });
-});
-
-
 /** Split transaction dialog */
 
 
@@ -199,6 +191,7 @@ pft.SplitTransactionDialog.Events = {
 
 
 pft.SplitTransactionDialog.prototype.showErrorMessage_ = function(message) {
+  //  TODO: use jQuery UI alert bar
   this.errorDiv_.text(message);
 };
 
@@ -278,8 +271,3 @@ pft.SplitTransactionDialog.prototype.open = function(transactionIndex, amount) {
 
   this.element_.dialog('open');
 };
-
-
-$(function() {
-  pft.SplitTransactionDialog.Dialog = new pft.SplitTransactionDialog();
-});

@@ -25,14 +25,14 @@ encode, is also provided to further simplify usage.
 """
 
 import datetime
-import simplejson
+import json
 import time
 
 from google.appengine.api import users
 from google.appengine.ext.ndb import model, query
 
 
-class ModelEncoder(simplejson.JSONEncoder):
+class ModelEncoder(json.JSONEncoder):
 
   """
   Extends JSONEncoder to add support for NDB Models and query results.

@@ -24,9 +24,18 @@
       pft.state.UpdateImportedTransaction(transaction);
     {% endfor %}
 
+    // TODO: make it a field of the prototype.
     pft.ParsedTransactionProcessor.IMPORTED_FILE_ID =
         {{ imported_file.key.id() }};
 
+    $(function() {
+      pft.SplitTransactionDialog.Dialog = new pft.SplitTransactionDialog();
+
+      $('[parsed_transaction_index]').each(function() {
+        new pft.ParsedTransactionProcessor(
+            $(this), $(this).attr('parsed_transaction_index'));
+      });
+    });
   </script>
 {% endblock %}
 

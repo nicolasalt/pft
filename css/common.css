@@ -3,13 +3,6 @@ body {
   font-size: 12px;
 }
 
-form {
-  border: 1px solid #ccc;
-  padding: 5px;
-  display: inline-block;
-  margin: 10px 0;
-}
-
 .category {
   color: #679ce8;
 }
@@ -24,7 +17,6 @@ form {
   width:900px;
 }
 
-.add_expense_button,
 .add_account_transaction_button {
   height: 21px;
   font-size: 12px;
@@ -33,14 +25,6 @@ form {
   padding-top: 5px;
   cursor: pointer;
   display: inline-block;
-}
-
-.add_expense_button {
-  width: 90px;
-  background: url(/img/add_expense_button.png) transparent no-repeat 0 0;
-}
-
-.add_account_transaction_button {
   width: 192px;
   background: url(/img/add_account_transaction.png) transparent no-repeat 0 0;
 }

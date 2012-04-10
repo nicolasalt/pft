@@ -6,6 +6,12 @@
   <script type="text/javascript" src="/js/transaction_dialog.js"></script>
 
   <style type="text/css">
+    .expense {
+      color: #800000;
+    }
+    .income {
+      color: #008000;
+    }
     table.days {
       table-layout: fixed;
     }
@@ -15,27 +21,26 @@
       vertical-align: top;
     }
     .day .title_cell {
-      width: 100px;
+      width: 150px;
       color: #999;
+      padding: 2px;
     }
     .day .transaction {
       cursor: pointer;
+      padding: 2px;
+    }
+    .day .transaction:hover {
+      background: #e9ffe3;
     }
     .day .expense_cell {
-      text-align: right;
-      width: 200px;
+      width: 500px;
       color: #800000;
-    }
-    .day .income_cell {
-      text-align: left;
-      width: 210px;
-      color: #008000;
-      padding-left: 10px;
     }
     .day .transaction .description {
       color: #aaa;
       font-size: 10px;
     }
+    .day .transaction .account,
     .day .transaction .category {
       font-size: 10px;
     }
@@ -51,11 +56,16 @@
 {% endblock %}
 
 {% macro render_transaction(transaction) -%}
-  <div class="transaction" transaction_id="{{ transaction.key.id() }}">
-    <div class="amount">{{ transaction.amount|abs }}</div>
-    {% if transaction.description %}
-      <span class="description">{{ transaction.description }}</span>
-    {% endif %}
+  {% if transaction.amount > 0 %}
+    {% set transaction_class = 'expense' %}
+  {% else %}
+    {% set transaction_class = 'income' %}
+  {% endif %}
+  <div class="transaction {{ transaction_class }}"
+       transaction_id="{{ transaction.key.id() }}">
+    <span class="amount">{{ transaction.amount|abs }}</span>
+    <span class="description">{{ transaction.description }}</span>
+    <span class="account">{{ transaction.account.name }}</span>
     {% if transaction.category %}
       <span class="category">{{ transaction.category.name }}</span>
     {% endif %}
@@ -75,11 +85,7 @@
       <tr class="day">
         <td class="title_cell">{{ day.date.strftime('%a, %d %b') }}</td>
         <td class="expense_cell">
-          {% for transaction in day.transactions if transaction.amount > 0 %}
-            {{ render_transaction(transaction) }}
-          {% endfor %}
-        <td class="income_cell">
-          {% for transaction in day.transactions if transaction.amount < 0 %}
+          {% for transaction in day.transactions %}
             {{ render_transaction(transaction) }}
           {% endfor %}
         </td>

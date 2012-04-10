@@ -153,9 +153,10 @@ class DetailedExpensesPage(CommonHandler):
     categories = lookup.GetAllCategories(self.profile)
     id_to_cat = dict([(cat.key.id(), cat) for cat in categories])
 
+    accounts = lookup.GetAllAccounts(self.profile)
+    id_to_account = dict([(acc.key.id(), acc) for acc in accounts])
+
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
-    for transaction in transactions:
-      transaction.id = transaction.key.id()
 
     total_income = 0
     total_expenses = 0
@@ -179,6 +180,7 @@ class DetailedExpensesPage(CommonHandler):
       if (transaction.category_id is not None and
           transaction.category_id in id_to_cat):
         transaction.category = id_to_cat[transaction.category_id]
+      transaction.account = id_to_account[transaction.account_id]
       days[transaction.date.day - 1]['transactions'].append(transaction)
 
     template_values = {

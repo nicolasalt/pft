@@ -7,14 +7,23 @@ body {
   color: #679ce8;
 }
 
+.account {
+  color: #67177a;
+}
+
 .error {
   color: #c00000;
+}
+
+.site_content {
+  width: 910px;
+  margin: 0 auto;
 }
 
 .fast_access_bar {
   margin: 10px 0;
   text-align: right;
-  width:900px;
+  width: 100%;
 }
 
 .add_account_transaction_button {

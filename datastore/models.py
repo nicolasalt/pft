@@ -17,6 +17,19 @@ class ParseSchema(ndb.Model):
   schema = ndb.StringProperty(required=True)
 
 
+class Account(ndb.Model):
+  name = ndb.StringProperty(required=True)
+  currency = ndb.StringProperty(required=True)
+  balance = ndb.FloatProperty(default=0.0)
+  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+
+
+class Category(ndb.Model):
+  name = ndb.StringProperty(required=True)
+  balance = ndb.FloatProperty(default=0.0)
+  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+
+
 # TODO: add accounts and categories to the profile model as structured
 # properties.
 class Profile(ndb.Model):
@@ -26,13 +39,8 @@ class Profile(ndb.Model):
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   main_currency = ndb.StringProperty(default='$')
   parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
-
-
-class Account(ndb.Model):
-  name = ndb.StringProperty(required=True)
-  currency = ndb.StringProperty(required=True)
-  balance = ndb.FloatProperty(default=0.0)
-  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  accounts = ndb.LocalStructuredProperty(Account, repeated=True)
+  categories = ndb.LocalStructuredProperty(Category, repeated=True)
 
 
 class Transaction(ndb.Model):
@@ -45,11 +53,6 @@ class Transaction(ndb.Model):
   dest_category_id = ndb.IntegerProperty()
   source = ndb.StringProperty(choices=['unknown', 'import', 'manual'],
                               default='unknown')
-
-
-class Category(ndb.Model):
-  name = ndb.StringProperty(required=True)
-  balance = ndb.FloatProperty(default=0.0)
 
 
 class ExpenseItem(ndb.Model):

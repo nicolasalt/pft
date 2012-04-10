@@ -25,6 +25,10 @@ pft.ParsedTransactionProcessor = function(element, transactionIndex) {
       this.handleSplitButtonClicked_.bind(this));
   this.element_.append(this.splitTransactionSelector_);
 
+  // TODO: add options (with autodetecting existing transactions):
+  //  - planned expense/income
+  //  - transfer between accounts
+
   this.processedView_ = $('<div/>').addClass('processed_view');
   this.element_.append(this.processedView_);
 
@@ -82,7 +86,7 @@ pft.ParsedTransactionProcessor.IMPORTED_FILE_ID = null;
 pft.ParsedTransactionProcessor.prototype.handleCategoryClicked_ =
     function(catId, drop) {
   var catToAmount = {};
-  catToAmount[catId || ''] = this.transaction_['amount'];
+  catToAmount[catId != null ? catId : ''] = this.transaction_['amount'];
   this.processTransaction_(catToAmount, drop);
 };
 

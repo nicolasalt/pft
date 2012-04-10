@@ -33,9 +33,7 @@ def GetProfileById(profile_id):
 
 
 def GetAllAccounts(profile):
-  account_query = models.Account.query(
-    ancestor=profile.key).order(-models.Account.date)
-  return account_query.fetch(1000)
+  return profile.accounts
 
 
 def GetAllTransactions(profile):
@@ -45,9 +43,7 @@ def GetAllTransactions(profile):
 
 
 def GetAllCategories(profile):
-  category_query = models.Category.query(
-    ancestor=profile.key).order(-models.Category.name)
-  return category_query.fetch(1000)
+  return profile.categories
 
 
 def GetTransactionsForBudget(profile, budget):
@@ -58,11 +54,15 @@ def GetTransactionsForBudget(profile, budget):
 
 
 def GetAccountById(profile, account_id):
-  return models.Account.get_by_id(account_id, parent=profile.key)
+  assert 0 <= account_id < len(profile.accounts)
+  # TODO: How to delete accounts?
+  return profile.accounts[account_id]
 
 
 def GetCategoryById(profile, category_id):
-  return models.Category.get_by_id(category_id, parent=profile.key)
+  assert 0 <= category_id < len(profile.categories)
+  # TODO: How to delete categories?
+  return profile.categories[category_id]
 
 
 def GetImportedFileById(profile, imported_file_id):

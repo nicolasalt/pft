@@ -10,6 +10,7 @@
     });
   </script>
 
+  <h3>Accounts</h3>
   <ul>
     {% for account in accounts %}
       <li>
@@ -19,7 +20,8 @@
         <br>
         Transactions:
         <ul>
-          {% for transaction in transactions if transaction.account_id == account.key.id() %}
+          {% set account_index = loop.index0 %}
+          {% for transaction in transactions if transaction.account_id == account_index %}
             <li>
               Date: {{ transaction.date|escape }},
               Category: {{ transaction.category_id }},
@@ -38,13 +40,29 @@
     <div><input type="submit" value="Add account" /></div>
 </form>
 
+<h3>Categories</h3>
+<ul>
+  {% for category in categories %}
+    <li>
+      Name: {{ category.name|escape }},
+      Balance: {{ category.balance }}
+    </li>
+  {% endfor %}
+</ul>
+
+<h4>Add category</h4>
+<form action="/do/add_category" method="post">
+  <div>Name: <input name="name"/></div>
+  <div><input type="submit" value="Add" /></div>
+</form>
+
 <br>
 <div>Add transaction</div>
 <form action="/do/add_transaction" method="post">
     <div>Account:
       <select name="account_id">
         {% for account in accounts %}
-          <option value="{{ account.key.id() }}">{{ account.name|escape }}</option>
+          <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>
     </div>
@@ -52,7 +70,7 @@
       <select name="category_id">
         <option value="">None</option>
         {% for category in categories %}
-          <option value="{{ category.key.id() }}">{{ category.name|escape }}</option>
+          <option value="{{ loop.index0 }}">{{ category.name|escape }}</option>
         {% endfor %}
       </select>
     </div>
@@ -68,7 +86,7 @@
     <div>Account:
       <select name="account_id">
         {% for account in accounts %}
-          <option value="{{ account.key.id() }}">{{ account.name|escape }}</option>
+          <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>
     </div>

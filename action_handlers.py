@@ -96,11 +96,9 @@ class DoAddCategory(CommonHandler):
   def HandlePost(self):
     name = self.request.get('name')
 
-    account = models.Category(
-      parent=self.profile.key,
-      name=name).put()
+    update.AddCategory(self.profile, name)
 
-    self.redirect('/edit_budget')
+    self.redirect('/')
 
 
 class DoEditBudget(CommonHandler):
@@ -139,7 +137,7 @@ class DoAddParseSchema(CommonHandler):
     schema = self.request.get('schema')
 
     self.profile.parse_schemas.append(
-      models.ParseSchema(name=name, schema=schema))
+        models.ParseSchema(name=name, schema=schema))
     self.profile.put()
 
     # TODO: redirect to a correct url
@@ -152,8 +150,8 @@ class DoAddTransactionsFromCsv(CommonHandler):
     raw_csv = self.request.get('csv')
 
     imported_file = models.ImportedFile(
-      parent=self.profile.key,
-      account_id=account_id)
+        parent=self.profile.key,
+        account_id=account_id)
     try:
       raw_csv.decode('utf-8')
     except UnicodeDecodeError:
@@ -198,6 +196,7 @@ def _FindMatchingTransactions(amount, transactions):
 
 
 def _FindResolvedTransactions(profile, imported_file):
+  # TODO: autodetect dropped transactions.
   # Looking for existing transactions from previous imports
   for parsed_transaction in imported_file.parsed_transactions:
     transactions = lookup.GetTransactionsForDay(
@@ -233,7 +232,7 @@ class DoApplyParseSchemaToImportedFile(CommonHandler):
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
-
+# TODO: optimize, now it is too slow
 class DoResolveParsedTransaction(CommonHandler):
   def HandlePost(self):
     imported_file_id = int(self.request.get('imported_file_id'))

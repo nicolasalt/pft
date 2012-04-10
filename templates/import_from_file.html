@@ -7,7 +7,7 @@
     <div>Account:
       <select name="account_id">
         {% for account in accounts %}
-          <option value="{{ account.key.id() }}">{{ account.name|escape }}</option>
+          <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>
     </div>

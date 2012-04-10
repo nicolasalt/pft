@@ -1,6 +1,5 @@
 import calendar
 from datetime import datetime
-import json
 from google.appengine.ext import ndb
 
 from common_handlers import CommonHandler
@@ -71,16 +70,15 @@ class EditBudgetPage(CommonHandler):
       budget = models.Budget(parent=self.profile.key, date=budget_date)
 
     categories = lookup.GetAllCategories(self.profile)
-    id_to_cat = dict([(cat.key.id(), cat) for cat in categories])
+    id_to_cat = dict([(id, cat) for id, cat in enumerate(categories)])
 
     if budget:
       cat_id_to_planned_expense = dict(
           [(exp.category_id, exp.planned_value) for exp in budget.expenses])
 
-      for category in categories:
-        if category.key.id() in cat_id_to_planned_expense:
-          category.planned_value = cat_id_to_planned_expense[
-               category.key.id()]
+      for id, category in enumerate(categories):
+        if id in cat_id_to_planned_expense:
+          category.planned_value = cat_id_to_planned_expense[id]
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
     total_income, total_expenses = budget_util.CalculateExpensesAndIncome(
@@ -151,10 +149,10 @@ class DetailedExpensesPage(CommonHandler):
       budget = models.Budget(parent=self.profile.key, date=budget_date)
 
     categories = lookup.GetAllCategories(self.profile)
-    id_to_cat = dict([(cat.key.id(), cat) for cat in categories])
+    id_to_cat = dict([(id, cat) for id, cat in enumerate(categories)])
 
     accounts = lookup.GetAllAccounts(self.profile)
-    id_to_account = dict([(acc.key.id(), acc) for acc in accounts])
+    id_to_account = dict([(id, acc) for id, acc in enumerate(accounts)])
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
 

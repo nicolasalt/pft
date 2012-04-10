@@ -3,10 +3,17 @@ from datastore import models, lookup
 
 
 def AddAccount(profile, name, currency):
-  account = models.Account(
-      parent=profile.key, name=name, currency= currency)
-  account.put()
+  account = models.Account(name=name, currency=currency)
+  profile.accounts.append(account)
+  profile.put()
   return account
+
+
+def AddCategory(profile, name):
+  category = models.Category(name=name)
+  profile.categories.append(category)
+  profile.put()
+  return category
 
 
 def _UpdateTransactionRelations(profile, transaction, amount):
@@ -20,23 +27,21 @@ def _UpdateTransactionRelations(profile, transaction, amount):
   """
   account = lookup.GetAccountById(profile, transaction.account_id)
   account.balance -= amount
-  account.put()
 
-  if transaction.category_id:
+  if transaction.category_id is not None:
     category = lookup.GetCategoryById(profile, transaction.category_id)
     category.balance -= amount
-    category.put()
 
   if transaction.dest_account_id is not None:
     dest_account = lookup.GetAccountById(profile, transaction.dest_account_id)
     dest_account.balance += amount
-    dest_account.put()
 
   if transaction.dest_category_id is not None:
     transaction.dest_category_id = transaction.dest_category_id
     dest_category = lookup.GetCategoryById(profile, transaction.dest_category_id)
     dest_category.balance += amount
-    dest_category.put()
+
+  profile.put()
 
 # TODO: make 'transaction' module
 @ndb.transactional
@@ -51,13 +56,15 @@ def AddTransaction(profile, account_id, amount, date, category_id,
     description=description,
     source=source)
 
-  if category_id:
+  if category_id is not None:
     transaction.category_id = category_id
   if dest_account_id is not None:
     transaction.dest_account_id = dest_account_id
   if dest_category_id is not None:
     transaction.dest_category_id = dest_category_id
 
+  # reload the latest profile
+  profile = lookup.GetProfileById(profile.key.id())
   _UpdateTransactionRelations(profile, transaction, amount)
 
   transaction.put()
@@ -101,6 +108,8 @@ def DeleteTransactions(profile, transaction_ids):
     keys.append(ndb.Key(models.Transaction, transaction_id, parent=profile.key))
   transactions = ndb.get_multi(keys)
 
+  # reload the latest profile
+  profile = lookup.GetProfileById(profile.key.id())
   for transaction in transactions:
     _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 

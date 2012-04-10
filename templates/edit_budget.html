@@ -45,39 +45,8 @@
 
   <script type="text/javascript">
     // Init.
-
-    {% for transaction in transactions %}
-      pft.state.UpdateTransaction({
-        'id': {{ transaction.key.id() }},
-        'account_id': {{ transaction.account_id }},
-        'category_id': {{ transaction.category_id or 'null' }},
-        'dest_account_id': {{ transaction.dest_account_id or 'null' }},
-        'dest_category_id': {{ transaction.dest_category_id or 'null' }},
-        'amount': {{ transaction.amount }},
-        'date': '{{ transaction.date.strftime('%d.%m.%Y') }}',
-        'description': '{{ transaction.description or '' }}'
-      });
-    {% endfor %}
-
   </script>
 {% endblock %}
-
-{% macro render_transaction(transaction) -%}
-  {% if transaction.amount > 0 %}
-    {% set transaction_class = 'expense' %}
-  {% else %}
-    {% set transaction_class = 'income' %}
-  {% endif %}
-  <div class="transaction {{ transaction_class }}" transaction_id="{{ transaction.key.id() }}">
-    <div class="amount">{{ transaction.amount|abs }}</div>
-    {% if transaction.description %}
-      <span class="description">{{ transaction.description }}</span>
-    {% endif %}
-    {% if transaction.category %}
-      <span class="category">{{ transaction.category.name }}</span>
-    {% endif %}
-  </div>
-{%- endmacro %}
 
 {% block content %}
   <h3>
@@ -85,60 +54,6 @@
     Viewing {{ budget.GetStrDate() }}
     <a href="/edit_budget?date={{ budget.GetStrDate() }}">Next</a>
   </h3>
-
-  <h4>Transactions:</h4>
-  <table class="days" cellpadding="0" cellspacing="0">
-    {% for day in days %}
-      <tr class="day">
-        <td class="title_cell">{{ day.date.strftime('%a, %d %b') }}</td>
-        <td class="expense_cell">
-          {% for transaction in day.transactions %}
-            {{ render_transaction(transaction) }}
-          {% endfor %}
-        </td>
-      </tr>
-    {% endfor %}
-  </table>
-
-  <h4>Total:</h4>
-  <div class="expense">{{ total_expenses }}</div>
-  <div class="income">{{ total_income }}</div>
-
-  <div id="transaction-dialog" class="transaction_dialog">
-    <div id="transaction-dialog-datepicker"></div>
-    Amount:
-    <input id="transaction-dialog-amount" />
-    <br/>
-
-    <div id="transaction-dialog-categories">
-      {% for category in categories -%}
-        <input type="radio" name="radio" category_id='{{ category.key.id() }}'
-            id="transaction-dialog-category-{{ category.key.id() }}"
-        /><label for="transaction-dialog-category-{{ category.key.id() }}">
-          {{ category.name|escape }}
-        </label>
-      {%- endfor %}
-    </div>
-    <br/>
-    <textarea id="transaction-dialog-description" ></textarea>
-    <br/>
-  </div>
-
-  <h3>Categories</h3>
-  <ul>
-    {% for category in categories %}
-      <li>
-        Name: {{ category.name|escape }},
-        Balance: {{ category.balance }}
-      </li>
-    {% endfor %}
-  </ul>
-
-  <h4>Add category</h4>
-  <form action="/do/add_category" method="post">
-    <div>Name: <input name="name"/></div>
-    <div><input type="submit" value="Add" /></div>
-  </form>
 
   <br><br>
 
@@ -156,7 +71,7 @@
     {% for category in categories %}
       <label>
         {{ category.name|escape }}
-        <input name="category_{{ category.key.id() }}" value="{{ category.planned_value }}" placeholder="Auto" />
+        <input name="category_{{ loop.index0 }}" value="{{ category.planned_value }}" placeholder="Auto" />
       </label>
       <br>
     {% endfor %}

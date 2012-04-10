@@ -76,13 +76,14 @@
     </div>
     <div>Description: <textarea name="description"></textarea></div>
     <div>Amount: <input name="amount"/></div>
-    <div>Date: <input name="date" id="datepicker"/></div></div>
+    <div>Date: <input name="date" id="datepicker"/></div>
     <div><input type="submit" value="Add transaction" /></div>
 </form>
 
 <br>
 <div>Add from csv</div>
-  <form action="/do/add_transactions_from_csv" method="post" enctype="multipart/form-data">
+  <form action="/do/add_transactions_from_csv" method="post"
+        enctype="multipart/form-data">
     <div>Account:
       <select name="account_id">
         {% for account in accounts %}

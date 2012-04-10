@@ -3,6 +3,11 @@ body {
   font-size: 12px;
 }
 
+header {
+  padding: 5px;
+  background-color: #ffece4;
+}
+
 .category {
   color: #679ce8;
 }

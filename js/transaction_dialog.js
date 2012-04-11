@@ -55,12 +55,11 @@ pft.TransactionDialog.prototype.open = function(transactionId) {
   this.inputArea_.val(
       transaction['amount'] + ' ' + transaction['description']);
   this.datePicker_.datepicker('setDate', transaction['date']);
-
-  this.element_.find(':checked').prop('checked', false);
-  this.element_.find(['category_id="' + transaction['category_id'] + '"']).
-      prop('checked', true);
-  this.element_.find(['account_id=' + transaction['account_id']]).
-      prop('checked', true);
+  var categoryId = transaction['category_id'] == null ? '' :
+      transaction['category_id'];
+  var account_id = transaction['account_id'] || 0;
+  this.element_.find('[for="tdc-' + categoryId + '"]').click();
+  this.element_.find('[for="tda-' + account_id + '"]').click();
 
   this.element_.dialog('option', 'title', transaction['date']);
   this.element_.dialog('open');

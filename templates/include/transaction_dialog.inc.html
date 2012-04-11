@@ -36,7 +36,11 @@
         class="input_area"></textarea>
 
     <div id="transaction-dialog-categories" class="categories">
-      {% for category in profile.categories -%}
+      <input type="radio" name="category_id" category_id="" id="tdc-" value=""
+        /><label for="tdc-">
+        No category
+      </label
+      >{% for category in profile.categories -%}
         <input type="radio" name="category_id" category_id="{{ loop.index0 }}"
             id="tdc-{{ loop.index0 }}" value="{{ loop.index0 }}"
           /><label for="tdc-{{ loop.index0 }}">

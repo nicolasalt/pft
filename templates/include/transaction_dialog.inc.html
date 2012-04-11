@@ -36,7 +36,7 @@
         class="input_area"></textarea>
 
     <div id="transaction-dialog-categories" class="categories">
-      {% for category in categories -%}
+      {% for category in profile.categories -%}
         <input type="radio" name="category_id" category_id="{{ loop.index0 }}"
             id="tdc-{{ loop.index0 }}" value="{{ loop.index0 }}"
           /><label for="tdc-{{ loop.index0 }}">
@@ -46,7 +46,7 @@
     </div>
 
     <div id="transaction-dialog-accounts" class="accounts">
-      {% for account in accounts -%}
+      {% for account in profile.accounts -%}
         <input type="radio" name="account_id" account_id="{{ loop.index0 }}"
             id="tda-{{ loop.index0 }}" value="{{ loop.index0 }}"
         /><label for="tda-{{ loop.index0 }}">

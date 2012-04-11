@@ -68,7 +68,7 @@
   <form action="/do/edit_budget" method="post">
     <input type="hidden" name="budget.GetStrDate()" value="{{ budget.GetStrDate() }}"/>
     <h5>Expenses</h5>
-    {% for category in categories %}
+    {% for category in profile.categories %}
       <label>
         {{ category.name|escape }}
         <input name="category_{{ loop.index0 }}" value="{{ category.planned_value }}" placeholder="Auto" />

@@ -6,7 +6,7 @@
   <form action="/do/add_transactions_from_csv" method="post" enctype="multipart/form-data">
     <div>Account:
       <select name="account_id">
-        {% for account in accounts %}
+        {% for account in profile.accounts %}
           <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>

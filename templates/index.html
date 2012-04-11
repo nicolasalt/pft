@@ -42,7 +42,7 @@
 
 <h3>Categories</h3>
 <ul>
-  {% for category in categories %}
+  {% for category in profile.categories %}
     <li>
       Name: {{ category.name|escape }},
       Balance: {{ category.balance }}
@@ -61,7 +61,7 @@
 <form action="/do/add_transaction" method="post">
     <div>Account:
       <select name="account_id">
-        {% for account in accounts %}
+        {% for account in profile.accounts %}
           <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>
@@ -69,7 +69,7 @@
     <div>Category:
       <select name="category_id">
         <option value="">None</option>
-        {% for category in categories %}
+        {% for category in profile.categories %}
           <option value="{{ loop.index0 }}">{{ category.name|escape }}</option>
         {% endfor %}
       </select>
@@ -86,7 +86,7 @@
         enctype="multipart/form-data">
     <div>Account:
       <select name="account_id">
-        {% for account in accounts %}
+        {% for account in profile.accounts %}
           <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
         {% endfor %}
       </select>

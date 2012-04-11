@@ -32,18 +32,10 @@ def GetProfileById(profile_id):
   return ndb.Key(models.Profile, profile_id).get()
 
 
-def GetAllAccounts(profile):
-  return profile.accounts
-
-
 def GetAllTransactions(profile):
   transaction_query = models.Transaction.query(
     ancestor=profile.key).order(-models.Transaction.date)
   return transaction_query.fetch(1000)
-
-
-def GetAllCategories(profile):
-  return profile.categories
 
 
 def GetTransactionsForBudget(profile, budget):

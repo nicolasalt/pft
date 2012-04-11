@@ -12,9 +12,7 @@ class MainPage(CommonHandler):
   def HandleGet(self):
 
     template_values = {
-      'accounts': lookup.GetAllAccounts(self.profile),
-      'transactions': lookup.GetAllTransactions(self.profile),
-      'categories': lookup.GetAllCategories(self.profile)
+      'transactions': lookup.GetAllTransactions(self.profile)
     }
 
     self.WriteToTemplate('templates/index.html', template_values)
@@ -24,7 +22,6 @@ class ImportFromFilePage(CommonHandler):
   def HandleGet(self):
 
     template_values = {
-      'accounts': lookup.GetAllAccounts(self.profile),
       'imported_file_descriptions':
           lookup.GetOrCreateImportedFileList(self.profile).imported_files
     }
@@ -34,16 +31,13 @@ class ImportFromFilePage(CommonHandler):
 
 class EditImportedFilePage(CommonHandler):
   def HandleGet(self):
-
     imported_file_id = int(self.request.get('id'))
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
-
 
     template_values = {
       'imported_file': imported_file,
       'imported_transactions_json': [
           ndb_json.encode(t) for t in imported_file.parsed_transactions],
-      'categories': lookup.GetAllCategories(self.profile),
       'account': lookup.GetAccountById(self.profile, imported_file.account_id)
     }
     if imported_file.source_file:
@@ -69,14 +63,14 @@ class EditBudgetPage(CommonHandler):
     if not budget:
       budget = models.Budget(parent=self.profile.key, date=budget_date)
 
-    categories = lookup.GetAllCategories(self.profile)
-    id_to_cat = dict([(id, cat) for id, cat in enumerate(categories)])
+    id_to_cat = dict([(id, cat) for id, cat in enumerate(
+        self.profile.categories)])
 
     if budget:
       cat_id_to_planned_expense = dict(
           [(exp.category_id, exp.planned_value) for exp in budget.expenses])
 
-      for id, category in enumerate(categories):
+      for id, category in enumerate(self.profile.categories):
         if id in cat_id_to_planned_expense:
           category.planned_value = cat_id_to_planned_expense[id]
 
@@ -100,7 +94,6 @@ class EditBudgetPage(CommonHandler):
       days[transaction.date.day - 1]['transactions'].append(transaction)
 
     template_values = {
-      'categories': categories,
       'budget': budget,
       'transactions': transactions,
       'days': days,
@@ -148,11 +141,11 @@ class DetailedExpensesPage(CommonHandler):
     if not budget:
       budget = models.Budget(parent=self.profile.key, date=budget_date)
 
-    categories = lookup.GetAllCategories(self.profile)
-    id_to_cat = dict([(id, cat) for id, cat in enumerate(categories)])
+    id_to_cat = dict([(id, cat) for id, cat in enumerate(
+      self.profile.categories)])
 
-    accounts = lookup.GetAllAccounts(self.profile)
-    id_to_account = dict([(id, acc) for id, acc in enumerate(accounts)])
+    id_to_account = dict([(id, acc) for id, acc in enumerate(
+        self.profile.accounts)])
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
 
@@ -182,8 +175,6 @@ class DetailedExpensesPage(CommonHandler):
       days[transaction.date.day - 1]['transactions'].append(transaction)
 
     template_values = {
-      'categories': categories,
-      'accounts': lookup.GetAllAccounts(self.profile),
       'budget': budget,
       'transactions': transactions,
       'transactions_json': [ndb_json.encode(t) for t in transactions],

@@ -11,7 +11,7 @@
   <script type="text/javascript">
     // Init.
 
-    {% for category in categories %}
+    {% for category in profile.categories %}
       pft.state.UpdateCategory({
           'id': {{ loop.index0 }},
           'name': '{{ category.name }}'

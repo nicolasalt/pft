@@ -12,9 +12,6 @@ pft.TransactionDialog = function() {
     }
   });
 
-  // Form for easier radio button state access.
-  this.form_ = $('#transaction-dialog-form');
-
   this.datePicker_ = $('#transaction-dialog-datepicker');
   this.datePicker_.datepicker({
     inline: true,
@@ -23,6 +20,8 @@ pft.TransactionDialog = function() {
 
   this.inputArea_ = $('#transaction-dialog-input-area');
 
+  this.errorDiv_ = $('#transaction-dialog-error');
+
   $('#transaction-dialog-categories').buttonset();
   $('#transaction-dialog-accounts').buttonset();
 
@@ -30,38 +29,69 @@ pft.TransactionDialog = function() {
 };
 
 pft.TransactionDialog.prototype.handleSaveButtonClicked_ = function() {
+  var amountAndDescription = this.inputArea_.val();
+  var firstSpaceIndex = amountAndDescription.search(' ');
+  if (firstSpaceIndex < 0) {
+    this.errorDiv_.text(
+        'No space found in the text. The text format should be: ' +
+        '"number text", e.g. "12.5 tasty pineapples"');
+    return;
+  }
+  var amount = parseFloat(amountAndDescription.slice(0, firstSpaceIndex));
+  if (!amount) {
+    this.errorDiv_.text(
+        'The first word is not a valid number. The text format should be: ' +
+        '"number text", e.g. "12.5 tasty pineapples"');
+    return;
+  }
+  var description = amountAndDescription.slice(firstSpaceIndex + 1);
   var data = {
     'transaction_id': this.transactionId_ || '',
-    'amount_and_description': this.inputArea_.val(),
+    'amount': amount,
+    'description': description,
     'category_id': this.element_.find('[category_id]:checked').val(),
     'account_id': this.element_.find('[account_id]:checked').val(),
-    'date': this.datePicker_.datepicker('getDate')
+    'date': $.datepicker.formatDate('dd.mm.yy',
+        this.datePicker_.datepicker('getDate'))
   };
-  alert(JSON.stringify(data));
+  $.post('/do/edit_transaction', data).success(function() {
+    window.location.reload();
+  });
+  this.element_.dialog('close');
 };
 
 pft.TransactionDialog.prototype.open = function(transactionId) {
   this.transactionId_ = transactionId;
 
-  var transaction = pft.state.GetTransaction(transactionId);
+  var transaction = pft.state.GetTransaction(transactionId) || {};
+  var date = new Date();
   if (!transaction) {
-    transaction = {
-      'amount': '',
-      'description': '',
-      'date': new Date()
-    };
+    this.datePicker_.datepicker('setDate', transaction['date']);
+    date = new Date();
+    this.inputArea_.val('');
+  } else {
+    date = $.datepicker.parseDate(
+        'yy-mm-dd', transaction['date'].substr(0, 10));
+    this.inputArea_.val(transaction['amount'] + ' ' +
+        transaction['description']);
   }
 
-  this.inputArea_.val(
-      transaction['amount'] + ' ' + transaction['description']);
-  this.datePicker_.datepicker('setDate', transaction['date']);
+  this.datePicker_.datepicker('setDate', date);
+  this.element_.dialog('option', 'title',
+                       $.datepicker.formatDate('dd.mm.yy', date));
+  this.errorDiv_.text('');
+
   var categoryId = transaction['category_id'] == null ? '' :
       transaction['category_id'];
-  var account_id = transaction['account_id'] || 0;
   this.element_.find('[for="tdc-' + categoryId + '"]').click();
-  this.element_.find('[for="tda-' + account_id + '"]').click();
+  this.element_.find('[category_id="' + categoryId + '"]').
+      prop('checked', true);
 
-  this.element_.dialog('option', 'title', transaction['date']);
+  var accountId = transaction['account_id'] || 0;
+  this.element_.find('[for="tda-' + accountId + '"]').click();
+  this.element_.find('[account_id="' + accountId + '"]').
+      prop('checked', true);
+
   this.element_.dialog('open');
   this.inputArea_.focus();
 };

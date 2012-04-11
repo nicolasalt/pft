@@ -15,21 +15,33 @@ class DoAddAccount(CommonHandler):
     self.redirect('/')
 
 
-class DoAddTransaction(CommonHandler):
+class DoEditTransaction(CommonHandler):
   def HandlePost(self):
     amount = float(self.request.get('amount'))
     description = self.request.get('description')
     account_id = int(self.request.get('account_id'))
-    date = datetime.strptime(self.request.get('date'), '%m/%d/%Y')
+    date = datetime.strptime(self.request.get('date'), '%d.%m.%Y')
+
     raw_category_id = self.request.get('category_id')
     category_id = None
     if raw_category_id:
       category_id = int(raw_category_id)
 
-    update.AddTransaction(self.profile, account_id,
-                          amount, date, category_id, description)
+    raw_transaction_id = self.request.get('transaction_id')
+    transaction_id = None
+    if raw_transaction_id:
+      transaction_id = int(raw_transaction_id)
 
-    self.redirect('/')
+    if transaction_id is not None:
+      update.UpdateTransaction(self.profile, transaction_id, account_id,
+                               amount, date, category_id=category_id,
+                               description=description, source='manual')
+    else:
+      update.AddTransaction(self.profile, account_id,
+                            amount, date, category_id=category_id,
+                            description=description, source='manual')
+
+    self.response.set_status(200)
 
 
 class DoEditProfile(CommonHandler):

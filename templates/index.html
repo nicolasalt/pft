@@ -1,18 +1,32 @@
 {% extends "templates/base.html" %}
 
+{% block head %}
+  <title>PFT: admin page</title>
+
+  <style type="text/css">
+    form {
+      border: 1px solid #ccc;
+      padding: 5px;
+      margin: 10px 0;
+      display: inline-block;
+    }
+  </style>
+{% endblock %}
+
 {% block content %}
   <script>
     $(function(){
       // Datepicker
       $('#datepicker').datepicker({
-        inline: true
+        inline: true,
+        dateFormat: 'dd.mm.yy'
       });
     });
   </script>
 
   <h3>Accounts</h3>
   <ul>
-    {% for account in accounts %}
+    {% for account in profile.accounts %}
       <li>
         Name: {{ account.name|escape }},
         Currency: {{ account.currency|escape }},
@@ -33,55 +47,55 @@
     {% endfor %}
   </ul>
 
-<div>Add account</div>
-<form action="/do/add_account" method="post">
+  <div>Add account</div>
+  <form action="/do/add_account" method="post">
+      <div>Name: <input name="name"/></div>
+      <div>Currency: <input name="currency"/></div>
+      <div><input type="submit" value="Add account" /></div>
+  </form>
+
+  <h3>Categories</h3>
+  <ul>
+    {% for category in profile.categories %}
+      <li>
+        Name: {{ category.name|escape }},
+        Balance: {{ category.balance }}
+      </li>
+    {% endfor %}
+  </ul>
+
+  <h4>Add category</h4>
+  <form action="/do/add_category" method="post">
     <div>Name: <input name="name"/></div>
-    <div>Currency: <input name="currency"/></div>
-    <div><input type="submit" value="Add account" /></div>
-</form>
+    <div><input type="submit" value="Add" /></div>
+  </form>
 
-<h3>Categories</h3>
-<ul>
-  {% for category in profile.categories %}
-    <li>
-      Name: {{ category.name|escape }},
-      Balance: {{ category.balance }}
-    </li>
-  {% endfor %}
-</ul>
+  <br>
+  <div>Add transaction</div>
+  <form action="/do/edit_transaction" method="post">
+      <div>Account:
+        <select name="account_id">
+          {% for account in profile.accounts %}
+            <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>Category:
+        <select name="category_id">
+          <option value="">None</option>
+          {% for category in profile.categories %}
+            <option value="{{ loop.index0 }}">{{ category.name|escape }}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>Description: <textarea name="description"></textarea></div>
+      <div>Amount: <input name="amount"/></div>
+      <div>Date: <input name="date" id="datepicker"/></div>
+      <div><input type="submit" value="Add transaction" /></div>
+  </form>
 
-<h4>Add category</h4>
-<form action="/do/add_category" method="post">
-  <div>Name: <input name="name"/></div>
-  <div><input type="submit" value="Add" /></div>
-</form>
-
-<br>
-<div>Add transaction</div>
-<form action="/do/add_transaction" method="post">
-    <div>Account:
-      <select name="account_id">
-        {% for account in profile.accounts %}
-          <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>Category:
-      <select name="category_id">
-        <option value="">None</option>
-        {% for category in profile.categories %}
-          <option value="{{ loop.index0 }}">{{ category.name|escape }}</option>
-        {% endfor %}
-      </select>
-    </div>
-    <div>Description: <textarea name="description"></textarea></div>
-    <div>Amount: <input name="amount"/></div>
-    <div>Date: <input name="date" id="datepicker"/></div>
-    <div><input type="submit" value="Add transaction" /></div>
-</form>
-
-<br>
-<div>Add from csv</div>
+  <br>
+  <div>Add from csv</div>
   <form action="/do/add_transactions_from_csv" method="post"
         enctype="multipart/form-data">
     <div>Account:

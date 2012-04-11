@@ -45,6 +45,10 @@ def GetTransactionsForBudget(profile, budget):
       models.Transaction.date < end_date).fetch(1000)
 
 
+def GetTransactionById(profile, transaction_id):
+  return models.Transaction.get_by_id(transaction_id, parent=profile.key)
+
+
 def GetAccountById(profile, account_id):
   assert 0 <= account_id < len(profile.accounts)
   # TODO: How to delete accounts?

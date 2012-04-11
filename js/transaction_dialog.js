@@ -63,9 +63,10 @@ pft.TransactionDialog.prototype.handleSaveButtonClicked_ = function() {
 pft.TransactionDialog.prototype.open = function(transactionId) {
   this.transactionId_ = transactionId;
 
-  var transaction = pft.state.GetTransaction(transactionId) || {};
+  var transaction = pft.state.GetTransaction(transactionId);
   var date = new Date();
   if (!transaction) {
+    transaction = {};
     this.datePicker_.datepicker('setDate', transaction['date']);
     date = new Date();
     this.inputArea_.val('');

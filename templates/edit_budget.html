@@ -6,41 +6,6 @@
   <script type="text/javascript" src="/js/transaction_dialog.js"></script>
 
   <style type="text/css">
-    .expense {
-      color: #800000;
-    }
-    .income {
-      color: #008000;
-    }
-    table.days {
-      table-layout: fixed;
-    }
-    .day td {
-      height: 20px;
-      border-top: 1px solid #eee;
-      vertical-align: top;
-    }
-    .day .title_cell {
-      width: 100px;
-      color: #999;
-    }
-    .day .transaction {
-      cursor: pointer;
-    }
-    .day .expense_cell {
-      text-align: right;
-      width: 200px;
-    }
-    .day .transaction.income {
-      width: 200px;
-    }
-    .day .transaction .description {
-      color: #aaa;
-      font-size: 10px;
-    }
-    .day .transaction .category {
-      font-size: 10px;
-    }
   </style>
 
   <script type="text/javascript">
@@ -65,38 +30,35 @@
     </p>
   {% endif %}
 
-  <form action="/do/edit_budget" method="post">
-    <input type="hidden" name="budget.GetStrDate()" value="{{ budget.GetStrDate() }}"/>
-    <h5>Expenses</h5>
-    {% for category in profile.categories %}
-      <label>
-        {{ category.name|escape }}
-        <input name="category_{{ loop.index0 }}" value="{{ category.planned_value }}" placeholder="Auto" />
-      </label>
-      <br>
+  <h5>Budget items</h5>
+  <ul>
+    {% for item in budget.items %}
+      <li>
+        {{ item }}
+      </li>
     {% endfor %}
-    <h5>Income</h5>
-    {% for income_item in budget.income %}
-      <label>
-        Income item name:
-        <input name="incomeitem_name_{{ loop.index0 }}" value="{{ income_item.name }}" />
-      </label>
-      <label>
-        Income item value:
-        <input name="incomeitem_value_{{ loop.index0 }}" value="{{ income_item.planned_value }}" />
-      </label>
-      <br>
-    {% endfor %}
-    <h6>Add new income item</h6>
+  </ul>
+
+  <form action="/do/edit_transaction" method="post">
+    <h5>Add new item</h5>
+    <input type="hidden" name="budget_date" value="{{ budget.GetStrDate() }}"/>
+    <input type="hidden" name="date" value="01.01.1000"/>
     <label>
-      Income item name:
-      <input name="new_incomeitem_name" />
+      Category:
+      <select name="dest_category_id">
+        {% for category in profile.categories %}
+          <option value="{{ loop.index0 }}">
+            {{ category.name|escape }}
+          </option>
+        {% endfor %}
+      </select>
     </label>
+    <br>
     <label>
-      Income item value:
-      <input name="new_incomeitem_value" />
+      Amount:
+      <input name="amount" />
     </label>
-    <div><input type="submit" value="Save" /></div>
+    <div><input type="submit" value="Add" /></div>
   </form>
 
 {% endblock %}

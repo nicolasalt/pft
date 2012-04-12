@@ -44,33 +44,30 @@ class Profile(ndb.Model):
 
 
 class Transaction(ndb.Model):
-  account_id = ndb.IntegerProperty(required=True)
+  account_id = ndb.IntegerProperty()
   category_id = ndb.IntegerProperty()
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
-  description = ndb.StringProperty()
+  description = ndb.StringProperty(indexed=False)
   dest_account_id = ndb.IntegerProperty()
   dest_category_id = ndb.IntegerProperty()
-  source = ndb.StringProperty(choices=['unknown', 'import', 'manual'],
-                              default='unknown')
+  source = ndb.StringProperty(
+      choices=['unknown', 'import', 'manual', 'budget'],
+      default='unknown')
+  planned = ndb.BooleanProperty(default=False)
 
 
-class ExpenseItem(ndb.Model):
-  category_id = ndb.IntegerProperty(required=True)
-  planned_value = ndb.FloatProperty()
-  transaction_id = ndb.IntegerProperty()
-
-
-class IncomeItem(ndb.Model):
-  name = ndb.StringProperty(required=True)
-  planned_value = ndb.FloatProperty()
+class BudgetItem(ndb.Model):
+  date = ndb.DateTimeProperty(required=True)
+  description = ndb.StringProperty()
+  category_id = ndb.IntegerProperty()
+  planned_amount = ndb.FloatProperty()
   transaction_id = ndb.IntegerProperty()
 
 
 class Budget(ndb.Model):
   date = ndb.DateTimeProperty(required=True)
-  expenses = ndb.LocalStructuredProperty(ExpenseItem, repeated=True)
-  income = ndb.LocalStructuredProperty(IncomeItem, repeated=True)
+  items = ndb.LocalStructuredProperty(BudgetItem, repeated=True)
 
   DATE_FORMAT = '%m.%Y'
 

@@ -2,50 +2,57 @@
 <html>
 <head>
   <link type="text/css" rel="stylesheet" href="/css/common.css" />
+  <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
+
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="/js/lib/jquery-ui-1.8.18.custom.min.js"></script>
   <script type="text/javascript" src="/js/lib/amplify.min.js"></script>
   <script type="text/javascript" src="/js/state.js"></script>
-  <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
+  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
 
   {% block head %}
     <title>Personal Finance Tracker</title>
   {% endblock %}
 
-  <style type="text/css">
-    .active_profile_name {
-      color: #999;
-    }
-  </style>
-
   <script>
     $(function() {
-      $('.add_expense_button').button();
+      $('button').button();
     });
   </script>
 </head>
 <body>
 <div class="site_content">
   <header>
-    <a href="/">Home</a> |
-    <a href="/edit_budget">Edit budget</a> |
-    <a href="/detailed_expenses">View detailed expenses</a> |
-    <a href="/import_from_file">Import from file</a> |
-    <a href="/edit_profile">Profile settings</a> |
-    <a href="/manage_profiles">Change profile</a>
-    <span class="active_profile_name">({{ profile.name }})</span>
+    <div class="right_block">
+      <a href="/manage_profiles">Change profile</a>
+      <span class="gray_name">({{ profile.name }})</span>
+
+      <a href="{{ logout_url }}">Log out</a>
+      <span class="gray_name">({{ google_user.nickname() }})</span>
+    </div>
+
+    <div class="left_block">
+      <a href="/">Overview</a>
+      <a href="/detailed_expenses">View detailed expenses</a>
+      <a href="/edit_profile">Profile settings</a>
+    </div>
   </header>
 
   <div class="fast_access_bar">
-    <div class="add_expense_button" transaction_id="">
+    <button transaction_id="">
       Add expense
-    </div>
-    <div class="add_account_transaction_button">
-      Add account transaction
-    </div>
+    </button>
+    <button>
+      Transfer
+    </button>
+    <button onclick="window.location = '/import_from_file'">
+      Import from file
+    </button>
   </div>
 
   {% block content %}{% endblock %}
+
+  {% include "templates/include/transaction_dialog.inc.html" %}
 </div>
 </body>
 </html>

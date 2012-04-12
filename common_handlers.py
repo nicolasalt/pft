@@ -10,7 +10,9 @@ jinja_environment = jinja2.Environment(
 class CommonHandler(webapp2.RequestHandler):
   def WriteToTemplate(self, template_name, template_values):
     template_values.update({
+      'google_user': self.google_user,
       'visitor': self.visitor,
+      'logout_url': users.create_logout_url(self.request.uri),
       'profile': self.profile
     })
     template = jinja_environment.get_template(template_name)

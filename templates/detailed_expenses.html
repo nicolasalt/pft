@@ -3,8 +3,6 @@
 {% block head %}
   <title>PFT: edit budget</title>
 
-  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
-
   <style type="text/css">
     .expense {
       color: #800000;
@@ -98,6 +96,4 @@
       <td class="income_cell">{{ total_income }}</td>
     </tr>
   </table>
-
-  {% include "templates/include/transaction_dialog.inc.html" %}
 {% endblock %}

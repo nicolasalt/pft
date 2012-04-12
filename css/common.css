@@ -1,11 +1,42 @@
 body {
   font-family: Verdana, Helvetica, sans-serif;
   font-size: 12px;
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  display: inline-block;
+}
+a:hover {
+  text-decoration: underline;
 }
 
 header {
-  padding: 5px;
-  background-color: #ffece4;
+  background-color: #faf4f0;
+}
+header .gray_name {
+  color: #999;
+  display: inline-block;
+  padding-right: 15px;
+}
+header a {
+  padding: 7px 0;
+}
+header .left_block a {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+header a:visited,
+header a {
+  color: #577fbf;
+}
+header a:hover {
+  color: #679ce8;
+}
+header .right_block {
+  float: right;
 }
 
 .category {
@@ -31,14 +62,76 @@ header {
   width: 100%;
 }
 
-.add_account_transaction_button {
-  height: 21px;
-  font-size: 12px;
-  color: white;
-  text-align: center;
-  padding-top: 5px;
-  cursor: pointer;
+.half_page_block {
+  width: 425px;
+}
+
+.full_page_block {
+  width: 887px;
+}
+
+.standard_block,
+.standard_block_with_title {
+  font-family: sans-serif;
+}
+.standard_block {
+  background-color: #faf7f6;
+  border: 1px solid #f0e2d9;
+  border-radius: 5px;
+  font-size: 15px;
+  padding: 5px 10px;
+  position: relative;
+}
+.standard_block .item {
+  line-height: 22px;
+}
+.standard_block .item .name {
+  width: 150px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   display: inline-block;
-  width: 192px;
-  background: url(/img/add_account_transaction.png) transparent no-repeat 0 0;
+}
+.standard_block .item .balance {
+  width: 100px;
+  text-align: right;
+  overflow: hidden;
+  display: inline-block;
+}
+.standard_block .item .currency {
+  color: #bbb;
+  display: inline-block;
+}
+.standard_block .item.total {
+  margin-top: 10px;
+}
+.standard_block .item.total .name,
+.standard_block .item.total .balance {
+  font-weight: bold;
+}
+
+.standard_block_with_title .title {
+  font-weight: bold;
+  font-size: 15px;
+  margin: 30px 10px 10px;
+  display: inline-block;
+}
+
+.standard_block_with_title {
+  display: inline-block;
+  vertical-align: top;
+}
+
+.standard_block_with_title .details_link {
+  color: #b56c39;
+  font-size: 12px;
+}
+.standard_block .details_link {
+  position: absolute;
+  right: 10px;
+  bottom: 5px;
+}
+
+.standard_block_divider {
+  width: 15px;
+  display: inline-block;
 }

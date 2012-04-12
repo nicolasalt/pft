@@ -1,17 +1,34 @@
+from datetime import datetime
+from google.appengine.ext import ndb
+from datastore import models
 
-def CalculateExpensesAndIncome(budget, transactions):
-  cat_id_to_planned_expense = dict(
-    [(exp.category_id, exp.planned_value) for exp in budget.expenses])
-
-  total_income = 0
-  total_expenses = 0
+def CalculateUnplannedExpensesAndIncome(budget, transactions):
+  unplanned_income = 0
+  unplanned_expenses = 0
+  budget_transaction_ids = GetTransactionIdsOfBudget(budget)
   for transaction in transactions:
-    if transaction.category_id:
-      if (not transaction.category_id in cat_id_to_planned_expense or
-          cat_id_to_planned_expense[transaction.category_id] is not None):
+    if transaction.key.id() in budget_transaction_ids:
         if transaction.amount > 0:
-          total_expenses += transaction.amount
+          unplanned_expenses += transaction.amount
         else:
-          total_income -= transaction.amount
+          unplanned_income -= transaction.amount
 
-  return total_income, total_expenses
+  return unplanned_income, unplanned_expenses
+
+
+def GetTransactionIdsOfBudget(budget):
+  return set((i.transaction_id for i in budget.items))
+
+
+def GetBudget(profile, str_date):
+  budget_date = datetime.now()
+  if str_date:
+    budget_date = models.Budget.ParseDate(str_date)
+
+  budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date),
+                       parent=profile.key)
+  budget = budget_key.get()
+  if not budget:
+    budget = models.Budget(parent=profile.key, date=budget_date)
+
+  return budget

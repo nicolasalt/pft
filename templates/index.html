@@ -1,111 +1,63 @@
 {% extends "templates/base.html" %}
 
 {% block head %}
-  <title>PFT: admin page</title>
-
-  <style type="text/css">
-    form {
-      border: 1px solid #ccc;
-      padding: 5px;
-      margin: 10px 0;
-      display: inline-block;
-    }
-  </style>
+  <title>PFT: overview</title>
 {% endblock %}
 
 {% block content %}
-  <script>
-    $(function(){
-      // Datepicker
-      $('#datepicker').datepicker({
-        inline: true,
-        dateFormat: 'dd.mm.yy'
-      });
-    });
-  </script>
-
-  <h3>Accounts</h3>
-  <ul>
-    {% for account in profile.accounts %}
-      <li>
-        Name: {{ account.name|escape }},
-        Currency: {{ account.currency|escape }},
-        Balance: {{ account.balance }}
-        <br>
-        Transactions:
-        <ul>
-          {% set account_index = loop.index0 %}
-          {% for transaction in transactions if transaction.account_id == account_index %}
-            <li>
-              Date: {{ transaction.date|escape }},
-              Category: {{ transaction.category_id }},
-              Amount: {{ transaction.amount }}
-            </li>
-          {% endfor %}
-        </ul>
-      </li>
-    {% endfor %}
-  </ul>
-
-  <div>Add account</div>
-  <form action="/do/add_account" method="post">
-      <div>Name: <input name="name"/></div>
-      <div>Currency: <input name="currency"/></div>
-      <div><input type="submit" value="Add account" /></div>
-  </form>
-
-  <h3>Categories</h3>
-  <ul>
-    {% for category in profile.categories %}
-      <li>
-        Name: {{ category.name|escape }},
-        Balance: {{ category.balance }}
-      </li>
-    {% endfor %}
-  </ul>
-
-  <h4>Add category</h4>
-  <form action="/do/add_category" method="post">
-    <div>Name: <input name="name"/></div>
-    <div><input type="submit" value="Add" /></div>
-  </form>
-
-  <br>
-  <div>Add transaction</div>
-  <form action="/do/edit_transaction" method="post">
-      <div>Account:
-        <select name="account_id">
-          {% for account in profile.accounts %}
-            <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
-          {% endfor %}
-        </select>
+  <div class="standard_block_with_title">
+    <div class="title">Categories</div>
+    <div class="standard_block half_page_block">
+      {% for category in profile.categories %}
+        <div class="item">
+          <span class="name">{{ category.name|escape }}</span>
+          <span class="balance">{{ category.balance|int }}</span>
+          <span class="currency">{{ profile.main_currency}}</span>
+        </div>
+      {% endfor %}
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ (total_balance - categories_total_balance)|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
       </div>
-      <div>Category:
-        <select name="category_id">
-          <option value="">None</option>
-          {% for category in profile.categories %}
-            <option value="{{ loop.index0 }}">{{ category.name|escape }}</option>
-          {% endfor %}
-        </select>
-      </div>
-      <div>Description: <textarea name="description"></textarea></div>
-      <div>Amount: <input name="amount"/></div>
-      <div>Date: <input name="date" id="datepicker"/></div>
-      <div><input type="submit" value="Add transaction" /></div>
-  </form>
-
-  <br>
-  <div>Add from csv</div>
-  <form action="/do/add_transactions_from_csv" method="post"
-        enctype="multipart/form-data">
-    <div>Account:
-      <select name="account_id">
-        {% for account in profile.accounts %}
-          <option value="{{ loop.index0 }}">{{ account.name|escape }}</option>
-        {% endfor %}
-      </select>
     </div>
-    <input type="file" name="csv" /><br>
-    <input type="submit" value="Submit" />
-  </form>
+  </div
+  ><div class="standard_block_divider"></div
+  ><div class="standard_block_with_title">
+    <div class="title">Accounts</div>
+    <div class="standard_block half_page_block">
+      {% for account in profile.accounts %}
+        <div class="item">
+          <span class="name">{{ account.name|escape }}</span>
+          <span class="balance">{{ account.balance|int }}</span>
+          <span class="currency">{{ account.currency}}</span>
+        </div>
+      {% endfor %}
+      <div class="item total">
+        <span class="name">Total</span>
+        <span class="balance">{{ total_balance|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+      <a class="details_link" href="/accounts_overview">see all</a>
+    </div>
+  </div>
+
+  <div class="standard_block_with_title">
+    <div class="title">Current month</div>
+    <a class="details_link" href="/edit_budget">details</a>
+    <div class="standard_block full_page_block">
+      {% for item in budget_items %}
+        <div class="item">
+          <span class="name">{{ item.name|escape }}</span>
+          <span class="balance">{{ item.amount|int }}</span>
+          <span class="currency">{{ profile.main_currency}}</span>
+        </div>
+      {% endfor %}
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ common_savings|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+    </div>
+  </div>
 {% endblock %}

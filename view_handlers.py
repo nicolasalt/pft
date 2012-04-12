@@ -8,14 +8,53 @@ import budget_util
 import parse_csv
 from util import ndb_json
 
+
 class MainPage(CommonHandler):
+  def HandleGet(self):
+    budget = budget_util.GetBudget(self.profile, self.request.get('date'))
+
+    transactions = lookup.GetTransactionsForBudget(self.profile, budget)
+    unplanned_income, unplanned_expenses = (
+        budget_util.CalculateUnplannedExpensesAndIncome(
+            budget, transactions))
+
+    total_balance = sum([a.balance for a in self.profile.accounts])
+    categories_total_balance = sum([c.balance for c in self.profile.categories])
+
+    budget_view_items = []
+    common_savings = 0
+    for item in budget.items:
+      if item.category_id:
+        budget_view_items.append({
+          'name': self.profile.categories[item.category_id].name,
+          'amount': item.planned_amount
+        })
+        common_savings -= item.planned_amount
+
+    budget_view_items.append({
+      'name': 'Other expenses',
+      'amount': unplanned_expenses
+    })
+    common_savings -= unplanned_expenses
+
+    template_values = {
+      'total_balance': total_balance,
+      'categories_total_balance': categories_total_balance,
+      'budget_items': budget_view_items,
+      'common_savings': common_savings
+    }
+
+    self.WriteToTemplate('templates/index.html', template_values)
+
+
+class AdminPage(CommonHandler):
   def HandleGet(self):
 
     template_values = {
       'transactions': lookup.GetAllTransactions(self.profile)
     }
 
-    self.WriteToTemplate('templates/index.html', template_values)
+    self.WriteToTemplate('templates/admin.html', template_values)
 
 
 class ImportFromFilePage(CommonHandler):
@@ -52,53 +91,17 @@ class EditImportedFilePage(CommonHandler):
 
 class EditBudgetPage(CommonHandler):
   def HandleGet(self):
-    raw_budget_date = self.request.get('date')
-    budget_date = datetime.now()
-    if raw_budget_date:
-      budget_date = models.Budget.ParseDate(raw_budget_date)
-
-    budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date),
-                         parent=self.profile.key)
-    budget = budget_key.get()
-    if not budget:
-      budget = models.Budget(parent=self.profile.key, date=budget_date)
-
-    id_to_cat = dict([(id, cat) for id, cat in enumerate(
-        self.profile.categories)])
-
-    if budget:
-      cat_id_to_planned_expense = dict(
-          [(exp.category_id, exp.planned_value) for exp in budget.expenses])
-
-      for id, category in enumerate(self.profile.categories):
-        if id in cat_id_to_planned_expense:
-          category.planned_value = cat_id_to_planned_expense[id]
+    budget = budget_util.GetBudget(self.profile, self.request.get('date'))
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
-    total_income, total_expenses = budget_util.CalculateExpensesAndIncome(
-        budget, transactions)
-
-    days = []
-    _, days_in_current_month = calendar.monthrange(
-        budget_date.year, budget_date.month)
-    for day in xrange(days_in_current_month):
-      days.append({
-        'date': datetime(budget_date.year, budget_date.month, day + 1),
-        'transactions': []
-      })
-
-    for transaction in transactions:
-      if (transaction.category_id is not None and
-          transaction.category_id in id_to_cat):
-        transaction.category = id_to_cat[transaction.category_id]
-      days[transaction.date.day - 1]['transactions'].append(transaction)
+    unplanned_income, unplanned_expenses = (
+        budget_util.CalculateUnplannedExpensesAndIncome(
+            budget, transactions))
 
     template_values = {
       'budget': budget,
-      'transactions': transactions,
-      'days': days,
-      'total_income': total_income,
-      'total_expenses': total_expenses
+      'unplanned_income': unplanned_income,
+      'unplanned_expenses': unplanned_expenses
     }
 
     self.WriteToTemplate('templates/edit_budget.html', template_values)

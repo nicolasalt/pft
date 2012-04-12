@@ -6,6 +6,7 @@ import view_handlers
 
 app = webapp2.WSGIApplication([
     ('/', view_handlers.MainPage),
+    ('/admin', view_handlers.AdminPage),
     ('/edit_budget', view_handlers.EditBudgetPage),
     ('/import_from_file', view_handlers.ImportFromFilePage),
     ('/edit_imported_file', view_handlers.EditImportedFilePage),
@@ -22,6 +23,5 @@ app = webapp2.WSGIApplication([
     ('/do/add_category', action_handlers.DoAddCategory),
     ('/do/edit_transaction', action_handlers.DoEditTransaction),
     ('/do/add_transactions_from_csv', action_handlers.DoAddTransactionsFromCsv),
-    ('/do/edit_budget', action_handlers.DoEditBudget),
     ('/do/edit_profile', action_handlers.DoEditProfile)],
     debug=True)

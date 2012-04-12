@@ -3,6 +3,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from common_handlers import CommonHandler
 from datastore import models, lookup, update
+import parse
 import parse_csv
 
 
@@ -16,30 +17,57 @@ class DoAddAccount(CommonHandler):
 
 
 class DoEditTransaction(CommonHandler):
+  def _UpdateBudget(self, budget_date, transaction):
+    budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date))
+    budget = models.Budget.get_or_insert(
+      budget_key.id(), parent=self.profile.key, date=budget_date)
+    budget_items = [i for i in budget.items
+                    if i.transaction_id == transaction.key.id()]
+    if len(budget_items) == 1:
+      budget_item = budget_items[0]
+    else:
+      budget_item = models.BudgetItem(
+        date=transaction.date, transaction_id=transaction.key.id())
+      budget.items.append(budget_item)
+    budget_item.date = transaction.date
+    budget_item.description = transaction.description
+    budget_item.category_id = transaction.category_id
+    budget_item.planned_amount = transaction.amount
+    budget.put()
+
   def HandlePost(self):
-    amount = float(self.request.get('amount'))
+    amount = parse.ParseFloat(self.request.get('amount'))
     description = self.request.get('description')
-    account_id = int(self.request.get('account_id'))
     date = datetime.strptime(self.request.get('date'), '%d.%m.%Y')
+    account_id = parse.ParseInt(self.request.get('account_id'))
+    category_id = parse.ParseInt(self.request.get('category_id'))
+    dest_category_id = parse.ParseInt(self.request.get('dest_category_id'))
+    dest_account_id = parse.ParseInt(self.request.get('dest_account_id'))
+    transaction_id = parse.ParseInt(self.request.get('transaction_id'))
 
-    raw_category_id = self.request.get('category_id')
-    category_id = None
-    if raw_category_id:
-      category_id = int(raw_category_id)
+    raw_budget_date = self.request.get('budget_date')
+    budget_date = None
+    if raw_budget_date:
+      budget_date = models.Budget.ParseDate(raw_budget_date)
+      date = budget_date.replace(day=date.day)
 
-    raw_transaction_id = self.request.get('transaction_id')
-    transaction_id = None
-    if raw_transaction_id:
-      transaction_id = int(raw_transaction_id)
+    source = 'budget' if budget_date else 'manual'
 
     if transaction_id is not None:
-      update.UpdateTransaction(self.profile, transaction_id, account_id,
-                               amount, date, category_id=category_id,
-                               description=description, source='manual')
+      transaction = update.UpdateTransaction(
+          self.profile, transaction_id, amount, date, account_id=account_id,
+          category_id=category_id, description=description,
+          dest_category_id=dest_category_id, dest_account_id=dest_account_id,
+          source=source, planned=budget_date is not None)
     else:
-      update.AddTransaction(self.profile, account_id,
-                            amount, date, category_id=category_id,
-                            description=description, source='manual')
+      transaction = update.AddTransaction(
+          self.profile, amount, date, account_id=account_id,
+          category_id=category_id, description=description,
+          dest_category_id=dest_category_id, dest_account_id=dest_account_id,
+          source=source, planned=budget_date is not None)
+
+    if budget_date:
+      self._UpdateBudget(budget_date, transaction)
 
     self.response.set_status(200)
 
@@ -111,36 +139,6 @@ class DoAddCategory(CommonHandler):
     update.AddCategory(self.profile, name)
 
     self.redirect('/')
-
-
-class DoEditBudget(CommonHandler):
-  def HandlePost(self):
-    budget_date = datetime.strptime(
-      self.request.get('budget_date'), '%m.%Y')
-
-    category_id_and_amount = []
-    for arg in self.request.arguments():
-      if arg.startswith('category_') and self.request.get(arg):
-        category_id = int(arg[9:])
-        category_id_and_amount.append(
-            (category_id, float(self.request.get(arg))))
-
-    budget_key = ndb.Key(models.Budget, budget_date.strftime('%m.%Y'))
-    budget = models.Budget.get_or_insert(
-        budget_key.id(), parent=self.profile.key, date=budget_date)
-    budget.expenses = [models.ExpenseItem(category_id=cat_id,
-                                          planned_value=amount)
-                       for cat_id, amount in category_id_and_amount]
-
-    if self.request.get('new_incomeitem_name'):
-      new_income_item_name = self.request.get('new_incomeitem_name')
-      new_income_item_value = float(self.request.get('new_incomeitem_value'))
-      budget.income.append(models.IncomeItem(
-          name=new_income_item_name, planned_value=new_income_item_value))
-
-    budget.put()
-
-    self.redirect('/edit_budget')
 
 
 class DoAddParseSchema(CommonHandler):
@@ -244,6 +242,7 @@ class DoApplyParseSchemaToImportedFile(CommonHandler):
 
     self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
 
+
 # TODO: optimize, now it is too slow
 class DoResolveParsedTransaction(CommonHandler):
   def HandlePost(self):
@@ -267,8 +266,10 @@ class DoResolveParsedTransaction(CommonHandler):
 
     def _AddTransaction(cat_id, amount):
       transaction = update.AddTransaction(
-          self.profile, imported_file.account_id, amount,
-          parsed_transaction.date, cat_id, parsed_transaction.description,
+          self.profile, amount, parsed_transaction.date,
+          account_id=imported_file.account_id,
+          category_id=cat_id,
+          description=parsed_transaction.description,
           source='import')
       parsed_transaction.resolutions.append(
           models.ImportedFileTransaction.ResolvedTransaction(

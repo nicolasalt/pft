@@ -25,8 +25,9 @@ def _UpdateTransactionRelations(profile, transaction, amount):
          To delete transaction: -transaction.amount.
          To modify transaction: new_amount - transaction.amount.
   """
-  account = lookup.GetAccountById(profile, transaction.account_id)
-  account.balance -= amount
+  if transaction.account_id is not None:
+    account = lookup.GetAccountById(profile, transaction.account_id)
+    account.balance -= amount
 
   if transaction.category_id is not None:
     category = lookup.GetCategoryById(profile, transaction.category_id)
@@ -37,17 +38,17 @@ def _UpdateTransactionRelations(profile, transaction, amount):
     dest_account.balance += amount
 
   if transaction.dest_category_id is not None:
-    transaction.dest_category_id = transaction.dest_category_id
-    dest_category = lookup.GetCategoryById(profile, transaction.dest_category_id)
+    dest_category = lookup.GetCategoryById(profile,
+                                           transaction.dest_category_id)
     dest_category.balance += amount
 
   profile.put()
 
 
 @ndb.transactional
-def AddTransaction(profile, account_id, amount, date, category_id=None,
+def AddTransaction(profile, amount, date, account_id=None, category_id=None,
                    description=None, dest_account_id=None,
-                   dest_category_id=None, source='unknown'):
+                   dest_category_id=None, source='unknown', planned=False):
   transaction = models.Transaction(
     parent=profile.key,
     account_id=account_id,
@@ -59,23 +60,25 @@ def AddTransaction(profile, account_id, amount, date, category_id=None,
     dest_category_id=dest_category_id,
     source=source)
 
-  # reload the latest profile
-  profile = lookup.GetProfileById(profile.key.id())
-  _UpdateTransactionRelations(profile, transaction, amount)
+  if not planned:
+    # reload the latest profile
+    profile = lookup.GetProfileById(profile.key.id())
+    _UpdateTransactionRelations(profile, transaction, amount)
 
   transaction.put()
   return transaction
 
 
 @ndb.transactional
-def UpdateTransaction(profile, transaction_id, account_id, amount, date,
+def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
                       category_id=None, description=None, dest_account_id=None,
-                      dest_category_id=None, source='unknown'):
+                      dest_category_id=None, source='unknown', planned=False):
   transaction = lookup.GetTransactionById(profile, transaction_id)
 
-  # reload the latest profile
-  profile = lookup.GetProfileById(profile.key.id())
-  _UpdateTransactionRelations(profile, transaction, -transaction.amount)
+  if not planned:
+    # reload the latest profile
+    profile = lookup.GetProfileById(profile.key.id())
+    _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 
   transaction.account_id = account_id
   transaction.amount = amount
@@ -86,7 +89,8 @@ def UpdateTransaction(profile, transaction_id, account_id, amount, date,
   transaction.dest_category_id = dest_category_id
   transaction.source = source
 
-  _UpdateTransactionRelations(profile, transaction, amount)
+  if not planned:
+    _UpdateTransactionRelations(profile, transaction, amount)
 
   transaction.put()
   return transaction

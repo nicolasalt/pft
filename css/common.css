@@ -144,3 +144,8 @@ header .right_block {
   height: 12px;
   display: inline-block;
 }
+
+.expense-chart {
+  width: 700px;
+  height: 400px;
+}

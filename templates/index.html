@@ -2,9 +2,44 @@
 
 {% block head %}
   <title>PFT: overview</title>
+
+<script type="text/javascript">
+  $(function () {
+    var data= [
+      {% for item in budget_items %}
+        ['{{ item.name|escape }}', {{ item.amount }}],
+      {% endfor %}
+      ['Common savings',   {{ common_savings }}]
+    ];
+
+    $('#expense-chart-dialog').dialog({
+      autoOpen: false,
+      resizable: false,
+      width: 730,
+      buttons: {
+        'Close': function() {
+          $(this).dialog('close');
+        }
+      }
+    });
+
+    var expenseChart = null;
+    $('#view-on-chart').click(function() {
+      $('#expense-chart-dialog').dialog('open');
+      if (!expenseChart) {
+        expenseChart = pft.AddExpenseChart('expense-chart', data);
+      }
+    });
+  });
+</script>
+
 {% endblock %}
 
 {% block content %}
+  <div id="expense-chart-dialog">
+    <div id="expense-chart" class="expense-chart"></div>
+  </div>
+
   <div class="standard_block_with_title">
     <div class="title">Categories</div>
     <div class="standard_block half_page_block">
@@ -64,6 +99,8 @@
               style="width: {{ (common_savings / max_expense * 100)|int }}px">
         </span>
       </div>
+      <a class="details_link" id="view-on-chart" href="javascript:void(0)">
+        view on chart</a>
     </div>
   </div>
 {% endblock %}

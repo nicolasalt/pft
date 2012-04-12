@@ -75,7 +75,7 @@ header .right_block {
   font-family: sans-serif;
 }
 .standard_block {
-  background-color: #faf7f6;
+  background-color: #FBF8F7;
   border: 1px solid #f0e2d9;
   border-radius: 5px;
   font-size: 15px;
@@ -133,5 +133,14 @@ header .right_block {
 
 .standard_block_divider {
   width: 15px;
+  display: inline-block;
+}
+
+.chart_line {
+  position: relative;
+  top: 1px;
+  margin-left: 2px;
+  background-color: #99CDE6;
+  height: 12px;
   display: inline-block;
 }

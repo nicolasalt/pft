@@ -51,12 +51,18 @@
           <span class="name">{{ item.name|escape }}</span>
           <span class="balance">{{ item.amount|int }}</span>
           <span class="currency">{{ profile.main_currency}}</span>
+          <span class="chart_line"
+                style="width: {{ (item.amount / max_expense * 100)|int }}px">
+          </span>
         </div>
       {% endfor %}
       <div class="item total">
         <span class="name">Common savings</span>
         <span class="balance">{{ common_savings|int }}</span>
         <span class="currency">{{ profile.main_currency}}</span>
+        <span class="chart_line"
+              style="width: {{ (common_savings / max_expense * 100)|int }}px">
+        </span>
       </div>
     </div>
   </div>

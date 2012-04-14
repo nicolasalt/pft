@@ -3,8 +3,7 @@ from common_handlers import CommonHandler
 from datastore import lookup
 from datastore import models
 from datastore import update
-from util import ndb_json
-import parse_csv
+from util import ndb_json, parse_csv
 
 
 # TODO: optimize, now it is too slow

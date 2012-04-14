@@ -3,7 +3,7 @@ from datetime import datetime
 from google.appengine.ext import ndb
 from common_handlers import CommonHandler
 from datastore import models, update
-import parse
+from util import parse
 
 
 class DoAddAccount(CommonHandler):

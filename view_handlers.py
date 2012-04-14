@@ -4,8 +4,7 @@ from google.appengine.ext import ndb
 
 from common_handlers import CommonHandler
 from datastore import models, lookup
-import budget_util
-from util import ndb_json
+from util import ndb_json, budget_util
 
 
 class MainPage(CommonHandler):

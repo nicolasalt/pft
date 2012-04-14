@@ -1,6 +1,6 @@
-import budget_util
 from common_handlers import CommonHandler
 from datastore import lookup
+from util import budget_util
 
 
 class EditBudgetPage(CommonHandler):

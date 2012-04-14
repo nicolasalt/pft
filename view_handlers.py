@@ -19,15 +19,11 @@ class MainPage(CommonHandler):
     total_balance = sum([a.balance for a in self.profile.accounts])
     categories_total_balance = sum([c.balance for c in self.profile.categories])
 
-    budget_view_items = []
+    budget_view_items = budget_util.GetBudgetViewItems(self.profile, budget)
     common_savings = 9000
     max_expense = 0
     for item in budget.items:
       if item.category_id is not None:
-        budget_view_items.append({
-          'name': self.profile.categories[item.category_id].name,
-          'amount': item.planned_amount
-        })
         common_savings -= item.planned_amount
         max_expense = max(max_expense, item.planned_amount)
 

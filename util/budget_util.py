@@ -29,6 +29,20 @@ def GetBudget(profile, str_date):
                        parent=profile.key)
   budget = budget_key.get()
   if not budget:
-    budget = models.Budget(parent=profile.key, date=budget_date)
+    budget = models.Budget(parent=profile.key,
+                           id=models.Budget.DateToStr(budget_date),
+                           date=budget_date)
 
   return budget
+
+
+def GetBudgetViewItems(profile, budget):
+  budget_view_items = []
+  for item in budget.items:
+    if item.category_id is not None:
+      budget_view_items.append({
+        'name': profile.categories[item.category_id].name,
+        'amount': item.planned_amount
+      })
+
+  return budget_view_items

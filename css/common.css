@@ -13,6 +13,10 @@ a:hover {
   text-decoration: underline;
 }
 
+form {
+  display: inline-block;
+}
+
 header {
   background-color: #faf4f0;
 }
@@ -84,6 +88,10 @@ header .right_block {
 }
 .standard_block .item {
   line-height: 22px;
+}
+.standard_block .item button {
+  font-size: 12px;
+  margin-left: 10px;
 }
 .standard_block .item .name {
   width: 150px;

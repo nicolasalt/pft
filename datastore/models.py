@@ -58,7 +58,7 @@ class Transaction(ndb.Model):
 
 
 class BudgetItem(ndb.Model):
-  date = ndb.DateTimeProperty(required=True)
+  date = ndb.DateTimeProperty()
   description = ndb.StringProperty()
   category_id = ndb.IntegerProperty()
   planned_amount = ndb.FloatProperty()

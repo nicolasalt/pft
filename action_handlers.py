@@ -16,24 +16,6 @@ class DoAddAccount(CommonHandler):
 
 
 class DoEditTransaction(CommonHandler):
-  def _UpdateBudget(self, budget_date, transaction):
-    budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date))
-    budget = models.Budget.get_or_insert(
-      budget_key.id(), parent=self.profile.key, date=budget_date)
-    budget_items = [i for i in budget.items
-                    if i.transaction_id == transaction.key.id()]
-    if len(budget_items) == 1:
-      budget_item = budget_items[0]
-    else:
-      budget_item = models.BudgetItem(
-        date=transaction.date, transaction_id=transaction.key.id())
-      budget.items.append(budget_item)
-    budget_item.date = transaction.date
-    budget_item.description = transaction.description
-    budget_item.category_id = transaction.category_id
-    budget_item.planned_amount = transaction.amount
-    budget.put()
-
   def HandlePost(self):
     amount = parse.ParseFloat(self.request.get('amount'))
     description = self.request.get('description')
@@ -64,9 +46,6 @@ class DoEditTransaction(CommonHandler):
           category_id=category_id, description=description,
           dest_category_id=dest_category_id, dest_account_id=dest_account_id,
           source=source, planned=budget_date is not None)
-
-    if budget_date:
-      self._UpdateBudget(budget_date, transaction)
 
     self.response.set_status(200)
 

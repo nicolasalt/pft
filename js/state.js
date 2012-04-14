@@ -71,3 +71,12 @@ $(function() {
     'id': '',
     'name': 'No category'});
 });
+
+
+pft.state.UpdateBudgetItem = function(item) {
+  pft.state.UpdateEntity(item, 'budget_items');
+};
+
+pft.state.GetBudgetItem = function(itemId) {
+  return pft.state.GetEntity(itemId, 'budget_items');
+};

@@ -3,13 +3,31 @@
 {% block head %}
   <title>PFT: edit budget</title>
 
-  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
+  <script type="text/javascript" src="/js/budget.js"></script>
 
   <style type="text/css">
+    .add_category_button {
+      display: block;
+      margin-top: 10px;
+    }
   </style>
 
   <script type="text/javascript">
     // Init.
+    {% for item in budget_items_json %}
+      var item = {{ item }};
+      item['id'] = {{ loop.index0 }};
+      pft.state.UpdateBudgetItem(item);
+    {% endfor %}
+
+    $('[budget_item_id]').live('click', function(){
+      pft.EditBudgetItem('{{ budget.GetStrDate() }}',
+          $(this).attr('budget_item_id'));
+    });
+    $('[delete_budget_item_id]').live('click', function(){
+      pft.DeleteBudgetItem('{{ budget.GetStrDate() }}',
+          $(this).attr('delete_budget_item_id'));
+    });
   </script>
 {% endblock %}
 
@@ -22,7 +40,7 @@
 
   <br><br>
 
-  <h3>Edit budget for {{ budget.date.strftime('%m.%Y') }}</h3>
+  <h3>Edit budget for {{ budget.GetStrDate() }}</h3>
 
   {% if not budget %}
     <p>
@@ -39,13 +57,34 @@
     {% endfor %}
   </ul>
 
-  <form action="/do/edit_transaction" method="post">
-    <h5>Add new item</h5>
-    <input type="hidden" name="budget_date" value="{{ budget.GetStrDate() }}"/>
-    <input type="hidden" name="date" value="01.01.1000"/>
+  <div class="standard_block_with_title">
+    <div class="title">Categories</div>
+    <div class="standard_block">
+      {% for item in budget_items %}
+        <div class="item">
+          <span class="name">{{ item.name|escape }}</span>
+          <span class="balance">{{ item.amount|int }}</span>
+          <span class="currency">{{ profile.main_currency}}</span>
+          <button icon="ui-icon-pencil"
+              budget_item_id="{{ loop.index0 }}">Edit</button>
+          <button icon="ui-icon-circle-minus"
+              delete_budget_item_id="{{ loop.index0 }}">Remove</button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <button icon="ui-icon-circle-plus"
+      class="add_category_button" budget_item_id="">
+    Add category
+  </button>
+
+  <div id="edit-budget-item-dialog" style="display: none">
+    <div>You can automatically transfer money to a category every month</div>
+    <br>
     <label>
       Category:
-      <select name="dest_category_id">
+      <select id="edit-budget-item-category">
         {% for category in profile.categories %}
           <option value="{{ loop.index0 }}">
             {{ category.name|escape }}
@@ -55,10 +94,9 @@
     </label>
     <br>
     <label>
-      Amount:
-      <input name="amount" />
+      How much money to transfer this month:
+      <input id="edit-budget-item-amount" />
     </label>
-    <div><input type="submit" value="Add" /></div>
-  </form>
+  </div>
 
 {% endblock %}

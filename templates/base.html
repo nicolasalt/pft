@@ -18,7 +18,13 @@
 
   <script>
     $(function() {
-      $('button').button();
+      $('button').each(function(){
+        var options = {};
+        if ($(this).attr('icon')) {
+          options['icons'] = {'primary': $(this).attr('icon')};
+        }
+        $(this).button(options);
+      });
     });
   </script>
 </head>
@@ -41,7 +47,7 @@
   </header>
 
   <div class="fast_access_bar">
-    <button transaction_id="">
+    <button transaction_id="" icon="ui-icon-circle-plus">
       Add expense
     </button>
     <button>

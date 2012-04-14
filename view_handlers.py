@@ -64,16 +64,7 @@ class DetailedExpensesPage(CommonHandler):
        - for a category (not implemented)
        - for an account (not implemented)
     """
-    raw_budget_date = self.request.get('date')
-    budget_date = datetime.now()
-    if raw_budget_date:
-      budget_date = models.Budget.ParseDate(raw_budget_date)
-
-    budget_key = ndb.Key(models.Budget, models.Budget.DateToStr(budget_date),
-                         parent=self.profile.key)
-    budget = budget_key.get()
-    if not budget:
-      budget = models.Budget(parent=self.profile.key, date=budget_date)
+    budget = budget_util.GetBudget(self.profile, self.request.get('date'))
 
     id_to_cat = dict([(id, cat) for id, cat in enumerate(
       self.profile.categories)])
@@ -83,38 +74,16 @@ class DetailedExpensesPage(CommonHandler):
 
     transactions = lookup.GetTransactionsForBudget(self.profile, budget)
 
-    total_income = 0
-    total_expenses = 0
-    for transaction in transactions:
-      if transaction.amount > 0:
-        total_expenses += transaction.amount
-      else:
-        total_income -= transaction.amount
-
-
-    days = []
-    _, days_in_current_month = calendar.monthrange(
-        budget_date.year, budget_date.month)
-    for day in xrange(days_in_current_month):
-      days.append({
-        'date': datetime(budget_date.year, budget_date.month, day + 1),
-        'transactions': []
-      })
-
     for transaction in transactions:
       if (transaction.category_id is not None and
           transaction.category_id in id_to_cat):
         transaction.category = id_to_cat[transaction.category_id]
       transaction.account = id_to_account[transaction.account_id]
-      days[transaction.date.day - 1]['transactions'].append(transaction)
 
     template_values = {
       'budget': budget,
       'transactions': transactions,
-      'transactions_json': [ndb_json.encode(t) for t in transactions],
-      'days': days,
-      'total_income': total_income,
-      'total_expenses': total_expenses
+      'transactions_json': [ndb_json.encode(t) for t in transactions]
     }
 
     self.WriteToTemplate('templates/detailed_expenses.html', template_values)

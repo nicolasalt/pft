@@ -4,19 +4,15 @@
   <title>PFT: edit budget</title>
 
   <style type="text/css">
-    .expense {
-      color: #800000;
-      text-align: right;
-    }
-    .income {
-      color: #008000;
-      text-align: right;
-    }
     table.transactions {
       table-layout: fixed;
     }
     .transaction td {
       border-top: 1px solid #eee;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      line-height: 16px;
     }
 
     .date_cell {
@@ -27,20 +23,39 @@
     }
     .amount_cell {
       width: 100px;
+      cursor: pointer;
+    }
+    .amount_cell .edit_icon {
+      display: none;
+    }
+    .amount_cell:hover .edit_icon {
+      display: inline-block;
+      float: left;
     }
     .description_cell {
       width: 450px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap;
     }
     .account_cell {
-      width: 150px;
+      width: 140px;
     }
     .category_cell {
-      width: 100px;
+      width: 110px;
     }
 
+    .prev_month_link span,
+    .next_month_link span {
+      display: inline-block;
+      position: relative;
+      top: 2px;
+    }
+    .prev_month_link {
+      margin-right: 30px;
+    }
+    .next_month_link {
+      margin-left: 30px;
+    }
+
+    /* Date table lib CSS hacks */
     table.dataTable tr.odd {
       background-color: white;
     }
@@ -77,9 +92,27 @@
 
 {% block content %}
   <h3>
-    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Previous</a>
-    Viewing {{ budget.GetStrDate() }}
-    <a href="/edit_budget?date={{ budget.GetStrDate() }}">Next</a>
+    {% if budget %}
+      <a href="/transaction_report?date={{ previous_month.strftime('%m.%Y') }}"
+         class="prev_month_link">
+        <span class="ui-icon ui-icon-circle-triangle-w"></span>
+        {{ previous_month.strftime('%B %Y') }}</a>
+      Viewing operations in {{ budget.date.strftime('%B %Y') }}
+      <a href="/transaction_report?date={{ next_month.strftime('%m.%Y') }}"
+         class="next_month_link">
+        {{ next_month.strftime('%B %Y') }}
+        <span class="ui-icon ui-icon-circle-triangle-e"></span>
+      </a>
+    {% else %}
+      {% if category %}
+        Category <span class="category">{{ category.name }}</span>
+      {% endif %}
+      {% if account %}
+        Account <span class="account">{{ account.name }}</span>
+      {% endif %}
+    {% endif %}
+
+    <button id="change-view"></button>
   </h3>
 
   <table id="transaction-table" class="transactions" cellpadding="0" cellspacing="0">
@@ -101,7 +134,11 @@
           {% else %}
             {% set amount_class = 'income' %}
           {% endif %}
-          <td class="amount_cell {{ amount_class }}">{{ transaction.amount|abs|round(1) }}</td>
+          <td class="amount_cell {{ amount_class }}"
+              transaction_id="{{ transaction.key.id() }}">
+            <div class="edit_icon ui-icon-pencil ui-icon"></div>
+            {{ transaction.amount|abs|round(1) }}
+          </td>
           <td class="description_cell description">{{ transaction.description }}</td>
           <td class="account_cell account">{{ transaction.account.name }}</td>
           <td class="category_cell category">

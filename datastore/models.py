@@ -72,14 +72,20 @@ class Budget(ndb.Model):
   DATE_FORMAT = '%m.%Y'
 
   def GetDateRange(self):
-    month = self.date.month
-    year = self.date.year
-    start = datetime(year, month, 1)
-    if month == 12:
-      end = datetime(year + 1, 1, 1)
+    start = datetime(self.date.year, self.date.month, 1)
+    return start, self.GetNextBudgetDate()
+
+  def GetNextBudgetDate(self):
+    if self.date.month == 12:
+      return datetime(self.date.year + 1, 1, 1)
     else:
-      end = datetime(year, month + 1, 1)
-    return start, end
+      return datetime(self.date.year, self.date.month + 1, 1)
+
+  def GetPreviousBudgetDate(self):
+    if self.date.month == 1:
+      return datetime(self.date.year - 1, 12, 1)
+    else:
+      return datetime(self.date.year, self.date.month - 1, 1)
 
   @staticmethod
   def DateToStr(date):

@@ -9,8 +9,12 @@ a {
   text-decoration: none;
   display: inline-block;
 }
+a:visited, a {
+  color: #577fbf;
+}
 a:hover {
   text-decoration: underline;
+  color: #679ce8;
 }
 
 form {
@@ -32,13 +36,6 @@ header .left_block a {
   padding-right: 15px;
   padding-left: 15px;
 }
-header a:visited,
-header a {
-  color: #577fbf;
-}
-header a:hover {
-  color: #679ce8;
-}
 header .right_block {
   float: right;
 }
@@ -48,11 +45,20 @@ header .right_block {
 }
 
 .account {
-  color: #67177a;
+  color: #254a39;
 }
 
 .error {
   color: #c00000;
+}
+
+.expense {
+  color: #800000;
+  text-align: right;
+}
+.income {
+  color: #008000;
+  text-align: right;
 }
 
 .site_content {

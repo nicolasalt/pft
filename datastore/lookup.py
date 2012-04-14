@@ -45,6 +45,15 @@ def GetTransactionsForBudget(profile, budget):
       models.Transaction.date < end_date).fetch(1000)
 
 
+def GetTransactions(profile, category_id, account_id):
+  query = models.Transaction.query(ancestor=profile.key)
+  if category_id is not None:
+    query = query.filter(models.Transaction.category_id == category_id)
+  if account_id is not None:
+    query = query.filter(models.Transaction.account_id == account_id)
+  return query.fetch(1000)
+
+
 def GetTransactionById(profile, transaction_id):
   return models.Transaction.get_by_id(transaction_id, parent=profile.key)
 

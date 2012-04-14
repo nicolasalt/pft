@@ -3,14 +3,14 @@ import webapp2
 import action_handlers
 from handlers import import_from_file
 from handlers import profile
-from handlers.planning import EditBudgetPage
+from handlers import planning
 import view_handlers
 
 
 app = webapp2.WSGIApplication([
     ('/', view_handlers.MainPage),
     ('/admin', view_handlers.AdminPage),
-    ('/edit_budget', EditBudgetPage),
+    ('/edit_budget', planning.EditBudgetPage),
     ('/import_from_file', import_from_file.ImportFromFilePage),
     ('/edit_imported_file', import_from_file.EditImportedFilePage),
     ('/edit_profile', profile.EditProfile),

@@ -1,6 +1,7 @@
 import budget_util
 from common_handlers import CommonHandler
-import datastore.lookup
+from datastore import lookup
+
 
 class EditBudgetPage(CommonHandler):
   def HandleGet(self):
@@ -17,4 +18,4 @@ class EditBudgetPage(CommonHandler):
       'unplanned_expenses': unplanned_expenses
     }
 
-    self.WriteToTemplate('templates/edit_budget.html', template_values)
+    self.WriteToTemplate('templates/planning/edit_budget.html', template_values)

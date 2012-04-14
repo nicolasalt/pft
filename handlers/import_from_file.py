@@ -157,6 +157,9 @@ class DoAddParseSchema(CommonHandler):
     self.redirect('/')
 
 
+# Pages
+
+
 class EditImportedFilePage(CommonHandler):
   def HandleGet(self):
     imported_file_id = int(self.request.get('id'))
@@ -175,7 +178,8 @@ class EditImportedFilePage(CommonHandler):
       template_values['formatted_parsed_lines'] = parse_csv.ParseCsvToPreview(
           source_file_lines)[:13]
 
-    self.WriteToTemplate('templates/edit_imported_file.html', template_values)
+    self.WriteToTemplate('templates/import_from_file/edit_imported_file.html',
+                         template_values)
 
 
 class ImportFromFilePage(CommonHandler):
@@ -186,4 +190,5 @@ class ImportFromFilePage(CommonHandler):
           lookup.GetOrCreateImportedFileList(self.profile).imported_files
     }
 
-    self.WriteToTemplate('templates/import_from_file.html', template_values)
+    self.WriteToTemplate('templates/import_from_file/import_from_file.html',
+                         template_values)

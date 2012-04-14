@@ -16,7 +16,7 @@ class DoEditProfile(CommonHandler):
 
     update.UpdateProfile(self.profile, **kw)
 
-    self.redirect('/user_settings')
+    self.redirect('/edit_profile')
 
 
 class DoAddProfile(CommonHandler):
@@ -72,9 +72,10 @@ class ManageProfilesPage(CommonHandler):
       'profiles': lookup.GetAllProfiles(self.google_user),
     }
 
-    self.WriteToTemplate('templates/manage_profiles.html', template_values)
+    self.WriteToTemplate('templates/profile/manage_profiles.html',
+                         template_values)
 
 
 class EditProfile(CommonHandler):
   def HandleGet(self):
-    self.WriteToTemplate('templates/edit_profile.html', {})
+    self.WriteToTemplate('templates/profile/edit_profile.html', {})

@@ -93,15 +93,15 @@
 {% block content %}
   <h3>
     {% if budget %}
-      <a href="/transaction_report?date={{ previous_month.strftime('%m.%Y') }}"
+      <a href="/transaction_report?budget_date={{ previous_month.strftime('%m.%Y') }}"
          class="prev_month_link">
-        <span class="ui-icon ui-icon-circle-triangle-w"></span>
-        {{ previous_month.strftime('%B %Y') }}</a>
+        <span class="ui-icon ui-icon-circle-triangle-w">
+        </span>{{ previous_month.strftime('%B %Y') }}</a>
       Viewing operations in {{ budget.date.strftime('%B %Y') }}
-      <a href="/transaction_report?date={{ next_month.strftime('%m.%Y') }}"
+      <a href="/transaction_report?budget_date={{ next_month.strftime('%m.%Y') }}"
          class="next_month_link">
-        {{ next_month.strftime('%B %Y') }}
-        <span class="ui-icon ui-icon-circle-triangle-e"></span>
+        {{ next_month.strftime('%B %Y') }}<span
+            class="ui-icon ui-icon-circle-triangle-e"></span>
       </a>
     {% else %}
       {% if category %}
@@ -111,8 +111,6 @@
         Account <span class="account">{{ account.name }}</span>
       {% endif %}
     {% endif %}
-
-    <button id="change-view"></button>
   </h3>
 
   <table id="transaction-table" class="transactions" cellpadding="0" cellspacing="0">

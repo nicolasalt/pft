@@ -42,6 +42,7 @@ def GetBudgetViewItems(profile, budget):
     if item.category_id is not None:
       budget_view_items.append({
         'name': profile.categories[item.category_id].name,
+        'category_id': item.category_id,
         'amount': item.planned_amount
       })
 

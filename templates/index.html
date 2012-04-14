@@ -1,7 +1,7 @@
 {% extends "templates/base.html" %}
 
 {% block head %}
-  <title>PFT: overview</title>
+  <title xmlns="http://www.w3.org/1999/html">PFT: overview</title>
 
 <script type="text/javascript">
   $(function () {
@@ -45,7 +45,9 @@
     <div class="standard_block half_page_block">
       {% for category in profile.categories %}
         <div class="item">
-          <span class="name">{{ category.name|escape }}</span>
+          <a href="/transaction_report?category_id={{ loop.index0 }}">
+            <span class="name category">{{ category.name|escape }}</span>
+          </a>
           <span class="balance">{{ category.balance|int }}</span>
           <span class="currency">{{ profile.main_currency}}</span>
         </div>
@@ -63,7 +65,9 @@
     <div class="standard_block half_page_block">
       {% for account in profile.accounts %}
         <div class="item">
-          <span class="name">{{ account.name|escape }}</span>
+          <a href="/transaction_report?account_id={{ loop.index0 }}">
+            <span class="name account">{{ account.name|escape }}</span>
+          </a>
           <span class="balance">{{ account.balance|int }}</span>
           <span class="currency">{{ account.currency}}</span>
         </div>
@@ -83,7 +87,13 @@
     <div class="standard_block full_page_block">
       {% for item in budget_items %}
         <div class="item">
-          <span class="name">{{ item.name|escape }}</span>
+          {% if 'category_id' in item %}
+            <a href="/transaction_report?category_id={{ item.category_id }}">
+              <span class="name category">{{ item.name|escape }}</span>
+            </a>
+          {% else %}
+            <span class="name">{{ item.name|escape }}</span>
+          {% endif %}
           <span class="balance">{{ item.amount|int }}</span>
           <span class="currency">{{ profile.main_currency}}</span>
           <span class="chart_line"

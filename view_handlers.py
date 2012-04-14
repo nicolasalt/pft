@@ -54,7 +54,7 @@ class AdminPage(CommonHandler):
 class TransactionReportPage(CommonHandler):
   def HandleGet(self):
     """
-      This page allow to view filtered transactions.
+      This page allows to view filtered transactions.
       Possible filters:
        - for a budget month
        - for a category

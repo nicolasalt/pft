@@ -2,7 +2,7 @@ from datetime import datetime
 
 from google.appengine.ext import ndb
 from common_handlers import CommonHandler
-from datastore import models, lookup, update
+from datastore import models, update
 import parse
 
 
@@ -69,66 +69,6 @@ class DoEditTransaction(CommonHandler):
       self._UpdateBudget(budget_date, transaction)
 
     self.response.set_status(200)
-
-
-class DoEditProfile(CommonHandler):
-  def HandlePost(self):
-    main_currency = self.request.get('main_currency')
-    password = self.request.get('password')
-
-    kw = {}
-    if main_currency:
-      kw['main_currency'] = main_currency
-    if password:
-      kw['password'] = password
-
-    update.UpdateProfile(self.profile, **kw)
-
-    self.redirect('/user_settings')
-
-
-class DoAddProfile(CommonHandler):
-  def post(self):
-    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
-      return
-
-    profile_name = self.request.get('name')
-
-    self.profile = update.AddProfile(self.google_user, profile_name)
-    update.UpdateUser(self.visitor, active_profile_id=self.profile.key.id())
-
-    self.redirect('/')
-
-
-class DoConnectToProfile(CommonHandler):
-  def post(self):
-    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
-      return
-
-    profile_code = self.request.get('profile_code')
-
-    if profile_code:
-      self.profile = lookup.GetProfileByCode(profile_code)
-      if self.profile:
-        update.AddUserToProfile(self.profile, self.google_user)
-        update.UpdateUser(self.visitor, active_profile_id=self.profile.key.id())
-
-    self.redirect('/')
-
-
-class DoSetActiveProfile(CommonHandler):
-  def post(self):
-    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
-      return
-
-    profile_id = int(self.request.get('id'))
-
-    if lookup.GetProfileById(profile_id):
-      update.UpdateUser(self.visitor, active_profile_id=profile_id)
-    else:
-      raise Exception('Profile with id %r does not exist' % profile_id)
-
-    self.redirect('/')
 
 
 class DoAddCategory(CommonHandler):

@@ -78,23 +78,6 @@ class EditBudgetPage(CommonHandler):
     self.WriteToTemplate('templates/edit_budget.html', template_values)
 
 
-class EditProfile(CommonHandler):
-  def HandleGet(self):
-    self.WriteToTemplate('templates/edit_profile.html', {})
-
-
-class ManageProfilesPage(CommonHandler):
-  def get(self):
-    if not self.InitUserAndProfile(redirect_to_choose_profile=False):
-      return
-
-    template_values = {
-      'profiles': lookup.GetAllProfiles(self.google_user),
-    }
-
-    self.WriteToTemplate('templates/manage_profiles.html', template_values)
-
-
 class DetailedExpensesPage(CommonHandler):
   def HandleGet(self):
     """

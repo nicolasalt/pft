@@ -5,7 +5,6 @@ from google.appengine.ext import ndb
 from common_handlers import CommonHandler
 from datastore import models, lookup
 import budget_util
-import parse_csv
 from util import ndb_json
 
 
@@ -38,7 +37,7 @@ class MainPage(CommonHandler):
       'amount': unplanned_expenses
     })
     common_savings -= unplanned_expenses
-    max_expense = max(max_expense, item.planned_amount)
+    max_expense = max(max_expense, common_savings)
 
     template_values = {
       'total_balance': total_balance,
@@ -59,38 +58,6 @@ class AdminPage(CommonHandler):
     }
 
     self.WriteToTemplate('templates/admin.html', template_values)
-
-
-class ImportFromFilePage(CommonHandler):
-  def HandleGet(self):
-
-    template_values = {
-      'imported_file_descriptions':
-          lookup.GetOrCreateImportedFileList(self.profile).imported_files
-    }
-
-    self.WriteToTemplate('templates/import_from_file.html', template_values)
-
-
-class EditImportedFilePage(CommonHandler):
-  def HandleGet(self):
-    imported_file_id = int(self.request.get('id'))
-    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
-
-    template_values = {
-      'imported_file': imported_file,
-      'imported_transactions_json': [
-          ndb_json.encode(t) for t in imported_file.parsed_transactions],
-      'account': lookup.GetAccountById(self.profile, imported_file.account_id)
-    }
-    if imported_file.source_file:
-      source_file_lines = imported_file.source_file.splitlines()
-      if imported_file.schema:
-        source_file_lines = [imported_file.schema] + source_file_lines
-      template_values['formatted_parsed_lines'] = parse_csv.ParseCsvToPreview(
-          source_file_lines)[:13]
-
-    self.WriteToTemplate('templates/edit_imported_file.html', template_values)
 
 
 class EditBudgetPage(CommonHandler):

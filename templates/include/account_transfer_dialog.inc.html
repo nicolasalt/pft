@@ -1,0 +1,59 @@
+<style>
+
+  .account_transfer_dialog {
+    display: none;
+  }
+  .account_transfer_dialog .properties,
+  .account_transfer_dialog .datepicker {
+    display: inline-block;
+    vertical-align: top;
+  }
+  .account_transfer_dialog .expense_input_help {
+    color: #999;
+    font-size: 11px;
+  }
+  .account_transfer_dialog .properties {
+    margin-right: 10px;
+  }
+  .account_transfer_dialog .categories,
+  .account_transfer_dialog .accounts {
+    margin-top: 5px;
+  }
+  .account_transfer_dialog .amount {
+    width: 300px;
+  }
+
+</style>
+
+<div id="account-transfer-dialog" class="account_transfer_dialog">
+  <div class="properties">
+    <div>Amount:</div>
+    <input id="account-transfer-dialog-amount" class="amount" />
+
+    <div>From account:</div>
+    <div id="account-transfer-dialog-source-accounts" class="accounts">
+      {% for account in profile.accounts -%}
+        <input type="radio" name="source_account_id"
+               source_account_id="{{ loop.index0 }}"
+               id="tdas-{{ loop.index0 }}" value="{{ loop.index0 }}"
+        /><label for="tdas-{{ loop.index0 }}">
+          {{ account.name|escape }}
+        </label>
+      {%- endfor %}
+    </div>
+
+    <div>To account:</div>
+    <div id="account-transfer-dialog-dest-accounts" class="accounts">
+      {% for account in profile.accounts -%}
+        <input type="radio" name="dest_account_id"
+               dest_account_id="{{ loop.index0 }}"
+               id="tdad-{{ loop.index0 }}" value="{{ loop.index0 }}"
+        /><label for="tdad-{{ loop.index0 }}">
+          {{ account.name|escape }}
+        </label>
+      {%- endfor %}
+    </div>
+  </div>
+  <div id="account-transfer-dialog-datepicker" class="datepicker"></div>
+  <div id="account-transfer-dialog-error" class="error"></div>
+</div>

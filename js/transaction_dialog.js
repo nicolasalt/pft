@@ -28,6 +28,7 @@ pft.TransactionDialog = function() {
   this.transactionId_ = null;
 };
 
+
 pft.TransactionDialog.prototype.handleSaveButtonClicked_ = function() {
   var amountAndDescription = this.inputArea_.val();
   var firstSpaceIndex = amountAndDescription.search(' ');
@@ -60,6 +61,7 @@ pft.TransactionDialog.prototype.handleSaveButtonClicked_ = function() {
   this.element_.dialog('close');
 };
 
+
 pft.TransactionDialog.prototype.open = function(transactionId) {
   this.transactionId_ = transactionId;
 
@@ -68,7 +70,6 @@ pft.TransactionDialog.prototype.open = function(transactionId) {
   if (!transaction) {
     transaction = {};
     this.datePicker_.datepicker('setDate', transaction['date']);
-    date = new Date();
     this.inputArea_.val('');
   } else {
     date = $.datepicker.parseDate(
@@ -96,6 +97,7 @@ pft.TransactionDialog.prototype.open = function(transactionId) {
   this.element_.dialog('open');
   this.inputArea_.focus();
 };
+
 
 $(function() {
   pft.TransactionDialog.Dialog = new pft.TransactionDialog();

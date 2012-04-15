@@ -1,5 +1,5 @@
 from exceptions import UnicodeDecodeError
-from common_handlers import CommonHandler
+from common import CommonHandler
 from datastore import lookup
 from datastore import models
 from datastore import update

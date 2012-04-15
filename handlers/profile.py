@@ -1,8 +1,8 @@
 from datetime import datetime
 from exceptions import Exception
-from common_handlers import CommonHandler
-from datastore import update, lookup, models
-from util import ndb_json, parse
+from common import CommonHandler
+from datastore import update, lookup
+from util import  parse
 
 
 class DoEditProfile(CommonHandler):

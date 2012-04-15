@@ -1,7 +1,6 @@
 from datetime import datetime
 
-from google.appengine.ext import ndb
-from common_handlers import CommonHandler
+from common import CommonHandler
 from datastore import models, update
 from util import parse
 
@@ -23,19 +22,25 @@ class DoEditTransaction(CommonHandler):
       budget_date = models.Budget.ParseDate(raw_budget_date)
       date = budget_date.replace(day=date.day)
 
+    if (not description and
+        account_id is not None and dest_account_id is not None):
+      description = 'Transfer from "%s" account to "%s" account' % (
+          self.profile.accounts[account_id].name,
+          self.profile.accounts[dest_account_id].name)
+
     source = 'budget' if budget_date else 'manual'
 
     if transaction_id is not None:
-      transaction = update.UpdateTransaction(
+      update.UpdateTransaction(
           self.profile, transaction_id, amount, date, account_id=account_id,
           category_id=category_id, description=description,
           dest_category_id=dest_category_id, dest_account_id=dest_account_id,
-          source=source, planned=budget_date is not None)
+          source=source)
     else:
-      transaction = update.AddTransaction(
+      update.AddTransaction(
           self.profile, amount, date, account_id=account_id,
           category_id=category_id, description=description,
           dest_category_id=dest_category_id, dest_account_id=dest_account_id,
-          source=source, planned=budget_date is not None)
+          source=source)
 
     self.response.set_status(200)

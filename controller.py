@@ -1,7 +1,6 @@
 import webapp2
 
-import action_handlers
-from handlers import import_from_file
+from handlers import import_from_file, transactions
 from handlers import profile
 from handlers import planning
 import view_handlers
@@ -12,7 +11,7 @@ app = webapp2.WSGIApplication([
     ('/admin', view_handlers.AdminPage),
     ('/transaction_report', view_handlers.TransactionReportPage),
 
-    ('/do/edit_transaction', action_handlers.DoEditTransaction),
+    ('/do/edit_transaction', transactions.DoEditTransaction),
 
     ('/edit_budget', planning.EditBudgetPage),
     ('/do/edit_budget_category', planning.DoEditBudgetCategory),

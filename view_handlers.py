@@ -1,4 +1,4 @@
-from common_handlers import CommonHandler
+from common import CommonHandler
 from datastore import  lookup
 from util import ndb_json, budget_util, parse
 

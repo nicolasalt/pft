@@ -13,6 +13,7 @@
 
   <script type="text/javascript" src="/js/state.js"></script>
   <script type="text/javascript" src="/js/transaction_dialog.js"></script>
+  <script type="text/javascript" src="/js/account_transfer_dialog.js"></script>
   <script type="text/javascript" src="/js/charts.js"></script>
   <script type="text/javascript" src="/js/categories.js"></script>
   <script type="text/javascript" src="/js/accounts.js"></script>
@@ -81,7 +82,8 @@
     <button transaction_id="" icon="ui-icon-circle-plus">
       Add expense
     </button>
-    <button icon="ui-icon-circle-plus">
+    <button icon="ui-icon-circle-plus"
+            account_transfer="{{ user_profile_settings.main_account_id }},{{ user_profile_settings.cash_account_id }}">
       Add cash withdrawal
     </button>
     <button id="more-actions-button"
@@ -93,7 +95,7 @@
             icon="ui-icon-csv">
           Import from file
         </button><br>
-        <button icon="ui-icon-transferthick-e-w">
+        <button icon="ui-icon-transferthick-e-w" account_transfer="">
           Transfer money between accounts
         </button>
       </div>
@@ -103,6 +105,7 @@
   {% block content %}{% endblock %}
 
   {% include "templates/include/transaction_dialog.inc.html" %}
+  {% include "templates/include/account_transfer_dialog.inc.html" %}
 </div>
 </body>
 </html>

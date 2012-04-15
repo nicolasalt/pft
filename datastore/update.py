@@ -9,6 +9,13 @@ def AddAccount(profile, name, currency):
   return account
 
 
+def EditAccount(profile, account_id, name, currency):
+  profile.accounts[account_id].name = name
+  profile.accounts[account_id].currency = currency
+  profile.put()
+  return profile.accounts[account_id]
+
+
 def AddCategory(profile, name):
   category = models.Category(name=name)
   profile.categories.append(category)

@@ -65,7 +65,7 @@ class DoSetActiveProfile(CommonHandler):
     self.redirect('/')
 
 
-class DoAddCategory(CommonHandler):
+class DoEditCategory(CommonHandler):
   def HandlePost(self):
     category_id = parse.ParseInt(self.request.get('category_id'))
     name = self.request.get('name')
@@ -90,11 +90,26 @@ class DoAddCategory(CommonHandler):
     self.response.set_status(200)
 
 
-class DoAddAccount(CommonHandler):
+class DoEditAccount(CommonHandler):
   def HandlePost(self):
+    account_id = parse.ParseInt(self.request.get('account_id'))
     name = self.request.get('name')
     currency = self.request.get('currency')
-    update.AddAccount(self.profile, name, currency)
+    balance = parse.ParseFloat(self.request.get('balance'))
+    # TODO: implement delete account
+    delete = self.request.get('delete') == '1'
+
+    if account_id is not None:
+      account = update.EditAccount(self.profile, account_id, name, currency)
+    else:
+      account = update.AddAccount(self.profile, name, currency)
+      account_id = len(self.profile.accounts) - 1
+
+    if balance is not None and abs(balance - account.balance) > 0.001:
+      update.AddTransaction(
+          self.profile, balance - account.balance, datetime.now(),
+          description='Manual account balance adjust',
+          dest_account_id=account_id, source='manual')
 
     self.response.set_status(200)
 
@@ -121,8 +136,6 @@ class EditProfile(CommonHandler):
     categories_total_balance = sum([c.balance for c in self.profile.categories])
 
     template_values = {
-      'accounts_json': [ndb_json.encode(a) for a in self.profile.accounts],
-      'categories_json': [ndb_json.encode(c) for c in self.profile.categories],
       'total_balance': total_balance,
       'categories_total_balance': categories_total_balance
     }

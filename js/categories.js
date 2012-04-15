@@ -54,3 +54,13 @@ pft.categories.SaveCategory = function(categoryId, opt_delete){
   });
   $('#edit-category-dialog').dialog('close');
 };
+
+
+$('[category_id]').live('click', function(){
+  pft.categories.EditCategory(
+      $(this).attr('category_id'));
+});
+$('[delete_category_id]').live('click', function(){
+  pft.categories.DeleteCategory(
+      $(this).attr('delete_category_id'));
+});

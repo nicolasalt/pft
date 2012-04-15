@@ -1,0 +1,47 @@
+{% macro categories_widget(profile, total_balance, categories_total_balance, editable=false) -%}
+
+  <div class="standard_block_with_title">
+    <div class="title">Categories</div>
+    <div class="standard_block half_page_block">
+      {% for category in profile.categories %}
+        <div class="item">
+          <a href="/transaction_report?category_id={{ loop.index0 }}">
+            <span class="name category">{{ category.name|escape }}</span>
+          </a>
+          <span class="balance">{{ category.balance|int }}</span>
+          <span class="currency">{{ profile.main_currency}}</span>
+          {% if editable %}
+            <button icon="ui-icon-pencil"
+                category_id="{{ loop.index0 }}">Edit</button>
+            <button icon="ui-icon-circle-minus"
+                delete_category_id="{{ loop.index0 }}">Remove</button>
+          {% endif %}
+        </div>
+      {% endfor %}
+      {% if editable or not profile.categories %}
+        <button icon="ui-icon-circle-plus"
+            class="add_button" category_id="">
+          Add category
+        </button>
+      {% endif %}
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ (total_balance - categories_total_balance)|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+      <a class="details_link" href="/settings">manage</a>
+    </div>
+  </div>
+
+  <div id="edit-category-dialog" style="display: none">
+    <label>
+      Name:
+      <input id="edit-category-name" />
+    </label>
+    <br>
+    <label>
+      Category balance:
+      <input id="edit-category-balance" />
+    </label>
+  </div>
+{%- endmacro %}

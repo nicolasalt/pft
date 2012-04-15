@@ -80,3 +80,12 @@ pft.state.UpdateBudgetItem = function(item) {
 pft.state.GetBudgetItem = function(itemId) {
   return pft.state.GetEntity(itemId, 'budget_items');
 };
+
+
+pft.state.UpdateAccount = function(account) {
+  pft.state.UpdateEntity(account, 'accounts');
+};
+
+pft.state.GetAccount = function(accountId) {
+  return pft.state.GetEntity(accountId, 'accounts');
+};

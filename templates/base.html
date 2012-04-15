@@ -15,6 +15,11 @@
   <script type="text/javascript" src="/js/state.js"></script>
   <script type="text/javascript" src="/js/transaction_dialog.js"></script>
   <script type="text/javascript" src="/js/charts.js"></script>
+  <script type="text/javascript" src="/js/categories.js"></script>
+  <script type="text/javascript" src="/js/accounts.js"></script>
+
+  {% import "templates/include/categories_widget.inc.html" as categories %}
+  {% import "templates/include/accounts_widget.inc.html" as accounts %}
 
   {% block head %}
     <title>Personal Finance Tracker</title>
@@ -30,6 +35,18 @@
         $(this).button(options);
       });
     });
+
+    {% for category in categories_json %}
+      var category = {{ category }};
+      category['id'] = {{ loop.index0 }};
+      pft.state.UpdateCategory(category);
+    {% endfor %}
+
+    {% for account in accounts_json %}
+      var account = {{ account }};
+      account['id'] = {{ loop.index0 }};
+      pft.state.UpdateAccount(account);
+    {% endfor %}
   </script>
 </head>
 <body>

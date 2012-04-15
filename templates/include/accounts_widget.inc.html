@@ -1,0 +1,52 @@
+{% macro accounts_widget(profile, total_balance, editable=false) -%}
+
+  <div class="standard_block_with_title">
+    <div class="title">Accounts</div>
+    <div class="standard_block half_page_block">
+      {% for account in profile.accounts %}
+        <div class="item">
+          <a href="/transaction_report?account_id={{ loop.index0 }}">
+            <span class="name account">{{ account.name|escape }}</span>
+          </a>
+          <span class="balance">{{ account.balance|int }}</span>
+          <span class="currency">{{ account.currency}}</span>
+          {% if editable %}
+            <button icon="ui-icon-pencil"
+                account_id="{{ loop.index0 }}">Edit</button>
+            <button icon="ui-icon-circle-minus"
+                delete_account_id="{{ loop.index0 }}">Remove</button>
+          {% endif %}
+        </div>
+      {% endfor %}
+      {% if editable or not profile.accounts %}
+        <button icon="ui-icon-circle-plus"
+            class="add_button" account_id="">
+          Add account
+        </button>
+      {% endif %}
+      <div class="item total">
+        <span class="name">Total</span>
+        <span class="balance">{{ total_balance|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+      <a class="details_link" href="/settings">manage</a>
+    </div>
+  </div>
+
+  <div id="edit-account-dialog" style="display: none">
+    <label>
+      Name:
+      <input id="edit-account-name" />
+    </label>
+    <br>
+    <label>
+      Currency:
+      <input id="edit-account-currency" />
+    </label>
+    <br>
+    <label>
+      Account balance:
+      <input id="edit-account-balance" />
+    </label>
+  </div>
+{%- endmacro %}

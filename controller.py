@@ -28,6 +28,7 @@ app = webapp2.WSGIApplication([
     ('/manage_profiles', profile.ManageProfilesPage),
     ('/do/edit_account', profile.DoEditAccount),
     ('/do/edit_category', profile.DoEditCategory),
+    ('/do/edit_user_profile_settings', profile.DoEditUserProfileSettings),
     ('/do/add_profile', profile.DoAddProfile),
     ('/do/connect_to_profile', profile.DoConnectToProfile),
     ('/do/set_active_profile', profile.DoSetActiveProfile),

@@ -26,9 +26,43 @@
     <div class="title">Profile settings</div>
     <div class="standard_block half_page_block">
       <form action="/do/edit_profile" method="post">
-        <div>
+        <label>
           Main currency:
           <input name="main_currency" value="{{ profile.main_currency }}"/>
+        </label>
+        <div><button type="submit">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+  <br>
+
+  <div class="standard_block_with_title">
+    <div class="title">User-specific profile settings</div>
+    <div class="standard_block half_page_block">
+      <form action="/do/edit_user_profile_settings" method="post">
+        <div class="item">
+        <label>
+          Cash account:
+          {{  accounts.accounts_select(profile, "cash_account_id", no_account_option=true) }}
+        </label>
+        <div class="item">
+          <label>
+            Main bank account:
+            {{ accounts.accounts_select(profile, "main_account_id", no_account_option=true) }}
+          </label>
+        </div>
+        <br>
+        <div class="item">Important accounts:</div>
+        <div class="item">
+          {% for account in profile.accounts %}
+            <label>
+              {{ account.name }}
+              <input name="important_account_{{ loop.index0 }}"
+                     value="true"
+                     type="checkbox"/>
+            </label>
+          {% endfor %}
         </div>
         <div><button type="submit">Save</button></div>
       </form>

@@ -29,7 +29,9 @@
         <span class="balance">{{ total_balance|int }}</span>
         <span class="currency">{{ profile.main_currency}}</span>
       </div>
-      <a class="details_link" href="/settings">manage</a>
+      {% if not editable %}
+        <a class="details_link" href="/settings">manage</a>
+      {% endif %}
     </div>
   </div>
 
@@ -49,4 +51,15 @@
       <input id="edit-account-balance" />
     </label>
   </div>
+{%- endmacro %}
+
+{% macro accounts_select(profile, element_name, no_account_option=false) -%}
+  <select name="{{ element_name }}">
+    {% if no_account_option %}
+      <option value="">No account selected</option>
+    {% endif %}
+    {% for account in profile.accounts %}
+      <option value="{{ loop.index0 }}">{{ account.name }}</option>
+    {% endfor %}
+  </select>
 {%- endmacro %}

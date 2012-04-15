@@ -2,10 +2,18 @@ from datetime import datetime, timedelta
 from google.appengine.ext import ndb
 
 
+class UserProfileSettings(ndb.Model):
+  cash_account_id = ndb.IntegerProperty()
+  main_account_id = ndb.IntegerProperty()
+  important_account_ids = ndb.IntegerProperty(repeated=True)
+
+
 class User(ndb.Model):
   google_user = ndb.UserProperty(required=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
   active_profile_id = ndb.IntegerProperty()
+  profile_settings = ndb.LocalStructuredProperty(UserProfileSettings,
+                                                 repeated=True)
 
   @staticmethod
   def MakeKey(user_id):
@@ -30,14 +38,12 @@ class Category(ndb.Model):
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
 
 
-# TODO: add accounts and categories to the profile model as structured
-# properties.
 class Profile(ndb.Model):
   name = ndb.StringProperty(required=True)
   owner = ndb.UserProperty(required=True)
   users = ndb.UserProperty(repeated=True)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)
-  main_currency = ndb.StringProperty(default='$')
+  main_currency = ndb.StringProperty(default='USD')
   parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
   accounts = ndb.LocalStructuredProperty(Account, repeated=True)
   categories = ndb.LocalStructuredProperty(Category, repeated=True)

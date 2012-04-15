@@ -114,6 +114,10 @@ class DoEditAccount(CommonHandler):
     self.response.set_status(200)
 
 
+class DoEditUserProfileSettings(CommonHandler):
+  def HandlePost(self):
+    self.redirect('/')
+
 # Pages
 
 

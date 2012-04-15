@@ -29,7 +29,9 @@
         <span class="balance">{{ (total_balance - categories_total_balance)|int }}</span>
         <span class="currency">{{ profile.main_currency}}</span>
       </div>
-      <a class="details_link" href="/settings">manage</a>
+      {% if not editable %}
+        <a class="details_link" href="/settings">manage</a>
+      {% endif %}
     </div>
   </div>
 

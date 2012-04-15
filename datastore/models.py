@@ -3,6 +3,7 @@ from google.appengine.ext import ndb
 
 
 class UserProfileSettings(ndb.Model):
+  profile_id = ndb.IntegerProperty(required=True)
   cash_account_id = ndb.IntegerProperty()
   main_account_id = ndb.IntegerProperty()
   important_account_ids = ndb.IntegerProperty(repeated=True)

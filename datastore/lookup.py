@@ -19,6 +19,18 @@ def GetActiveProfile(google_user):
     return None
 
 
+def GetOrCreateUserProfileSettings(profile, visitor):
+  settings = None
+  for s in visitor.profile_settings:
+    if s.profile_id == profile.key.id():
+      settings = s
+  if settings is None:
+    settings = models.UserProfileSettings(profile_id=profile.key.id())
+    visitor.profile_settings.append(settings)
+
+  return settings
+
+
 def GetAllProfiles(google_user):
   return models.Profile.query().filter(
       models.Profile.users == google_user).fetch(100)

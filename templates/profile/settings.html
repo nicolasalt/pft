@@ -4,9 +4,8 @@
   <title>PFT: profile settings</title>
 
   <style type="text/css">
-    .add_button {
-      display: block;
-      margin: 10px 0 0 0;
+    .item label {
+      margin-right: 10px;
     }
   </style>
 
@@ -44,12 +43,14 @@
         <div class="item">
         <label>
           Cash account:
-          {{  accounts.accounts_select(profile, "cash_account_id", no_account_option=true) }}
+          {{ accounts.accounts_select(profile, "cash_account_id",
+             selected_account_id=user_profile_settings.cash_account_id, no_account_option=true) }}
         </label>
         <div class="item">
           <label>
             Main bank account:
-            {{ accounts.accounts_select(profile, "main_account_id", no_account_option=true) }}
+            {{ accounts.accounts_select(profile, "main_account_id",
+               selected_account_id=user_profile_settings.main_account_id, no_account_option=true) }}
           </label>
         </div>
         <br>
@@ -57,10 +58,10 @@
         <div class="item">
           {% for account in profile.accounts %}
             <label>
+              {% set checked='checked' if loop.index0 in user_profile_settings.important_account_ids %}
               {{ account.name }}
               <input name="important_account_{{ loop.index0 }}"
-                     value="true"
-                     type="checkbox"/>
+                     type="checkbox" {{ checked }}/>
             </label>
           {% endfor %}
         </div>

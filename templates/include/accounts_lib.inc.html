@@ -53,13 +53,14 @@
   </div>
 {%- endmacro %}
 
-{% macro accounts_select(profile, element_name, no_account_option=false) -%}
+{% macro accounts_select(profile, element_name, selected_account_id=none, no_account_option=false) -%}
   <select name="{{ element_name }}">
     {% if no_account_option %}
       <option value="">No account selected</option>
     {% endif %}
     {% for account in profile.accounts %}
-      <option value="{{ loop.index0 }}">{{ account.name }}</option>
+      {% set selected="selected" if loop.index0 == selected_account_id %}
+      <option value="{{ loop.index0 }}" {{ selected }}>{{ account.name }}</option>
     {% endfor %}
   </select>
 {%- endmacro %}

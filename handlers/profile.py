@@ -1,7 +1,7 @@
 from datetime import datetime
 from exceptions import Exception
 from common_handlers import CommonHandler
-from datastore import update, lookup
+from datastore import update, lookup, models
 from util import ndb_json, parse
 
 
@@ -18,7 +18,7 @@ class DoEditProfile(CommonHandler):
 
     update.UpdateProfile(self.profile, **kw)
 
-    self.redirect('/edit_profile')
+    self.redirect('/settings')
 
 
 class DoAddProfile(CommonHandler):
@@ -116,7 +116,28 @@ class DoEditAccount(CommonHandler):
 
 class DoEditUserProfileSettings(CommonHandler):
   def HandlePost(self):
-    self.redirect('/')
+    cash_account_id = parse.ParseInt(self.request.get('cash_account_id'))
+    main_account_id = parse.ParseInt(self.request.get('main_account_id'))
+    important_account_ids = set()
+    for arg in self.request.arguments():
+      if arg[:18] == 'important_account_':
+        important_account_ids.add(int(arg[18:]))
+
+    if cash_account_id is not None:
+      important_account_ids.add(cash_account_id)
+    if main_account_id is not None:
+      important_account_ids.add(main_account_id)
+
+    settings = lookup.GetOrCreateUserProfileSettings(self.profile, self.visitor)
+
+    settings.cash_account_id = cash_account_id
+    settings.main_account_id = main_account_id
+    settings.important_account_ids = important_account_ids
+
+    self.visitor.put()
+
+    self.redirect('/settings')
+
 
 # Pages
 

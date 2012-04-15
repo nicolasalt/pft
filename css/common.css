@@ -171,3 +171,22 @@ header .right_block {
   display: block;
   margin: 10px 0 0 0;
 }
+
+.more_actions_menu_wrapper {
+  position: relative;
+}
+.more_actions_menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  z-index: 100;
+}
+.more_actions_menu button {
+  border: 0;
+  width: 100%;
+  text-align: left;
+}
+
+.ui-icon-csv {
+  background: url(/img/csv_icon_sm.gif) no-repeat 0 0 transparent !important;
+}

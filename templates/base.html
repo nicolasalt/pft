@@ -8,7 +8,6 @@
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.7.1.min.js"></script>
   <script type="text/javascript" src="/js/lib/jquery-ui-1.8.18.custom.min.js"></script>
   <script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.0/jquery.dataTables.min.js"></script>
-  <script type="text/javascript" src="/js/lib/jquery.ui.menu.js"></script>
   <script type="text/javascript" src="/js/lib/amplify.min.js"></script>
   <script type="text/javascript" src="/js/lib/highcharts.js"></script>
 
@@ -28,11 +27,22 @@
   <script>
     $(function() {
       $('button').each(function(){
-        var options = {};
+        var options = {
+          'icons': {}
+        };
         if ($(this).attr('icon')) {
-          options['icons'] = {'primary': $(this).attr('icon')};
+          options['icons']['primary'] = $(this).attr('icon');
+        }
+        if ($(this).attr('icon_secondary')) {
+          options['icons']['secondary'] = $(this).attr('icon_secondary');
         }
         $(this).button(options);
+      });
+    });
+
+    $(function() {
+      $('#more-actions-button').click(function(){
+        $('#more-actions-menu').toggle();
       });
     });
 
@@ -71,12 +81,23 @@
     <button transaction_id="" icon="ui-icon-circle-plus">
       Add expense
     </button>
-    <button>
-      Transfer
+    <button icon="ui-icon-circle-plus">
+      Add cash withdrawal
     </button>
-    <button onclick="window.location = '/import_from_file'">
-      Import from file
-    </button>
+    <button id="more-actions-button"
+            icon_secondary="ui-icon-triangle-1-s">More</button>
+    <div class="more_actions_menu_wrapper">
+      <div id="more-actions-menu"
+           class="more_actions_menu ui-widget ui-state-default ui-corner-all">
+        <button onclick="window.location = '/import_from_file'"
+            icon="ui-icon-csv">
+          Import from file
+        </button><br>
+        <button icon="ui-icon-transferthick-e-w">
+          Transfer money between accounts
+        </button>
+      </div>
+    </div>
   </div>
 
   {% block content %}{% endblock %}

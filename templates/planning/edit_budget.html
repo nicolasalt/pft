@@ -32,6 +32,8 @@
 {% endblock %}
 
 {% block content %}
+  {% include "templates/planning/edit_budget_category.inc.html" %}
+
   <h3>
     <a href="/edit_budget?date={{ budget.GetStrDate() }}">Previous</a>
     Viewing {{ budget.GetStrDate() }}
@@ -69,25 +71,5 @@
       class="add_category_button" budget_item_id="">
     Add category
   </button>
-
-  <div id="edit-budget-item-dialog" style="display: none">
-    <div>You can automatically transfer money to a category every month</div>
-    <br>
-    <label>
-      Category:
-      <select id="edit-budget-item-category">
-        {% for category in profile.categories %}
-          <option value="{{ loop.index0 }}">
-            {{ category.name|escape }}
-          </option>
-        {% endfor %}
-      </select>
-    </label>
-    <br>
-    <label>
-      How much money to transfer this month:
-      <input id="edit-budget-item-amount" />
-    </label>
-  </div>
 
 {% endblock %}

@@ -6,15 +6,6 @@ from datastore import models, update
 from util import parse
 
 
-class DoAddAccount(CommonHandler):
-  def HandlePost(self):
-    name = self.request.get('name')
-    currency = self.request.get('currency')
-    update.AddAccount(self.profile, name, currency)
-
-    self.redirect('/')
-
-
 class DoEditTransaction(CommonHandler):
   def HandlePost(self):
     amount = parse.ParseFloat(self.request.get('amount'))
@@ -48,12 +39,3 @@ class DoEditTransaction(CommonHandler):
           source=source, planned=budget_date is not None)
 
     self.response.set_status(200)
-
-
-class DoAddCategory(CommonHandler):
-  def HandlePost(self):
-    name = self.request.get('name')
-
-    update.AddCategory(self.profile, name)
-
-    self.redirect('/')

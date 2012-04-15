@@ -87,7 +87,7 @@ header .right_block {
 .standard_block {
   background-color: #FBF8F7;
   border: 1px solid #f0e2d9;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 15px;
   padding: 5px 10px;
   position: relative;
@@ -121,6 +121,9 @@ header .right_block {
 .standard_block .item.total .name,
 .standard_block .item.total .balance {
   font-weight: bold;
+}
+.standard_block button {
+  font-size: 12px;
 }
 
 .standard_block_with_title .title {

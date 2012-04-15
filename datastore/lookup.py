@@ -48,9 +48,13 @@ def GetTransactionsForBudget(profile, budget):
 def GetTransactions(profile, category_id, account_id):
   query = models.Transaction.query(ancestor=profile.key)
   if category_id is not None:
-    query = query.filter(models.Transaction.category_id == category_id)
+    query = query.filter(ndb.query.OR(
+        models.Transaction.category_id == category_id,
+        models.Transaction.dest_category_id == category_id))
   if account_id is not None:
-    query = query.filter(models.Transaction.account_id == account_id)
+    query = query.filter(ndb.query.OR(
+        models.Transaction.account_id == account_id,
+        models.Transaction.dest_account_id == account_id))
   return query.fetch(1000)
 
 

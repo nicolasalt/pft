@@ -1,0 +1,106 @@
+{% extends "templates/base.html" %}
+
+{% block head %}
+  <title>PFT: profile settings</title>
+
+  <script type="text/javascript" src="/js/categories.js"></script>
+
+  <style type="text/css">
+    .add_button {
+      display: block;
+      margin: 10px 0 0 0;
+    }
+  </style>
+
+  <script type="text/javascript">
+    // Init.
+    {% for category in categories_json %}
+      var category = {{ category }};
+      category['id'] = {{ loop.index0 }};
+      pft.state.UpdateCategory(category);
+    {% endfor %}
+
+    $('[category_id]').live('click', function(){
+      pft.categories.EditCategory(
+          $(this).attr('category_id'));
+    });
+    $('[delete_category_id]').live('click', function(){
+      pft.categories.DeleteCategory(
+          $(this).attr('delete_category_id'));
+    });
+  </script>
+{% endblock %}
+
+{% block content %}
+  {% include "templates/profile/edit_category.inc.html" %}
+
+  <div class="standard_block_with_title">
+    <div class="title">Categories</div>
+    <div class="standard_block half_page_block">
+      {% for category in profile.categories %}
+        <div class="item">
+          <a href="/transaction_report?category_id={{ loop.index0 }}">
+            <span class="name category">{{ category.name|escape }}</span>
+          </a>
+          <span class="balance">{{ category.balance|int }}</span>
+          <span class="currency">{{ profile.main_currency}}</span>
+          <button icon="ui-icon-pencil"
+              category_id="{{ loop.index0 }}">Edit</button>
+          <button icon="ui-icon-circle-minus"
+              delete_category_id="{{ loop.index0 }}">Remove</button>
+        </div>
+      {% endfor %}
+      <button icon="ui-icon-circle-plus"
+          class="add_button" category_id="">
+        Add category
+      </button>
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ (total_balance - categories_total_balance)|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+    </div>
+  </div
+  ><div class="standard_block_divider"></div
+  ><div class="standard_block_with_title">
+    <div class="title">Accounts</div>
+    <div class="standard_block half_page_block">
+      {% for account in profile.accounts %}
+        <div class="item">
+          <a href="/transaction_report?account_id={{ loop.index0 }}">
+            <span class="name account">{{ account.name|escape }}</span>
+          </a>
+          <span class="balance">{{ account.balance|int }}</span>
+          <span class="currency">{{ account.currency}}</span>
+          <button icon="ui-icon-pencil"
+              account_id="{{ loop.index0 }}">Edit</button>
+          <button icon="ui-icon-circle-minus"
+              delete_account_id="{{ loop.index0 }}">Remove</button>
+        </div>
+      {% endfor %}
+      <button icon="ui-icon-circle-plus"
+          class="add_button" account_id="">
+        Add account
+      </button>
+      <div class="item total">
+        <span class="name">Total</span>
+        <span class="balance">{{ total_balance|int }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="standard_block_with_title">
+    <div class="title">Profile settings</div>
+    <div class="standard_block half_page_block">
+      <form action="/do/edit_profile" method="post">
+        <div>
+          Main currency:
+          <input name="main_currency" value="{{ profile.main_currency }}"/>
+        </div>
+        <div><button type="submit">Save</button></div>
+      </form>
+    </div>
+  </div>
+
+{% endblock %}

@@ -12,10 +12,6 @@
       font-size: 11px;
       color: #999;
     }
-
-    .standard_block button {
-      font-size: 12px;
-    }
   </style>
 {% endblock %}
 
@@ -44,24 +40,32 @@
   You have no connected profiles yet. Create a new profile of join an existing one by code.
 {% endif %}
 
-<h3>Add a new profile</h3>
+<div class="standard_block_with_title">
+  <div class="title">Add a new profile</div>
+  <div class="standard_block half_page_block">
+    <form action="/do/add_profile" method="post">
+      <label>
+        Name
+        <input name="name"/>
+      </label>
+      <button type="submit">Create a new profile</button>
+    </form>
+  </div>
+</div>
 
-<form action="/do/add_profile" method="post" class="standard_block">
-  <label>
-    Name
-    <input name="name"/>
-  </label>
-  <button type="submit">Create a new profile</button>
-</form>
+<br>
 
-<h3>or join an existing one</h3>
-
-<form action="/do/connect_to_profile" method="post" class="standard_block">
-  <label>
-    Join existing profile by code:
-    <input name="profile_code"/>
-  </label>
-  <button type="submit">Join</button>
-</form>
+<div class="standard_block_with_title">
+  <div class="title">or join an existing one</div>
+  <div class="standard_block half_page_block">
+    <form action="/do/connect_to_profile" method="post">
+      <label>
+        Join existing profile by code:
+        <input name="profile_code"/>
+      </label>
+      <button type="submit">Join</button>
+    </form>
+  </div>
+</div>
 
 {% endblock %}

@@ -1,7 +1,7 @@
 {% extends "templates/base.html" %}
 
 {% block head %}
-  <title>PFT: edit budget</title>
+  <title>PFT: report</title>
 
   <style type="text/css">
     table.transactions {
@@ -138,7 +138,11 @@
             {{ transaction.amount|abs|round(1) }}
           </td>
           <td class="description_cell description">{{ transaction.description }}</td>
-          <td class="account_cell account">{{ transaction.account.name }}</td>
+          <td class="account_cell account">
+            {% if transaction.account %}
+              {{ transaction.account.name }}
+            {% endif %}
+          </td>
           <td class="category_cell category">
             {% if transaction.category %}
               {{ transaction.category.name }}

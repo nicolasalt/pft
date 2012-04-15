@@ -12,8 +12,6 @@ app = webapp2.WSGIApplication([
     ('/admin', view_handlers.AdminPage),
     ('/transaction_report', view_handlers.TransactionReportPage),
 
-    ('/do/add_account', action_handlers.DoAddAccount),
-    ('/do/add_category', action_handlers.DoAddCategory),
     ('/do/edit_transaction', action_handlers.DoEditTransaction),
 
     ('/edit_budget', planning.EditBudgetPage),
@@ -26,8 +24,10 @@ app = webapp2.WSGIApplication([
     ('/do/resolve_parsed_transaction', import_from_file.DoResolveParsedTransaction),
     ('/do/add_transactions_from_csv', import_from_file.DoAddTransactionsFromCsv),
 
-    ('/edit_profile', profile.EditProfile),
+    ('/settings', profile.EditProfile),
     ('/manage_profiles', profile.ManageProfilesPage),
+    ('/do/edit_account', profile.DoAddAccount),
+    ('/do/edit_category', profile.DoAddCategory),
     ('/do/add_profile', profile.DoAddProfile),
     ('/do/connect_to_profile', profile.DoConnectToProfile),
     ('/do/set_active_profile', profile.DoSetActiveProfile),

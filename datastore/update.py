@@ -16,6 +16,12 @@ def AddCategory(profile, name):
   return category
 
 
+def EditCategory(profile, category_id, name):
+  profile.categories[category_id].name = name
+  profile.put()
+  return profile.categories[category_id]
+
+
 def _UpdateTransactionRelations(profile, transaction, amount):
   """
     Does not update transaction.amount.
@@ -48,7 +54,7 @@ def _UpdateTransactionRelations(profile, transaction, amount):
 @ndb.transactional
 def AddTransaction(profile, amount, date, account_id=None, category_id=None,
                    description=None, dest_account_id=None,
-                   dest_category_id=None, source='unknown', planned=False):
+                   dest_category_id=None, source='unknown'):
   transaction = models.Transaction(
     parent=profile.key,
     account_id=account_id,
@@ -60,10 +66,9 @@ def AddTransaction(profile, amount, date, account_id=None, category_id=None,
     dest_category_id=dest_category_id,
     source=source)
 
-  if not planned:
-    # reload the latest profile
-    profile = lookup.GetProfileById(profile.key.id())
-    _UpdateTransactionRelations(profile, transaction, amount)
+  # reload the latest profile
+  profile = lookup.GetProfileById(profile.key.id())
+  _UpdateTransactionRelations(profile, transaction, amount)
 
   transaction.put()
   return transaction
@@ -72,13 +77,12 @@ def AddTransaction(profile, amount, date, account_id=None, category_id=None,
 @ndb.transactional
 def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
                       category_id=None, description=None, dest_account_id=None,
-                      dest_category_id=None, source='unknown', planned=False):
+                      dest_category_id=None, source='unknown'):
   transaction = lookup.GetTransactionById(profile, transaction_id)
 
-  if not planned:
-    # reload the latest profile
-    profile = lookup.GetProfileById(profile.key.id())
-    _UpdateTransactionRelations(profile, transaction, -transaction.amount)
+  # reload the latest profile
+  profile = lookup.GetProfileById(profile.key.id())
+  _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 
   transaction.account_id = account_id
   transaction.amount = amount
@@ -89,8 +93,7 @@ def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
   transaction.dest_category_id = dest_category_id
   transaction.source = source
 
-  if not planned:
-    _UpdateTransactionRelations(profile, transaction, amount)
+  _UpdateTransactionRelations(profile, transaction, amount)
 
   transaction.put()
   return transaction

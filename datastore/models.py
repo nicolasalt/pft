@@ -54,7 +54,6 @@ class Transaction(ndb.Model):
   source = ndb.StringProperty(
       choices=['unknown', 'import', 'manual', 'budget'],
       default='unknown')
-  planned = ndb.BooleanProperty(default=False)
 
 
 class BudgetItem(ndb.Model):

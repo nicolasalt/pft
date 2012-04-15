@@ -28,6 +28,8 @@ class ParseSchema(ndb.Model):
 
 class Account(ndb.Model):
   name = ndb.StringProperty(required=True)
+  # TODO: add automatic currency converter:
+  # http://www.google.com/ig/calculator?hl=en&q=1rub=?eur
   currency = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)

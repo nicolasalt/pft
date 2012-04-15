@@ -1,7 +1,7 @@
 {% extends "templates/base.html" %}
 
 {% block head %}
-  <title>PFT: manage profile</title>
+  <title>PFT: manage profiles</title>
 
   <style type="text/css">
     .active_profile {
@@ -12,46 +12,56 @@
       font-size: 11px;
       color: #999;
     }
+
+    .standard_block button {
+      font-size: 12px;
+    }
   </style>
 {% endblock %}
 
 {% block content %}
 
-<h2>Your profiles:</h2>
+{% if profiles %}
+  <h2>Your profiles:</h2>
 
-<ul>
-  {% for profile in profiles %}
-    <li>
-      <form action="/do/set_active_profile" method="post">
-        {{ profile.name }}
-        {% if visitor.active_profile_id == profile.key.id() %}
-          <span class="active_profile">Active</span>
-        {% else %}
-          <input type="hidden" name="id" value="{{ profile.key.id() }}" />
-          <input type="submit" value="Select" />
-        {% endif %}
-        <div class="profile_code">Profile code: {{ profile.key.urlsafe() }}</div>
-      </form>
-    </li>
-  {% endfor %}
-</ul>
+  <ul>
+    {% for profile in profiles %}
+      <li>
+        <form action="/do/set_active_profile" method="post">
+          {{ profile.name }}
+          {% if visitor.active_profile_id == profile.key.id() %}
+            <span class="active_profile">Active</span>
+          {% else %}
+            <input type="hidden" name="id" value="{{ profile.key.id() }}" />
+            <input type="submit" value="Select" />
+          {% endif %}
+          <div class="profile_code">Profile code: {{ profile.key.urlsafe() }}</div>
+        </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  You have no connected profiles yet. Create a new profile of join an existing one by code.
+{% endif %}
 
-<h3>Add a new profile or join an existing one</h3>
+<h3>Add a new profile</h3>
 
-<form action="/do/add_profile" method="post">
+<form action="/do/add_profile" method="post" class="standard_block">
   <label>
     Name
     <input name="name"/>
   </label>
-  <input type="submit" value="Create a new profile" />
+  <button type="submit">Create a new profile</button>
 </form>
-<br>
-<form action="/do/connect_to_profile" method="post">
+
+<h3>or join an existing one</h3>
+
+<form action="/do/connect_to_profile" method="post" class="standard_block">
   <label>
     Join existing profile by code:
     <input name="profile_code"/>
-  </label><br>
-  <input type="submit" value="Join" />
+  </label>
+  <button type="submit">Join</button>
 </form>
 
 {% endblock %}

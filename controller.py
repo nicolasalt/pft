@@ -1,14 +1,13 @@
 import webapp2
 
-from handlers import import_from_file_handlers, transaction_handlers, taskqueue_handlers
+from handlers import import_from_file_handlers, transaction_handlers, taskqueue_handlers, other_handlers
 from handlers import profile_handlers
 from handlers import planning_handlers
-import view_handlers
 
 
 app = webapp2.WSGIApplication([
-    ('/', view_handlers.MainPage),
-    ('/admin', view_handlers.AdminPage),
+    ('/', other_handlers.MainPage),
+    ('/admin', other_handlers.AdminPage),
 
     ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
     ('/transaction_report', transaction_handlers.TransactionReportPage),

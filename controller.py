@@ -9,9 +9,9 @@ import view_handlers
 app = webapp2.WSGIApplication([
     ('/', view_handlers.MainPage),
     ('/admin', view_handlers.AdminPage),
-    ('/transaction_report', view_handlers.TransactionReportPage),
 
     ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
+    ('/transaction_report', transaction_handlers.TransactionReportPage),
 
     ('/edit_budget', planning_handlers.EditBudgetPage),
     ('/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),

@@ -140,3 +140,16 @@ class ImportedFileDescription(ndb.Model):
 class ImportedFileList(ndb.Model):
   imported_files = ndb.LocalStructuredProperty(
       ImportedFileDescription, repeated=True)
+
+
+# Single in the system
+class CurrencyRates(ndb.Model):
+  class Rate(ndb.Model):
+    currency = ndb.StringProperty(required=True)
+    # How many USD is 1 currency item.
+    rate = ndb.FloatProperty(required=True)
+
+  SUPPORTED_CURRENCIES = ['usd', 'euro', 'chf', 'rub']
+
+  last_updated = ndb.DateTimeProperty()
+  rates = ndb.LocalStructuredProperty(Rate, repeated=True)

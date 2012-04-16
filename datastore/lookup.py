@@ -109,3 +109,7 @@ def GetTransactionsForDay(profile, date, account_id):
   if account_id:
     query.filter(models.Transaction.account_id == account_id)
   return query.fetch(1000)
+
+
+def GetLatestCurrencyRates():
+  return models.CurrencyRates.get_or_insert('global_currency_rates')

@@ -149,3 +149,15 @@ def UpdateUser(user, **kw):
   for key, value in kw.iteritems():
     setattr(user, key, value)
   user.put()
+
+
+def UpdateCurrencyRates(new_rates):
+  """
+    Args:
+      new rates: dict like {'euro': 1.34, 'rub': 0.33}
+  """
+
+  ratesModel = lookup.GetLatestCurrencyRates()
+  ratesModel.rates = [models.CurrencyRates.Rate(currency=c, rate=r)
+                      for c, r in new_rates.iteritems()]
+  ratesModel.put()

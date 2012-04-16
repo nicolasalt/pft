@@ -1,6 +1,6 @@
 import webapp2
 
-from handlers import import_from_file, transactions
+from handlers import import_from_file, transactions, taskqueue_handlers
 from handlers import profile
 from handlers import planning
 import view_handlers
@@ -31,5 +31,8 @@ app = webapp2.WSGIApplication([
     ('/do/add_profile', profile.DoAddProfile),
     ('/do/connect_to_profile', profile.DoConnectToProfile),
     ('/do/set_active_profile', profile.DoSetActiveProfile),
-    ('/do/edit_profile', profile.DoEditProfile)],
+    ('/do/edit_profile', profile.DoEditProfile),
+
+    # Taskqueues
+    ('/task/update_currency_rates', taskqueue_handlers.UpdateCurrencyRates)],
     debug=True)

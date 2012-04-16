@@ -1,5 +1,5 @@
 import re
-import urllib2
+from google.appengine.api import urlfetch
 from datastore import models
 
 def _ParseRateFromJson(text):
@@ -14,10 +14,9 @@ def GetFreshRates():
   rates = {}
   for currency in models.CurrencyRates.SUPPORTED_CURRENCIES:
     url = 'http://www.google.com/ig/calculator?hl=en&q=1%s=?usd' % currency
-    try:
-      result = urllib2.urlopen(url)
-      rates[currency] = _ParseRateFromJson(result)
-    except urllib2.URLError:
-      pass
+    result = urlfetch.fetch(url)
+    rate = _ParseRateFromJson(result.content)
+    if rate is not None:
+      rates[currency] = rate
 
   return rates

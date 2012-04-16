@@ -108,4 +108,20 @@
     <input type="file" name="csv" /><br>
     <input type="submit" value="Submit" />
   </form>
+
+  <br>
+  <div>Known currency exchange rates +(last updated {{ currency_rates.last_updated }})</div>
+  <ul>
+    {% for rate in currency_rates.rates %}
+      <li>
+        1 {{ rate.currency }} = {{ rate.rate }} USD
+      </li>
+    {% endfor %}
+  </ul>
+
+  <div>Run currency exchange update</div>
+  <form action="/task/update_currency_rates" method="post">
+    <input type="submit" value="Run" />
+  </form>
+
 {% endblock %}

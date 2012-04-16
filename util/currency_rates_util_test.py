@@ -1,5 +1,7 @@
 import unittest
 import urllib2
+from google.appengine.api import urlfetch
+from google.appengine.api.urlfetch_service_pb import URLFetchResponse
 from datastore import models
 import mox
 from util import currency_rates_util
@@ -21,21 +23,31 @@ if __name__ == '__main__':
 
 
 class GetFreshRatesTestCase(unittest.TestCase):
+  class FakeResponse(object):
+    def __init__(self, content):
+      self.content = content
+
   def setUp(self):
     self.mox = mox.Mox()
-    self.mox.StubOutWithMock(urllib2, 'urlopen')
+    self.mox.StubOutWithMock(urlfetch, 'fetch')
 
     self.old_supported_currencies = models.CurrencyRates.SUPPORTED_CURRENCIES
 
-    models.CurrencyRates.SUPPORTED_CURRENCIES = ['usd', 'euro']
+    models.CurrencyRates.SUPPORTED_CURRENCIES = ['usd', 'euro', 'rub']
 
   def test_normal(self):
-    urllib2.urlopen(
+    urlfetch.fetch(
         'http://www.google.com/ig/calculator?hl=en&q=1usd=?usd').AndReturn(
-            '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}')
-    urllib2.urlopen(
+            GetFreshRatesTestCase.FakeResponse(
+            '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}'))
+    urlfetch.fetch(
         'http://www.google.com/ig/calculator?hl=en&q=1euro=?usd').AndReturn(
-            '{lhs: "1 Euro",rhs: "1.3015 U.S. dollars",error: "",icc: true}')
+            GetFreshRatesTestCase.FakeResponse(
+            '{lhs: "1 Euro",rhs: "1.3015 U.S. dollars",error: "",icc: true}'))
+    urlfetch.fetch(
+        'http://www.google.com/ig/calculator?hl=en&q=1rub=?usd').AndReturn(
+            GetFreshRatesTestCase.FakeResponse(
+                'error'))
 
     self.mox.ReplayAll()
     rates = currency_rates_util.GetFreshRates()

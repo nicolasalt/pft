@@ -45,7 +45,8 @@ class AdminPage(CommonHandler):
   def HandleGet(self):
 
     template_values = {
-      'transactions': lookup.GetAllTransactions(self.profile)
+      'transactions': lookup.GetAllTransactions(self.profile),
+      'currency_rates': lookup.GetLatestCurrencyRates()
     }
 
     self.WriteToTemplate('templates/admin.html', template_values)

@@ -1,3 +1,4 @@
+from datetime import datetime
 from google.appengine.ext import ndb
 from datastore import models, lookup
 
@@ -156,8 +157,10 @@ def UpdateCurrencyRates(new_rates):
     Args:
       new rates: dict like {'euro': 1.34, 'rub': 0.33}
   """
-
   ratesModel = lookup.GetLatestCurrencyRates()
+  rates = dict([(r.currency, r.rate) for r in ratesModel.rates])
+  rates.update(new_rates)
   ratesModel.rates = [models.CurrencyRates.Rate(currency=c, rate=r)
-                      for c, r in new_rates.iteritems()]
+                      for c, r in rates.iteritems()]
+  ratesModel.last_updated = datetime.now()
   ratesModel.put()

@@ -1,7 +1,5 @@
 import unittest
-import urllib2
 from google.appengine.api import urlfetch
-from google.appengine.api.urlfetch_service_pb import URLFetchResponse
 from datastore import models
 import mox
 from util import currency_rates_util

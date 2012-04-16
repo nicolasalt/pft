@@ -1,6 +1,6 @@
 from common import CommonHandler
 from datastore import  lookup
-from util import  budget_util
+from util import  budget_util, currency_rates_util
 
 
 class MainPage(CommonHandler):
@@ -12,7 +12,6 @@ class MainPage(CommonHandler):
         budget_util.CalculateUnplannedExpensesAndIncome(
             budget, transactions))
 
-    total_balance = sum([a.balance for a in self.profile.accounts])
     categories_total_balance = sum([c.balance for c in self.profile.categories])
 
     budget_view_items = budget_util.GetBudgetViewItems(self.profile, budget)
@@ -31,7 +30,7 @@ class MainPage(CommonHandler):
     max_expense = max(max_expense, common_savings)
 
     template_values = {
-      'total_balance': total_balance,
+      'total_balance': self.GetTotalAccountBalance(),
       'categories_total_balance': categories_total_balance,
       'budget_items': budget_view_items,
       'common_savings': common_savings,

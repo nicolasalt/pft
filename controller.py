@@ -34,4 +34,5 @@ app = webapp2.WSGIApplication([
 
     # Taskqueues
     ('/task/update_currency_rates', taskqueue_handlers.UpdateCurrencyRates)],
+
     debug=True)

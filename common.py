@@ -3,7 +3,7 @@ from google.appengine.api import users
 import webapp2
 import jinja2
 from datastore import lookup
-from util import ndb_json
+from util import ndb_json, currency_rates_util
 
 jinja_environment = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
@@ -41,6 +41,12 @@ class CommonHandler(webapp2.RequestHandler):
       return False
 
     return True
+
+  def GetTotalAccountBalance(self):
+    total = currency_rates_util.CalculateCurrencySum(
+       [(a.balance, a.currency) for a in self.profile.accounts],
+       self.profile.main_currency)
+    return total or 0
 
 
   def HandleGet(self):

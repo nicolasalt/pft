@@ -113,7 +113,7 @@ header .right_block {
 .standard_block .item .currency {
   color: #bbb;
   display: inline-block;
-  margin-right: 20px;
+  width: 50px;
 }
 .standard_block .item.total {
   margin-top: 10px;

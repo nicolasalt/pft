@@ -1,6 +1,6 @@
 import unittest
 from google.appengine.api import urlfetch
-from datastore import models
+from datastore import models, lookup
 import mox
 from util import currency_rates_util
 
@@ -16,14 +16,15 @@ class ParseFromJsonTestCase(unittest.TestCase):
         '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}')
     self.assertAlmostEqual(1.0, parsed_rate)
 
-if __name__ == '__main__':
-  unittest.main()
-
 
 class GetFreshRatesTestCase(unittest.TestCase):
   class FakeResponse(object):
     def __init__(self, content):
       self.content = content
+
+  def tearDown(self):
+    models.CurrencyRates.SUPPORTED_CURRENCIES = self.old_supported_currencies
+    self.mox.UnsetStubs()
 
   def setUp(self):
     self.mox = mox.Mox()
@@ -53,9 +54,40 @@ class GetFreshRatesTestCase(unittest.TestCase):
 
     self.assertDictEqual({'euro': 1.3015, 'usd': 1}, rates)
 
+
+class CalculateCurrencySumTestCase(unittest.TestCase):
+  def setUp(self):
+    self.mox = mox.Mox()
+    self.mox.StubOutWithMock(lookup, 'GetLatestCurrencyRates')
+
+    self.fake_currency_rates_model = models.CurrencyRates()
+    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
+        currency='usd', rate=1.0))
+    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
+        currency='euro', rate=1.3023))
+    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
+        currency='rub', rate=0.033674))
+
   def tearDown(self):
-    models.CurrencyRates.SUPPORTED_CURRENCIES = self.old_supported_currencies
     self.mox.UnsetStubs()
+
+  def test_normal(self):
+    lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
+
+    self.mox.ReplayAll()
+    self.assertAlmostEqual(
+        832.185068598919,
+        currency_rates_util.CalculateCurrencySum(
+            [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'RUB'))
+    self.mox.VerifyAll()
+
+  def test_mainCurrencyIsNotKnown(self):
+    lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
+
+    self.mox.ReplayAll()
+    self.assertIsNone(currency_rates_util.CalculateCurrencySum(
+        [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'error'))
+    self.mox.VerifyAll()
 
 if __name__ == '__main__':
   unittest.main()

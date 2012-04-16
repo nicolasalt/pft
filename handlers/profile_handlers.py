@@ -157,11 +157,10 @@ class ManageProfilesPage(CommonHandler):
 
 class EditProfile(CommonHandler):
   def HandleGet(self):
-    total_balance = sum([a.balance for a in self.profile.accounts])
     categories_total_balance = sum([c.balance for c in self.profile.categories])
 
     template_values = {
-      'total_balance': total_balance,
+      'total_balance': self.GetTotalAccountBalance(),
       'categories_total_balance': categories_total_balance
     }
 

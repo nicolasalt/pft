@@ -145,6 +145,7 @@ class ImportedFileList(ndb.Model):
 # Single in the system
 class CurrencyRates(ndb.Model):
   class Rate(ndb.Model):
+    # Lowercase
     currency = ndb.StringProperty(required=True)
     # How many USD is 1 currency item.
     rate = ndb.FloatProperty(required=True)

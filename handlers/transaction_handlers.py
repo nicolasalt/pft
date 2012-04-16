@@ -96,4 +96,4 @@ class TransactionReportPage(CommonHandler):
       'transactions_json': [ndb_json.encode(t) for t in transactions]
     }
 
-    self.WriteToTemplate('templates/transaction_report.html', template_values)
+    self.WriteToTemplate('templates/transactions/transaction_report.html', template_values)

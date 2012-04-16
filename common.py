@@ -5,8 +5,12 @@ import jinja2
 from datastore import lookup
 from util import ndb_json, currency_rates_util
 
+def currency_filter(value):
+    return '{:0,.0f}'.format(value).replace(',', ' ')
+
 jinja_environment = jinja2.Environment(
   loader=jinja2.FileSystemLoader(os.path.dirname(__file__)))
+jinja_environment.filters['currency'] = currency_filter
 
 class CommonHandler(webapp2.RequestHandler):
   def WriteToTemplate(self, template_name, template_values):

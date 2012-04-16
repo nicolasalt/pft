@@ -8,7 +8,7 @@
           <a href="/transaction_report?account_id={{ loop.index0 }}">
             <span class="name account">{{ account.name|escape }}</span>
           </a>
-          <span class="balance">{{ account.balance|int }}</span>
+          <span class="balance">{{ account.balance|currency }}</span>
           <span class="currency">{{ account.currency}}</span>
           {% if editable %}
             <button icon="ui-icon-pencil"
@@ -59,7 +59,7 @@
       <option value="">No account selected</option>
     {% endif %}
     {% for account in profile.accounts %}
-      {% set selected="selected" if loop.index0 == selected_account_id %}
+      {% set selected="'selected" if loop.index0 == selected_account_id %}
       <option value="{{ loop.index0 }}" {{ selected }}>{{ account.name }}</option>
     {% endfor %}
   </select>

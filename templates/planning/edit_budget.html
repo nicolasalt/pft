@@ -56,7 +56,7 @@
       {% for item in budget_items %}
         <div class="item">
           <span class="name">{{ item.name|escape }}</span>
-          <span class="balance">{{ item.amount|int }}</span>
+          <span class="balance">{{ item.amount|currency }}</span>
           <span class="currency">{{ profile.main_currency}}</span>
           <button icon="ui-icon-pencil"
               budget_item_id="{{ loop.index0 }}">Edit</button>

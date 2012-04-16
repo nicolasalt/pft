@@ -26,7 +26,7 @@
       {% endif %}
       <div class="item total">
         <span class="name">Total</span>
-        <span class="balance">{{ total_balance|int }}</span>
+        <span class="balance">{{ total_balance|currency }}</span>
         <span class="currency">{{ profile.main_currency}}</span>
       </div>
       {% if not editable %}

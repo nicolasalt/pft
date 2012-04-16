@@ -8,7 +8,7 @@
           <a href="/transaction_report?category_id={{ loop.index0 }}">
             <span class="name category">{{ category.name|escape }}</span>
           </a>
-          <span class="balance">{{ category.balance|int }}</span>
+          <span class="balance">{{ category.balance|currency }}</span>
           <span class="currency">{{ profile.main_currency}}</span>
           {% if editable %}
             <button icon="ui-icon-pencil"
@@ -26,7 +26,7 @@
       {% endif %}
       <div class="item total">
         <span class="name">Common savings</span>
-        <span class="balance">{{ (total_balance - categories_total_balance)|int }}</span>
+        <span class="balance">{{ (total_balance - categories_total_balance)|currency }}</span>
         <span class="currency">{{ profile.main_currency}}</span>
       </div>
       {% if not editable %}

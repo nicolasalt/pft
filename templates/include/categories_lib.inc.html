@@ -12,15 +12,18 @@
           <span class="currency">{{ profile.main_currency}}</span>
           {% if editable %}
             <button icon="ui-icon-pencil"
-                category_id="{{ loop.index0 }}">Edit</button>
+                    onclick="pft.categories.EditCategory({{ loop.index0 }});">
+              Edit</button>
             <button icon="ui-icon-circle-minus"
-                delete_category_id="{{ loop.index0 }}">Remove</button>
+                    onclick="pft.categories.DeleteCategory({{ loop.index0 }});">
+              Remove</button>
           {% endif %}
         </div>
       {% endfor %}
       {% if editable or not profile.categories %}
         <button icon="ui-icon-circle-plus"
-            class="add_button" category_id="">
+            class="add_button"
+            onclick="pft.categories.EditCategory();">
           Add category
         </button>
       {% endif %}

@@ -101,7 +101,4 @@ pft.TransactionDialog.prototype.open = function(transactionId) {
 
 $(function() {
   pft.TransactionDialog.Dialog = new pft.TransactionDialog();
-  $('[transaction_id]').live('click', function() {
-    pft.TransactionDialog.Dialog.open($(this).attr('transaction_id'));
-  });
 });

@@ -10,7 +10,7 @@ pft.accounts.DeleteAccount = function(accountId) {
 pft.accounts.EditAccount = function(accountId) {
   var account = pft.state.GetAccount(accountId);
   var title = 'Edit account';
-  if (accountId == '') {
+  if (accountId == undefined) {
     account = {
       'name': '',
       'balance': '',
@@ -57,13 +57,3 @@ pft.accounts.SaveAccount = function(accountId, opt_delete){
   });
   $('#edit-account-dialog').dialog('close');
 };
-
-
-$('[account_id]').live('click', function(){
-  pft.accounts.EditAccount(
-      $(this).attr('account_id'));
-});
-$('[delete_account_id]').live('click', function(){
-  pft.accounts.DeleteAccount(
-      $(this).attr('delete_account_id'));
-});

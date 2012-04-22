@@ -79,11 +79,12 @@
   </header>
 
   <div class="fast_access_bar">
-    <button transaction_id="" icon="ui-icon-circle-plus">
+    <button icon="ui-icon-circle-plus"
+        onclick="pft.TransactionDialog.Dialog.open();">
       Add expense
     </button>
     <button icon="ui-icon-circle-plus"
-            account_transfer="{{ user_profile_settings.main_account_id }},{{ user_profile_settings.cash_account_id }}">
+            onclick="pft.AccountTransferDialog.Dialog.open({{ user_profile_settings.main_account_id }}, {{ user_profile_settings.cash_account_id }});">
       Add cash withdrawal
     </button>
     <button id="more-actions-button"

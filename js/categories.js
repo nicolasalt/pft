@@ -10,7 +10,7 @@ pft.categories.DeleteCategory = function(categoryId) {
 pft.categories.EditCategory = function(categoryId) {
   var category = pft.state.GetCategory(categoryId);
   var title = 'Edit category';
-  if (categoryId == '') {
+  if (categoryId == undefined) {
     category = {
       'name': '',
       'balance': ''
@@ -54,13 +54,3 @@ pft.categories.SaveCategory = function(categoryId, opt_delete){
   });
   $('#edit-category-dialog').dialog('close');
 };
-
-
-$('[category_id]').live('click', function(){
-  pft.categories.EditCategory(
-      $(this).attr('category_id'));
-});
-$('[delete_category_id]').live('click', function(){
-  pft.categories.DeleteCategory(
-      $(this).attr('delete_category_id'));
-});

@@ -68,14 +68,4 @@ pft.AccountTransferDialog.prototype.open =
 
 $(function() {
   pft.AccountTransferDialog.Dialog = new pft.AccountTransferDialog();
-  $('[account_transfer]').live('click', function() {
-    var sourceAccountId = null;
-    var destAccountId = null;
-    if ($(this).attr('account_transfer')) {
-      var sourceAndDest = $(this).attr('account_transfer').split(',');
-      sourceAccountId = sourceAndDest[0];
-      destAccountId = sourceAndDest[1];
-    }
-    pft.AccountTransferDialog.Dialog.open(sourceAccountId, destAccountId);
-  });
 });

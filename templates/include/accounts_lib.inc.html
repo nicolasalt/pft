@@ -12,15 +12,17 @@
           <span class="currency">{{ account.currency}}</span>
           {% if editable %}
             <button icon="ui-icon-pencil"
-                account_id="{{ loop.index0 }}">Edit</button>
+                    onclick="pft.accounts.EditAccount({{ loop.index0 }});">
+              Edit</button>
             <button icon="ui-icon-circle-minus"
-                delete_account_id="{{ loop.index0 }}">Remove</button>
+                    onclick="pft.accounts.DeleteAccount({{ loop.index0 }});">
+              Remove</button>
           {% endif %}
         </div>
       {% endfor %}
       {% if editable or not profile.accounts %}
         <button icon="ui-icon-circle-plus"
-            class="add_button" account_id="">
+            class="add_button" onclick="pft.accounts.EditAccount();">
           Add account
         </button>
       {% endif %}

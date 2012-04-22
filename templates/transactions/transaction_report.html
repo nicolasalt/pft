@@ -133,7 +133,7 @@
             {% set amount_class = 'income' %}
           {% endif %}
           <td class="amount_cell {{ amount_class }}"
-              transaction_id="{{ transaction.key.id() }}">
+              onclick="pft.TransactionDialog.Dialog.open({{ transaction.key.id() }});">
             <div class="edit_icon ui-icon-pencil ui-icon"></div>
             {{ transaction.amount|abs|round(1) }}
           </td>

@@ -15,9 +15,9 @@ class GetProfile(CommonHandler):
       response.update({
         'user_profile_settings': lookup.GetOrCreateUserProfileSettings(
             self.profile, self.visitor),
-        'accounts_json': [ndb_json.encode(a) for a in self.profile.accounts],
-        'categories_json': [ndb_json.encode(c)
-                            for c in self.profile.categories],
+        'total_balance': self.GetTotalAccountBalance(),
+        'categories_total_balance':
+            sum([c.balance for c in self.profile.categories]),
       })
 
     self.WriteToJson(response)

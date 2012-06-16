@@ -1,0 +1,36 @@
+<!doctype html>
+<html ng-app>
+<head>
+  <link type="text/css" rel="stylesheet" href="/css/common.css" />
+  <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
+  <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
+
+  <script type="text/javascript" src="/js/lib/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="/js/lib/jquery-ui-1.8.18.custom.min.js"></script>
+  <script type="text/javascript" src="/js/lib/jquery.dataTables.min.js"></script>
+  <script type="text/javascript" src="/js/lib/amplify.min.js"></script>
+  <script type="text/javascript" src="/js/lib/highcharts.js"></script>
+  <script type="text/javascript" src="/js/lib/angular-1.0.0.js"></script>
+  <script type="text/javascript" src="/js/lib/angular-bootstrap-1.0.0.js"></script>
+  <script type="text/javascript" src="/js/lib/angular-resource-1.0.0.js"></script>
+
+  <script type="text/javascript" src="/js/state.js"></script>
+  <script type="text/javascript" src="/js/transaction_dialog.js"></script>
+  <script type="text/javascript" src="/js/account_transfer_dialog.js"></script>
+  <script type="text/javascript" src="/js/charts.js"></script>
+  <script type="text/javascript" src="/js/categories.js"></script>
+  <script type="text/javascript" src="/js/accounts.js"></script>
+
+  <script type="text/javascript" src="/js/app_ctrl.js"></script>
+
+  <title>PFT: overview</title>
+</head>
+<body ng-controller="pft.AppCtrl">
+<div class="site_content">
+  <div>
+    Name: <input ng-model="name"/><br>
+    Name is {{ name }}
+  </div>
+</div>
+</body>
+</html>

@@ -11,6 +11,8 @@ handlers:
   static_dir: js
 - url: /img
   static_dir: img
+- url: /a
+  static_dir: templates/angular
 - url: /.*
   script: controller.app
 

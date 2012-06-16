@@ -6,8 +6,6 @@
   <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
 
   <script type="text/javascript" src="/js/lib/jquery-1.7.1.min.js"></script>
-  <script type="text/javascript" src="/js/lib/jquery-ui-1.8.18.custom.min.js"></script>
-  <script type="text/javascript" src="/js/lib/jquery.dataTables.min.js"></script>
   <script type="text/javascript" src="/js/lib/amplify.min.js"></script>
   <script type="text/javascript" src="/js/lib/highcharts.js"></script>
   <script type="text/javascript" src="/js/lib/angular-1.0.0.js"></script>
@@ -38,13 +36,26 @@
 
     <div class="left_block">
       <a href="/">Home</a>
-      <a href="/transaction_report">Reports</a>
-      <a href="/settings">Profile settings</a>
+      <a href="/#">Reports</a>
+      <a href="/#">Profile settings</a>
     </div>
   </header>
 
-  Name: <input ng-model="name"/><br>
-  Name is {{ name }}
+  <div class="fast_access_bar">
+    <button>
+      Add expense
+    </button>
+    <button ng-show="profileData.user_profile_settings">
+      Add cash withdrawal
+    </button>
+    <button>
+      Import from file
+    </button>
+    <button>
+      Transfer money between accounts
+    </button>
+  </div>
+
   <p>Profile: {{ profileData }}</p>
 </div>
 </body>

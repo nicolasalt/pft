@@ -1,5 +1,5 @@
 <!doctype html>
-<html ng-app>
+<html ng-app="pftApp">
 <head>
   <link type="text/css" rel="stylesheet" href="/css/common.css" />
   <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
@@ -27,10 +27,25 @@
 </head>
 <body ng-controller="pft.AppCtrl">
 <div class="site_content">
-  <div>
-    Name: <input ng-model="name"/><br>
-    Name is {{ name }}
-  </div>
+  <header>
+    <div class="right_block">
+      <a href="#">Change profile</a>
+      <span class="gray_name">({{ profileData.profile.name }})</span>
+
+      <a href="{{ profileData.logout_url }}">Log out</a>
+      <span class="gray_name">({{ profileData.google_user.nickname }})</span>
+    </div>
+
+    <div class="left_block">
+      <a href="/">Home</a>
+      <a href="/transaction_report">Reports</a>
+      <a href="/settings">Profile settings</a>
+    </div>
+  </header>
+
+  Name: <input ng-model="name"/><br>
+  Name is {{ name }}
+  <p>Profile: {{ profileData }}</p>
 </div>
 </body>
 </html>

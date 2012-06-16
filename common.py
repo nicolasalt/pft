@@ -32,6 +32,9 @@ class CommonHandler(webapp2.RequestHandler):
     template = jinja_environment.get_template(template_name)
     self.response.out.write(template.render(template_values))
 
+  def WriteToJson(self, template_values):
+    self.response.out.write(ndb_json.encode(template_values))
+
   def InitUserAndProfile(self, redirect_to_choose_profile=True):
     self.google_user = users.get_current_user()
     if not self.google_user:

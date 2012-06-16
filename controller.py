@@ -3,9 +3,12 @@ import webapp2
 from handlers import import_from_file_handlers, transaction_handlers, taskqueue_handlers, other_handlers
 from handlers import profile_handlers
 from handlers import planning_handlers
+from handlers import api
 
 
 app = webapp2.WSGIApplication([
+    ('/api/get_profile', api.GetProfile),
+
     ('/', other_handlers.MainPage),
     ('/admin', other_handlers.AdminPage),
 

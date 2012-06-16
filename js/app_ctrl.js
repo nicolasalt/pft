@@ -1,5 +1,5 @@
 
-pft.module = angular.module('pftApp', ['ngResource']);
+pft.module = angular.module('pftApp', ['ngResource', 'bootstrapPrettify']);
 
 pft.AppCtrl = function($scope, $resource) {
   $scope.name = 'Nikolay';
@@ -8,5 +8,7 @@ pft.AppCtrl = function($scope, $resource) {
     query: {method:'GET'}
   });
 
-  $scope.profileData = api.get();
+  $scope.profileData = api.get(null, function() {
+    $scope.profileDataFormatted = angular.toJson(eval($scope.profileData), true);
+  });
 };

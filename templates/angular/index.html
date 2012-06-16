@@ -6,10 +6,12 @@
   <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
 
   <script type="text/javascript" src="/js/lib/jquery-1.7.1.min.js"></script>
+  <script type="text/javascript" src="/js/lib/jquery-ui-1.8.18.custom.min.js"></script>
   <script type="text/javascript" src="/js/lib/amplify.min.js"></script>
   <script type="text/javascript" src="/js/lib/highcharts.js"></script>
   <script type="text/javascript" src="/js/lib/angular-1.0.0.js"></script>
   <script type="text/javascript" src="/js/lib/angular-bootstrap-1.0.0.js"></script>
+  <script type="text/javascript" src="/js/lib/angular-bootstrap-prettify-1.0.0.js"></script>
   <script type="text/javascript" src="/js/lib/angular-resource-1.0.0.js"></script>
 
   <script type="text/javascript" src="/js/state.js"></script>
@@ -56,7 +58,61 @@
     </button>
   </div>
 
-  <p>Profile: {{ profileData }}</p>
+  <!-- Categories -->
+
+  <div class="standard_block_with_title">
+    <div class="title">Categories</div>
+    <div class="standard_block half_page_block">
+      <div class="item" ng-repeat="category in profileData.profile.categories">
+        <a href="/transaction_report?category_id={{ $index }}">
+          <span class="name category">{{ category.name }}</span>
+        </a>
+        <span class="balance">{{ category.balance }}</span>
+        <span class="currency">{{ profileData.profile.main_currency}}</span>
+
+        <button ng-click="editCategoryDialogVisible = true">
+          Edit</button>
+        <button>
+          Remove</button>
+      </div>
+
+      <button class="add_button" ng-click="editCategoryDialogVisible = true">
+        Add category
+      </button>
+
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ profileData.total_balance - profileData.categories_total_balance }}</span>
+        <span class="currency">{{ profileData.profile.main_currency}}</span>
+      </div>
+
+      <a class="details_link" href="/settings">manage</a>
+    </div>
+  </div>
+
+  <!-- end categories -->
+
+  <div class="standard_block_divider"></div>
+<br> editCategoryDialogVisible: {{ editCategoryDialogVisible }}
+
+  <br>
+  <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
+  <pre ng-show="profileVisible">{{ profileDataFormatted }}</pre>
+
+  <!-- Dialogs -->
+
+
+  <div id="edit-category-dialog" ng-show="editCategoryDialogVisible">
+    <label>
+      Name:
+      <input id="edit-category-name" />
+    </label>
+    <br>
+    <label>
+      Category balance:
+      <input id="edit-category-balance" />
+    </label>
+  </div>
 </div>
 </body>
 </html>

@@ -21,6 +21,7 @@
   <script type="text/javascript" src="/js/categories.js"></script>
   <script type="text/javascript" src="/js/accounts.js"></script>
 
+  <script type="text/javascript" src="/js/directives.js"></script>
   <script type="text/javascript" src="/js/app_ctrl.js"></script>
 
   <title>PFT: overview</title>
@@ -44,51 +45,24 @@
   </header>
 
   <div class="fast_access_bar">
-    <button>
+    <button pft-button icon="ui-icon-circle-plus">
       Add expense
     </button>
-    <button ng-show="profileData.user_profile_settings">
+    <button pft-button icon="ui-icon-circle-plus"
+            ng-show="profileData.user_profile_settings">
       Add cash withdrawal
     </button>
-    <button>
+    <button pft-button icon="ui-icon-csv">
       Import from file
     </button>
-    <button>
+    <button pft-button icon="ui-icon-transferthick-e-w">
       Transfer money between accounts
     </button>
   </div>
 
-  <!-- Categories -->
+  <div pft-categories-widget class="standard_block_with_title"></div>
 
-  <div class="standard_block_with_title">
-    <div class="title">Categories</div>
-    <div class="standard_block half_page_block">
-      <div class="item" ng-repeat="category in profileData.profile.categories">
-        <a href="/transaction_report?category_id={{ $index }}">
-          <span class="name category">{{ category.name }}</span>
-        </a>
-        <span class="balance">{{ category.balance }}</span>
-        <span class="currency">{{ profileData.profile.main_currency}}</span>
-
-        <button ng-click="editCategoryDialogVisible = true">
-          Edit</button>
-        <button>
-          Remove</button>
-      </div>
-
-      <button class="add_button" ng-click="editCategoryDialogVisible = true">
-        Add category
-      </button>
-
-      <div class="item total">
-        <span class="name">Common savings</span>
-        <span class="balance">{{ profileData.total_balance - profileData.categories_total_balance }}</span>
-        <span class="currency">{{ profileData.profile.main_currency}}</span>
-      </div>
-
-      <a class="details_link" href="/settings">manage</a>
-    </div>
-  </div>
+  <div pft-accounts-widget class="standard_block_with_title"></div>
 
   <!-- end categories -->
 
@@ -99,10 +73,11 @@
   <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
   <pre ng-show="profileVisible">{{ profileDataFormatted }}</pre>
 
+
   <!-- Dialogs -->
 
-
-  <div id="edit-category-dialog" ng-show="editCategoryDialogVisible">
+  <div title='Edit category'
+       dialog-show="editCategoryDialogVisible">
     <label>
       Name:
       <input id="edit-category-name" />
@@ -111,6 +86,23 @@
     <label>
       Category balance:
       <input id="edit-category-balance" />
+    </label>
+  </div>
+
+  <div id="edit-account-dialog" style="display: none">
+    <label>
+      Name:
+      <input id="edit-account-name" />
+    </label>
+    <br>
+    <label>
+      Currency:
+      <input id="edit-account-currency" />
+    </label>
+    <br>
+    <label>
+      Account balance:
+      <input id="edit-account-balance" />
     </label>
   </div>
 </div>

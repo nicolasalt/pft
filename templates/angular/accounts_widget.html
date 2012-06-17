@@ -1,0 +1,30 @@
+<div>
+  <div class="title">Accounts</div>
+  <div class="standard_block half_page_block">
+    <div class="item" ng-repeat="account in profileData.profile.accounts">
+      <a href="/transaction_report?account_id={{ $index }}">
+        <span class="name account">{{ account.name }}</span>
+      </a>
+      <span class="balance">{{ account.balance }}</span>
+      <span class="currency">{{ account.currency}}</span>
+
+      <button pft-button icon="ui-icon-pencil">
+        Edit</button>
+      <button pft-button icon="ui-icon-circle-minus">
+        Remove</button>
+    </div>
+
+    <button pft-button icon="ui-icon-circle-plus"
+        class="add_button">
+      Add account
+    </button>
+
+    <div class="item total">
+      <span class="name">Total</span>
+      <span class="balance">{{ profileData.total_balance }}</span>
+      <span class="currency">{{ profileData.profile.main_currency}}</span>
+    </div>
+
+    <a class="details_link" href="/settings">manage</a>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 
-pft.module = angular.module('pftApp', ['ngResource', 'bootstrapPrettify']);
+pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']);
 
 pft.AppCtrl = function($scope, $resource) {
   $scope.name = 'Nikolay';

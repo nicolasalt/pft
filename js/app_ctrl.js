@@ -6,6 +6,7 @@ pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']).
           otherwise({templateUrl: 'main_page.html', controller: pft.MainPageCtrl});
     }]);
 
+
 pft.AppCtrl = function($scope, $resource) {
   var getProfileRequest = $resource('/api/get_profile', {}, {
     query: {method:'GET'}
@@ -20,4 +21,8 @@ pft.AppCtrl = function($scope, $resource) {
     });
   };
   $scope.updateProfile();
+
+  $scope.openTransactionDialog = function (opt_transactionId) {
+    pft.TransactionDialog.Dialog.open(opt_transactionId);
+  };
 };

@@ -2,6 +2,7 @@
 <html ng-app="pftApp">
 <head>
   <link type="text/css" rel="stylesheet" href="/css/common.css" />
+  <link type="text/css" rel="stylesheet" href="/css/transaction_dialog.css" />
   <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
 
@@ -46,7 +47,8 @@
   </header>
 
   <div class="fast_access_bar">
-    <button pft-button icon="ui-icon-circle-plus">
+    <button pft-button icon="ui-icon-circle-plus"
+            ng-click="openTransactionDialog()">
       Add expense
     </button>
     <button pft-button icon="ui-icon-csv">
@@ -89,6 +91,38 @@
       <input id="edit-account-balance" />
     </label>
   </div>
+
+  <div id="transaction-dialog" class="transaction_dialog">
+    <div class="properties">
+      <div class="expense_input_help">
+        For example: 13.5 products in Coop
+      </div>
+      <textarea id="transaction-dialog-input-area"
+          class="input_area"></textarea>
+
+      <div id="transaction-dialog-categories" class="categories">
+        <input type="radio" name="category_id" category_id="" id="tdc-" value=""/>
+        <label for="tdc-"> No category </label>
+        <span ng-repeat="category in profile.categories">
+          <input type="radio" name="category_id" category_id="{{ $index }}"
+                 id="tdc-{{ $index }}" value="{{ $index }}" />
+          <label for="tdc-{{ $index }}"> {{ category.name }} </label>
+        </span>
+      </div>
+
+      <div id="transaction-dialog-accounts" class="accounts">
+        <span ng-repeat="account in profile.accounts">
+          <input type="radio" name="account_id" account_id="{{ $index }}"
+                 id="tda-{{ $index }}" value="{{ $index }}" />
+          <label for="tda-{{ $index }}"> {{ account.name }} </label>
+        </span>
+      </div>
+
+    </div>
+    <div id="transaction-dialog-datepicker" class="datepicker"></div>
+    <div id="transaction-dialog-error" class="error"></div>
+  </div>
+
 
   <!-- Debug -->
 

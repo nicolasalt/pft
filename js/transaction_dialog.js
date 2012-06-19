@@ -22,8 +22,8 @@ pft.TransactionDialog = function() {
 
   this.errorDiv_ = $('#transaction-dialog-error');
 
-  $('#transaction-dialog-categories').buttonset();
-  $('#transaction-dialog-accounts').buttonset();
+//  $('#transaction-dialog-categories').buttonset();
+//  $('#transaction-dialog-accounts').buttonset();
 
   this.transactionId_ = null;
 };

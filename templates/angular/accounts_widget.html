@@ -1,30 +1,43 @@
 <div>
   <div class="title">Accounts</div>
   <div class="standard_block half_page_block">
-    <div class="item" ng-repeat="account in profileData.profile.accounts">
+    <div class="item" ng-repeat="account in profile.accounts">
       <a href="/transaction_report?account_id={{ $index }}">
         <span class="name account">{{ account.name }}</span>
       </a>
-      <span class="balance">{{ account.balance }}</span>
+      <span class="balance">{{ account.balance | number:0 }}</span>
       <span class="currency">{{ account.currency}}</span>
 
-      <button pft-button icon="ui-icon-pencil">
+      <button pft-button
+              ng-show="accountsManageMode"
+              icon="ui-icon-pencil"
+              ng-click="openEditAccountDialog($index)">
         Edit</button>
-      <button pft-button icon="ui-icon-circle-minus">
+      <button pft-button
+              icon="ui-icon-circle-minus"
+              ng-show="accountsManageMode">
         Remove</button>
     </div>
 
-    <button pft-button icon="ui-icon-circle-plus"
-        class="add_button">
+    <button pft-button
+            icon="ui-icon-circle-plus"
+            ng-show="accountsManageMode"
+            class="add_button"
+            ng-click="openEditAccountDialog()">
       Add account
     </button>
 
     <div class="item total">
       <span class="name">Total</span>
-      <span class="balance">{{ profileData.total_balance }}</span>
-      <span class="currency">{{ profileData.profile.main_currency}}</span>
+      <span class="balance">{{ profileData.total_balance | number:0 }}</span>
+      <span class="currency">{{ profile.main_currency}}</span>
     </div>
 
-    <a class="details_link" href="/settings">manage</a>
+    <a class="details_link"
+       ng-hide="accountsManageMode"
+       ng-click="accountsManageMode = true">manage</a>
+    <a class="details_link"
+       ng-show="accountsManageMode"
+       ng-click="accountsManageMode = false">done</a>
   </div>
 </div>

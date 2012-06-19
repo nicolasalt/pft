@@ -31,7 +31,7 @@
   <header>
     <div class="right_block">
       <a href="#">Change profile</a>
-      <span class="gray_name">({{ profileData.profile.name }})</span>
+      <span class="gray_name">({{ profile.name }})</span>
 
       <a href="{{ profileData.logout_url }}">Log out</a>
       <span class="gray_name">({{ profileData.google_user.nickname }})</span>
@@ -67,7 +67,6 @@
   <!-- end categories -->
 
   <div class="standard_block_divider"></div>
-<br> editCategoryDialogVisible: {{ editCategoryDialogVisible }}
 
   <br>
   <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
@@ -76,8 +75,7 @@
 
   <!-- Dialogs -->
 
-  <div title='Edit category'
-       dialog-show="editCategoryDialogVisible">
+  <div id="edit-category-dialog" style="display: none">
     <label>
       Name:
       <input id="edit-category-name" />

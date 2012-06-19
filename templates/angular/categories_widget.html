@@ -1,32 +1,42 @@
 <div>
   <div class="title">Categories</div>
   <div class="standard_block half_page_block">
-    <div class="item" ng-repeat="category in profileData.profile.categories">
+    <div class="item" ng-repeat="category in profile.categories">
       <a href="/transaction_report?category_id={{ $index }}">
         <span class="name category">{{ category.name }}</span>
       </a>
-      <span class="balance">{{ category.balance }}</span>
-      <span class="currency">{{ profileData.profile.main_currency}}</span>
+      <span class="balance">{{ category.balance | number:0 }}</span>
+      <span class="currency">{{ profile.main_currency}}</span>
 
       <button pft-button
               icon="ui-icon-pencil"
-              ng-click="editCategoryDialogVisible = true">
+              ng-show="categoriesManageMode"
+              ng-click="openEditCategoryDialog($index)">
         Edit</button>
-      <button pft-button icon="ui-icon-circle-minus">
+      <button pft-button
+              icon="ui-icon-circle-minus"
+              ng-show="categoriesManageMode">
         Remove</button>
     </div>
 
     <button pft-button icon="ui-icon-circle-plus"
-            class="add_button" ng-click="editCategoryDialogVisible = true">
+            class="add_button"
+            ng-show="categoriesManageMode"
+            ng-click="openEditCategoryDialog()">
       Add category
     </button>
 
     <div class="item total">
       <span class="name">Common savings</span>
-      <span class="balance">{{ profileData.total_balance - profileData.categories_total_balance }}</span>
-      <span class="currency">{{ profileData.profile.main_currency}}</span>
+      <span class="balance">{{ profileData.total_balance - profileData.categories_total_balance | number:0 }}</span>
+      <span class="currency">{{ profile.main_currency}}</span>
     </div>
 
-    <a class="details_link" href="/settings">manage</a>
+    <a class="details_link"
+       ng-hide="categoriesManageMode"
+       ng-click="categoriesManageMode = true">manage</a>
+    <a class="details_link"
+       ng-show="categoriesManageMode"
+       ng-click="categoriesManageMode = false">done</a>
   </div>
 </div>

@@ -8,6 +8,7 @@ from handlers import api
 
 app = webapp2.WSGIApplication([
     ('/api/get_profile', api.GetProfile),
+    ('/api/get_budget', api.GetBudget),
 
     ('/', other_handlers.MainPage),
     ('/admin', other_handlers.AdminPage),

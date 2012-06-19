@@ -14,8 +14,17 @@ pft.AppCtrl = function($scope, $resource) {
       $scope.profile = $scope.profileData.profile;
     });
   };
-
   $scope.updateProfile();
+
+  var getBudgetRequest = $resource('/api/get_budget', {}, {
+    query: {method:'GET'}
+  });
+  $scope.updateBudget = function () {
+    $scope.budget = getBudgetRequest.get(null, function() {
+      $scope.budgetFormatted = angular.toJson(eval($scope.budget), true);
+    });
+  };
+  $scope.updateBudget();
 
   $scope.openEditCategoryDialog = function(opt_catId) {
     var category = $scope.profile.categories[opt_catId];
@@ -93,7 +102,6 @@ pft.AppCtrl = function($scope, $resource) {
         }
     });
   };
-
 
   $scope.saveAccount = function(opt_accountId, opt_delete){
     var data = {

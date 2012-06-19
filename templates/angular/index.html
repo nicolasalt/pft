@@ -48,10 +48,6 @@
     <button pft-button icon="ui-icon-circle-plus">
       Add expense
     </button>
-    <button pft-button icon="ui-icon-circle-plus"
-            ng-show="profileData.user_profile_settings">
-      Add cash withdrawal
-    </button>
     <button pft-button icon="ui-icon-csv">
       Import from file
     </button>
@@ -62,16 +58,43 @@
 
   <div pft-categories-widget class="standard_block_with_title"></div>
 
+  <div class="standard_block_divider"></div>
+
   <div pft-accounts-widget class="standard_block_with_title"></div>
 
   <!-- end categories -->
 
-  <div class="standard_block_divider"></div>
+  <div class="standard_block_with_title">
+    <div class="title">Current month</div>
+    <a class="details_link" href="/edit_budget">details</a>
+    <div class="standard_block full_page_block">
+      <div class="item" ng-repeat="item in budget.budget_items">
+        <a href="/transaction_report?category_id={{ item.category_id }}"
+           ng-show="item.category_id != null">
+          <span class="name category">{{ item.name }}</span>
+        </a>
+        <span class="name"
+              ng-hide="item.category_id != null">{{ item.name }}</span>
 
-  <br>
-  <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
-  <pre ng-show="profileVisible">{{ profileDataFormatted }}</pre>
+        <span class="balance">{{ item.amount | number:0 }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+        <span class="chart_line"
+              style="width: {{ (item.amount / budget.max_expense * 100) | number:0 }}px">
+        </span>
+      </div>
 
+      <div class="item total">
+        <span class="name">Common savings</span>
+        <span class="balance">{{ budget.common_savings | number:0 }}</span>
+        <span class="currency">{{ profile.main_currency}}</span>
+        <span class="chart_line"
+              style="width: {{ (budget.common_savings / budget.max_expense * 100) | number:0 }}px">
+        </span>
+      </div>
+      <a class="details_link" id="view-on-chart" href="javascript:void(0)">
+        view on chart</a>
+    </div>
+  </div>
 
   <!-- Dialogs -->
 
@@ -103,6 +126,16 @@
       <input id="edit-account-balance" />
     </label>
   </div>
+
+  <!-- Debug -->
+
+  <br>
+  <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
+  <pre ng-show="profileVisible">{{ profileDataFormatted }}</pre>
+
+  <br>
+  <button ng-click="budgetVisible = !budgetVisible">Show budget JSON</button>
+  <pre ng-show="budgetVisible">{{ budgetFormatted }}</pre>
 </div>
 </body>
 </html>

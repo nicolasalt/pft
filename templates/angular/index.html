@@ -3,6 +3,7 @@
 <head>
   <link type="text/css" rel="stylesheet" href="/css/common.css" />
   <link type="text/css" rel="stylesheet" href="/css/transaction_dialog.css" />
+  <link type="text/css" rel="stylesheet" href="/css/transactions.css" />
   <link type="text/css" href="/css/custom-theme/jquery-ui-1.8.18.custom.css" rel="stylesheet" />
   <link rel="stylesheet" type="text/css" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.8.2/css/jquery.dataTables.css">
 
@@ -19,11 +20,10 @@
   <script type="text/javascript" src="/js/transaction_dialog.js"></script>
   <script type="text/javascript" src="/js/account_transfer_dialog.js"></script>
   <script type="text/javascript" src="/js/charts.js"></script>
-  <script type="text/javascript" src="/js/categories.js"></script>
-  <script type="text/javascript" src="/js/accounts.js"></script>
 
   <script type="text/javascript" src="/js/directives.js"></script>
   <script type="text/javascript" src="/js/main_page_ctrl.js"></script>
+  <script type="text/javascript" src="/js/transactions_page_ctrl.js"></script>
   <script type="text/javascript" src="/js/app_ctrl.js"></script>
 
   <title>PFT: overview</title>
@@ -129,10 +129,6 @@
   <br>
   <button ng-click="profileVisible = !profileVisible">Show profile JSON</button>
   <pre ng-show="profileVisible">{{ profileDataFormatted }}</pre>
-
-  <br>
-  <button ng-click="budgetVisible = !budgetVisible">Show budget JSON</button>
-  <pre ng-show="budgetVisible">{{ budgetFormatted }}</pre>
 </div>
 </body>
 </html>

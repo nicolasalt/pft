@@ -52,11 +52,13 @@ header .right_block {
   color: #c00000;
 }
 
-.expense {
+.expense,
+.expense_true {
   color: #800000;
   text-align: right;
 }
-.income {
+.income,
+.expense_false {
   color: #008000;
   text-align: right;
 }

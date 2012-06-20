@@ -1,0 +1,64 @@
+
+Category id: {{ selectedCategoryId }}
+
+<h3 ng-show="budget">
+  <a href="/transaction_report?budget_date={{ previous_month.strftime('%m.%Y') }}"
+     class="prev_month_link">
+    <span class="ui-icon ui-icon-circle-triangle-w">
+    </span>{{ previous_month.strftime('%B %Y') }}</a>
+  Viewing operations in {{ budget.date.strftime('%B %Y') }}
+  <a href="/transaction_report?budget_date={{ next_month.strftime('%m.%Y') }}"
+     class="next_month_link">
+    {{ next_month.strftime('%B %Y') }}<span
+        class="ui-icon ui-icon-circle-triangle-e"></span>
+  </a>
+</h3>
+
+<h3 ng-hide="budget">
+  <span ng-show="category">
+    Category <span class="category">{{ category.name }}</span>
+  </span>
+  <span ng-show="account">
+    Account <span class="account">{{ account.name }}</span>
+  </span>
+</h3>
+
+<table id="transaction-table" class="transactions" cellpadding="0" cellspacing="0">
+  <thead>
+    <tr class="transaction">
+      <th class="date_cell">Date</th>
+      <th class="amount_cell">Amount</th>
+      <th class="description_cell">Description</th>
+      <th class="account_cell">Account</th>
+      <th class="category_cell">Category</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr class="transaction" ng-repeat="transaction in transactions">
+      <td class="date_cell">{{ transaction.date + 'Z'|date:"EEE, d MMM" }}</td>
+      <td class="amount_cell expense_{{ transaction.amount > 0 }}"
+          onclick="pft.TransactionDialog.Dialog.open({{ transaction.id }});">
+        <div class="edit_icon ui-icon-pencil ui-icon"></div>
+        {{ transaction.amount|number:1 }}
+      </td>
+      <td class="description_cell description">{{ transaction.description }}</td>
+      <td class="account_cell account">
+        {{ transaction.account.name }}
+      </td>
+      <td class="category_cell category">
+        {{ transaction.category.name }}
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+
+<!-- Debug -->
+
+<br>
+<button ng-click="budgetVisible = !budgetVisible">Show budget JSON</button>
+<pre ng-show="budgetVisible">{{ budgetFormatted }}</pre>
+
+<br>
+<button ng-click="transactionsVisible = !transactionsVisible">Show transactions JSON</button>
+<pre ng-show="transactionsVisible">{{ transactionsFormatted }}</pre>

@@ -2,7 +2,7 @@
   <div class="title">Categories</div>
   <div class="standard_block half_page_block">
     <div class="item" ng-repeat="category in profile.categories">
-      <a href="/transaction_report?category_id={{ $index }}">
+      <a href="#/transactions/category_id={{ $index }}">
         <span class="name category">{{ category.name }}</span>
       </a>
       <span class="balance">{{ category.balance | number:0 }}</span>

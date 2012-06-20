@@ -2,7 +2,11 @@
 pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']).
     config(['$routeProvider', function($routeProvider) {
       $routeProvider.
+          when('/transactions/budget_date=:budgetDate',
+               {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           when('/transactions/category_id=:categoryId',
+               {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
+          when('/transactions',
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           otherwise({templateUrl: 'main_page.html', controller: pft.MainPageCtrl});
     }]);

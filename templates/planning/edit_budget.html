@@ -5,13 +5,6 @@
 
   <script type="text/javascript" src="/js/budget.js"></script>
 
-  <style type="text/css">
-    .add_category_button {
-      display: block;
-      margin-top: 10px;
-    }
-  </style>
-
   <script type="text/javascript">
     // Init.
     {% for item in budget_items_json %}
@@ -68,7 +61,7 @@
   </div>
 
   <button icon="ui-icon-circle-plus"
-      class="add_category_button" budget_item_id="">
+      class="add_budget_category_button" budget_item_id="">
     Add category
   </button>
 

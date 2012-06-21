@@ -27,6 +27,7 @@ class ParseSchema(ndb.Model):
 
 
 class Account(ndb.Model):
+  account_id = ndb.IntegerProperty() # Used only in GET operations, filled for js
   name = ndb.StringProperty(required=True)
   # TODO: add automatic currency converter:
   # http://www.google.com/ig/calculator?hl=en&q=1rub=?eur
@@ -36,6 +37,7 @@ class Account(ndb.Model):
 
 
 class Category(ndb.Model):
+  category_id = ndb.IntegerProperty() # Used only in GET operations, filled for js
   name = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
   date = ndb.DateTimeProperty(required=True, auto_now_add=True)

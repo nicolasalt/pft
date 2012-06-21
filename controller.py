@@ -11,11 +11,11 @@ app = webapp2.WSGIApplication([
     ('/api/get_budget', api.GetBudget),
     ('/api/get_transactions', api.GetTransactions),
 
-    ('/', other_handlers.MainPage),
+    ('/', other_handlers.MainPage), # D
     ('/admin', other_handlers.AdminPage),
 
     ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
-    ('/transaction_report', transaction_handlers.TransactionReportPage),
+    ('/transaction_report', transaction_handlers.TransactionReportPage), # D
 
     ('/edit_budget', planning_handlers.EditBudgetPage),
     ('/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),

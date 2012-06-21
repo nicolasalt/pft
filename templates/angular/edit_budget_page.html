@@ -1,0 +1,60 @@
+
+<h3>
+  <a href="#/edit_budget/budget_date={{ transactionData.previous_month + 'Z'|date:'MM.yyyy' }}"
+     class="prev_month_link">
+    <span class="ui-icon ui-icon-circle-triangle-w">
+    </span>{{ transactionData.previous_month + 'Z'|date:'MMM yyyy' }}</a>
+  Viewing {{ budgetData.budget.date + 'Z'|date:'MMM yyyy' }}
+  <a href="#/edit_budget/budget_date={{ transactionData.next_month + 'Z'|date:'MM.yyyy' }}"
+     class="next_month_link">
+    {{ transactionData.next_month + 'Z'|date:'MMM yyyy' }}<span
+        class="ui-icon ui-icon-circle-triangle-e"></span>
+  </a>
+</h3>
+
+<br><br>
+
+<h3>Edit budget for {{ budgetData.budget.date + 'Z'|date:'MM.yyyy' }}</h3>
+
+<p ng-hide="budgetData.budget.items">
+  Budget is not planned yet.
+</p>
+
+<div class="standard_block_with_title">
+  <div class="title">Categories</div>
+  <div class="standard_block">
+    <div class="item"
+         ng-repeat="item in budgetData.budget.items">
+      <span class="name">{{ profile.categories[item.category_id].name }}</span>
+      <span class="balance">{{ item.planned_amount|number:0 }}</span>
+      <span class="currency">{{ profile.main_currency}}</span>
+      <button icon="ui-icon-pencil" pft-button
+              ng-click="editBudgetItem(item, $index)">Edit</button>
+      <button icon="ui-icon-circle-minus" pft-button
+              ng-click="deleteBudgetItem($index)">Remove</button>
+    </div>
+  </div>
+</div>
+
+<button icon="ui-icon-circle-plus" pft-button
+        class="add_budget_category_button"
+        ng-click="editBudgetItem()">
+  Add category
+</button>
+
+
+<div id="edit-budget-item-dialog" style="display: none">
+  <div>You can automatically transfer money to a category every month</div>
+  <br>
+  <label>
+    Category:
+    <select ng-model="budgetCategory"
+            ng-options="c.name for c in profile.categories">
+    </select>
+  </label>
+  <br>
+  <label>
+    How much money to transfer this month:
+    <input ng-model="budgetCategoryPlannedAmount" />
+  </label>
+</div>

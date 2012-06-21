@@ -10,6 +10,10 @@ pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']).
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           when('/transactions',
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
+          when('/edit_budget/budget_date=:budgetDate',
+               {templateUrl: 'edit_budget_page.html', controller: pft.EditBudgetPageCtrl}).
+          when('/edit_budget',
+               {templateUrl: 'edit_budget_page.html', controller: pft.EditBudgetPageCtrl}).
           otherwise({templateUrl: 'main_page.html', controller: pft.MainPageCtrl});
     }]);
 

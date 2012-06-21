@@ -12,6 +12,11 @@ class GetProfile(CommonHandler):
       'profile': self.profile
     }
     if self.profile:
+      for i, category in enumerate(self.profile.categories):
+        category.category_id = i
+      for i, account in enumerate(self.profile.accounts):
+        account.account_id = i
+
       response.update({
         'user_profile_settings': lookup.GetOrCreateUserProfileSettings(
             self.profile, self.visitor),
@@ -51,6 +56,7 @@ class GetBudget(CommonHandler):
 
     response = {
       'total_balance': self.GetTotalAccountBalance(),
+      'budget': budget,
       'categories_total_balance': categories_total_balance,
       'budget_items': budget_view_items,
       'common_savings': common_savings,

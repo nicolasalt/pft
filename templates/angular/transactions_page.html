@@ -1,11 +1,11 @@
 
 <h3 ng-show="transactionData.budget">
-  <a href="#/transactions/budget_date={{ transactionData.previous_month + 'Z'|date:'MM.yy' }}"
+  <a href="#/transactions/budget_date={{ transactionData.previous_month + 'Z'|date:'MM.yyyy' }}"
      class="prev_month_link">
     <span class="ui-icon ui-icon-circle-triangle-w">
     </span>{{ transactionData.previous_month + 'Z'|date:'MMM yyyy' }}</a>
   Viewing operations in {{ transactionData.budget.date + 'Z'|date:'MMM yyyy' }}
-  <a href="#/transactions/budget_date={{ transactionData.next_month + 'Z'|date:'MM.yy' }}"
+  <a href="#/transactions/budget_date={{ transactionData.next_month + 'Z'|date:'MM.yyyy' }}"
      class="next_month_link">
     {{ transactionData.next_month + 'Z'|date:'MMM yyyy' }}<span
         class="ui-icon ui-icon-circle-triangle-e"></span>

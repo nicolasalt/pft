@@ -6,6 +6,8 @@ pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']).
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           when('/transactions/category_id=:categoryId',
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
+          when('/transactions/account_id=:accountId',
+               {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           when('/transactions',
                {templateUrl: 'transactions_page.html', controller: pft.TransactionsPageCtrl}).
           otherwise({templateUrl: 'main_page.html', controller: pft.MainPageCtrl});

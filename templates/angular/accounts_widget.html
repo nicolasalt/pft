@@ -2,7 +2,7 @@
   <div class="title">Accounts</div>
   <div class="standard_block half_page_block">
     <div class="item" ng-repeat="account in profile.accounts">
-      <a href="/transaction_report?account_id={{ $index }}">
+      <a href="#/transactions/account_id={{ $index }}">
         <span class="name account">{{ account.name }}</span>
       </a>
       <span class="balance">{{ account.balance | number:0 }}</span>

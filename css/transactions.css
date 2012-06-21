@@ -1,12 +1,17 @@
 table.transactions {
   table-layout: fixed;
+  border-collapse: collapse;
 }
 .transaction td {
-  border-top: 1px solid #eee;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.transaction td,
+.transaction th {
   line-height: 16px;
+  border: 1px solid #eee;
+  padding: 2px 5px;
 }
 
 .date_cell {

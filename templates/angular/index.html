@@ -23,11 +23,14 @@
   <script type="text/javascript" src="/js/account_transfer_dialog.js"></script>
   <script type="text/javascript" src="/js/charts.js"></script>
   <script type="text/javascript" src="/js/budget.js"></script>
+  <script type="text/javascript" src="/js/edit_imported_file.js"></script>
 
   <script type="text/javascript" src="/js/directives.js"></script>
   <script type="text/javascript" src="/js/main_page_ctrl.js"></script>
   <script type="text/javascript" src="/js/transactions_page_ctrl.js"></script>
   <script type="text/javascript" src="/js/edit_budget_page_ctrl.js"></script>
+  <script type="text/javascript" src="/js/import_from_file_page_ctrl.js"></script>
+  <script type="text/javascript" src="/js/edit_imported_file_page_ctrl.js"></script>
   <script type="text/javascript" src="/js/app_ctrl.js"></script>
 
   <title>PFT: overview</title>
@@ -55,7 +58,8 @@
             ng-click="openTransactionDialog()">
       Add expense
     </button>
-    <button pft-button icon="ui-icon-csv">
+    <button pft-button icon="ui-icon-csv"
+            ng-click="openImportFromFile()">
       Import from file
     </button>
     <button pft-button icon="ui-icon-transferthick-e-w">

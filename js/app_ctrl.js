@@ -14,11 +14,16 @@ pft.mainModule = angular.module('pftApp', ['ngResource', 'pft.directives']).
                {templateUrl: 'edit_budget_page.html', controller: pft.EditBudgetPageCtrl}).
           when('/edit_budget',
                {templateUrl: 'edit_budget_page.html', controller: pft.EditBudgetPageCtrl}).
+          when('/import_from_file',
+               {templateUrl: 'import_from_file_page.html', controller: pft.ImportFromFilePageCtrl}).
+          when('/edit_imported_file/id=:importedFileId',
+               {templateUrl: 'edit_imported_file_page.html',
+                controller: pft.EditImportedFilePageCtrl}).
           otherwise({templateUrl: 'main_page.html', controller: pft.MainPageCtrl});
     }]);
 
 
-pft.AppCtrl = function($scope, $resource) {
+pft.AppCtrl = function($scope, $resource, $location) {
   var getProfileRequest = $resource('/api/get_profile', {}, {
     query: {method:'GET'}
   });
@@ -35,5 +40,9 @@ pft.AppCtrl = function($scope, $resource) {
 
   $scope.openTransactionDialog = function (opt_transactionId) {
     pft.TransactionDialog.Dialog.open(opt_transactionId);
+  };
+
+  $scope.openImportFromFile = function () {
+    $location.path('/import_from_file');
   };
 };

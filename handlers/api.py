@@ -1,7 +1,7 @@
 from google.appengine.api import users
 from common import CommonHandler
 from datastore import lookup
-from util import ndb_json, budget_util, parse
+from util import ndb_json, budget_util, parse, parse_csv
 
 class GetProfile(CommonHandler):
   def HandleGet(self):
@@ -108,5 +108,34 @@ class GetTransactions(CommonHandler):
       'account': account,
       'transactions': transactions
     }
+
+    self.WriteToJson(response)
+
+
+class GetImportedFileDescriptions(CommonHandler):
+  def HandleGet(self):
+
+    response = {
+      'imported_file_descriptions':
+          lookup.GetOrCreateImportedFileList(self.profile).imported_files
+    }
+
+    self.WriteToJson(response)
+
+
+class GetImportedFile(CommonHandler):
+  def HandleGet(self):
+    imported_file_id = int(self.request.get('id'))
+    imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)
+
+    response = {
+      'imported_file': imported_file
+    }
+    if imported_file.source_file:
+      source_file_lines = imported_file.source_file.splitlines()
+      if imported_file.schema:
+        source_file_lines = [imported_file.schema] + source_file_lines
+      response['formatted_parsed_lines'] = parse_csv.ParseCsvToPreview(
+          source_file_lines)[:13]
 
     self.WriteToJson(response)

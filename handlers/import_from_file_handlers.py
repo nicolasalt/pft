@@ -140,7 +140,7 @@ class DoAddTransactionsFromCsv(CommonHandler):
         date=imported_file.date))
     imported_file_list.put()
 
-    self.redirect('/edit_imported_file?id=%d' % imported_file.key.id())
+    self.redirect('/a/index.html#edit_imported_file/id=%d' % imported_file.key.id())
 
 
 class DoAddParseSchema(CommonHandler):

@@ -28,10 +28,12 @@ table.imported_transactions {
 .imported_transaction .description_cell {
   width: 400px;
 }
-.imported_transaction .amount_cell.credit {
+.imported_transaction .amount_cell.credit,
+.imported_transaction .amount_cell.credit_true {
   color: #008000;
 }
-.imported_transaction .amount_cell.debit {
+.imported_transaction .amount_cell.debit,
+.imported_transaction .amount_cell.credit_false {
   color: #800000;
 }
 .imported_transaction .selector {

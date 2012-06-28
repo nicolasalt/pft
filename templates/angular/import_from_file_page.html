@@ -1,0 +1,22 @@
+<h2>Import expenses and income from file</h2>
+
+<form action="/do/add_transactions_from_csv" method="post" enctype="multipart/form-data"
+    id="add_transactions_form">
+  <div>Account:
+    <select ng-model="account" name="account_id"
+            ng-options="a.name for a in profile.accounts">
+    </select>
+  </div>
+  <input type="file" name="csv" /><br>
+  <button ng-click="submitTransactionsForm()">Submit</button>
+</form>
+
+<h3>Edit previous imports</h3>
+
+<ul>
+  <li ng-repeat="importedFileDescription in importedFileDescriptions">
+    <a href="#/edit_imported_file/id={{ importedFileDescription.imported_file_id }}">
+      {{ importedFileDescription.date }}
+    </a>
+  </li>
+</ul>

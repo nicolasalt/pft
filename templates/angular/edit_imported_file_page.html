@@ -34,10 +34,11 @@
 
   <div ng-show="importedFile.parsed">
     <table class="imported_transactions" cellpadding="0" cellspacing="0">
-      <tr class="imported_transaction"
-          ng-repeat="transaction in importedFile.parsed_transactions">
+      <tr class="imported_transaction selected_{{ currentTransactionIndex == $index }} resolved_{{ transaction.resolutions.length > 0 }}"
+          ng-repeat="transaction in importedFile.parsed_transactions"
+          ng-click="switchToTransaction($index)">
         <td class="date_cell">
-          {{ transaction.date }}
+          {{ transaction.date + 'Z'|date:'EEE, d MMM yyyy' }}
         </td>
         <td class="description_cell">
           {{ transaction.description }}
@@ -45,9 +46,28 @@
         <td class="amount_cell credit_{{ transaction.amount < 0 }}">
           {{ transaction.amount }}
         </td>
-        <td parsed_transaction_index={{ $index }}></td>
+        <td parsed_transaction_index="{{ $index }}"></td>
       </tr>
     </table>
+
+    <div class="current_imported_transaction">
+      <div class="date">{{ getCurrentTransaction().date + 'Z'|date:'EEE, d MMM yyyy' }}</div>
+      <div class="description">{{ getCurrentTransaction().description }}</div>
+      <div class="amount credit_{{ getCurrentTransaction().amount < 0 }}">
+        {{ getCurrentTransaction().amount }}</div>
+
+      <div>
+        <div class="resolveTransactionButton"
+             ng-repeat="category in profile.categories"
+             ng-click="resolveTransaction(category)">
+          {{ category.name }}
+        </div>
+        <div class="resolveTransactionButton">Split</div>
+        <div class="resolveTransactionButton">Drop</div>
+      </div>
+      <button ng-click="previousTransaction()">Previous</button>
+      <button ng-click="nextTransaction()">Next</button>
+    </div>
 
     <div id="split-transaction-dialog" class="split_transaction_dialog"></div>
   </div>

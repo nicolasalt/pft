@@ -14,6 +14,14 @@
 
 table.imported_transactions {
   table-layout: fixed;
+  display: inline-block;
+  width: 45%;
+}
+.imported_transaction.selected_true {
+  background-color: #eee;
+}
+.imported_transaction.resolved_true td {
+  color: #ccc !important;
 }
 .imported_transaction td {
   height: 20px;
@@ -21,6 +29,7 @@ table.imported_transactions {
   vertical-align: top;
   padding: 0 5px;
   color: #666;
+  cursor: pointer;
 }
 .imported_transaction .date_cell {
   width: 100px;
@@ -72,6 +81,40 @@ table.imported_transactions {
 }
 .imported_transaction.processed:hover .cancel_button {
   display: inline-block;
+}
+
+.current_imported_transaction {
+  display: inline-block;
+  border: 1px solid #800;
+  width: 45%;
+  vertical-align: top;
+  height: 300px;
+}
+.current_imported_transaction .date {
+  color: #999;
+  font-size: 140%;
+  margin-bottom: 10px;
+}
+.current_imported_transaction .description {
+  font-size: 140%;
+  margin-bottom: 10px;
+}
+.current_imported_transaction .amount {
+  font-size: 160%;
+  margin-bottom: 20px;
+}
+.current_imported_transaction .amount.credit_true {
+  color: #008000;
+}
+.current_imported_transaction .amount.credit_false {
+  color: #800000;
+}
+.current_imported_transaction .resolveTransactionButton {
+  display: inline-block;
+  cursor: pointer;
+  border: 1px solid #0078ae;
+  margin: 3px;
+  padding: 3px;
 }
 
 .split_transaction_dialog .category_splitter {

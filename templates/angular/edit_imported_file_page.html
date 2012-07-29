@@ -7,7 +7,7 @@
       Select schema:
       <div>
         <select ng-model="schema"
-                ng-options="schema in profile.parse_schemas">
+                ng-options="schema.name for schema in profile.parse_schemas">
         </select>
         <button ng-click="applySelectedSchema()">Apply</button>
       </div>

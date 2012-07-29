@@ -1,5 +1,5 @@
 
-pft.EditImportedFilePageCtrl = function($scope, $resource, $routeParams) {
+pft.EditImportedFilePageCtrl = function($scope, $resource, $routeParams, $http) {
   $scope.importedFileId = $routeParams.importedFileId;
 
   $scope.dialog = new pft.SplitTransactionDialog();
@@ -20,23 +20,17 @@ pft.EditImportedFilePageCtrl = function($scope, $resource, $routeParams) {
   };
   $scope.updateImportedFileDescriptions();
 
-  var applyParseSchemaRequest = $resource('/api/apply_parse_schema_to_import_file', {}, {
-    query: {method:'POST'}
-  });
   $scope.applySelectedSchema = function () {
-    applyParseSchemaRequest.post({
-        'id': $scope.importedFile.id,
-        'schema': $scope.schema},
-      $scope.updateImportedFileDescriptions);
+    $.post('/api/do/apply_parse_schema_to_import_file', {
+          'id': $scope.importedFile.id,
+          'schema': $scope.schema['schema']}).success(
+        $scope.updateImportedFileDescriptions);
   };
 
-  var addParseSchemaRequest = $resource('/api/add_parse_schema', {}, {
-    query: {method:'POST'}
-  });
   $scope.addParseSchema = function () {
-    addParseSchemaRequest.post({
-        'name': $scope.schemaName,
-        'schema': $scope.schemaToAdd},
-      $scope.updateImportedFileDescriptions);
+    $.post('/api/do/add_parse_schema', {
+          'name': $scope.schemaName,
+          'schema': $scope.schemaToAdd}).success(
+        $scope.updateProfile);
   };
 };

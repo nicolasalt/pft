@@ -6,16 +6,17 @@ import webtest
 
 
 class GetProfileTestCase(unittest.TestCase):
-  def test_normal(self):
+  def setUp(self):
     self.testapp = webtest.TestApp(controller.app)
 
     self.testbed = testbed.Testbed()
     self.testbed.activate()
+    self.testbed.init_user_stub()
 
+  def testVisitorNotLoggedIn(self):
     response = self.testapp.get('/api/get_profile')
 
-    self.assertEqual('',response)
-
+    self.assertEqual(302,response.status_int)
 
 
 if __name__ == '__main__':

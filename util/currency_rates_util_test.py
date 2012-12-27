@@ -6,7 +6,7 @@ from util import currency_rates_util
 
 
 class ParseFromJsonTestCase(unittest.TestCase):
-  def test_normal(self):
+  def testNormal(self):
     parsed_rate = currency_rates_util._ParseRateFromJson(
         '{lhs: "1 Russian ruble",rhs: "0.033616 U.S. dollars",error: "",'
         'icc: true}')
@@ -34,7 +34,7 @@ class GetFreshRatesTestCase(unittest.TestCase):
 
     models.CurrencyRates.SUPPORTED_CURRENCIES = ['usd', 'euro', 'rub']
 
-  def test_normal(self):
+  def testNormal(self):
     urlfetch.fetch(
         'http://www.google.com/ig/calculator?hl=en&q=1usd=?usd').AndReturn(
             GetFreshRatesTestCase.FakeResponse(
@@ -71,7 +71,7 @@ class CalculateCurrencySumTestCase(unittest.TestCase):
   def tearDown(self):
     self.mox.UnsetStubs()
 
-  def test_normal(self):
+  def testNormal(self):
     lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
 
     self.mox.ReplayAll()
@@ -81,7 +81,7 @@ class CalculateCurrencySumTestCase(unittest.TestCase):
             [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'RUB'))
     self.mox.VerifyAll()
 
-  def test_mainCurrencyIsNotKnown(self):
+  def testMainCurrencyIsNotKnown(self):
     lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
 
     self.mox.ReplayAll()

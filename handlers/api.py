@@ -6,7 +6,6 @@ from util import ndb_json, budget_util, parse, parse_csv
 class GetProfile(CommonHandler):
   def HandleGet(self):
     response = {
-      'google_user': self.google_user,
       'visitor': self.visitor,
       'logout_url': users.create_logout_url(self.request.uri),
       'profile': self.profile

@@ -58,7 +58,7 @@ class GetFreshRatesTestCase(unittest.TestCase):
 class CalculateCurrencySumTestCase(unittest.TestCase):
   def setUp(self):
     self.mox = mox.Mox()
-    self.mox.StubOutWithMock(lookup, 'GetLatestCurrencyRates')
+    self.mox.StubOutWithMock(models.CurrencyRates, 'Get')
 
     self.fake_currency_rates_model = models.CurrencyRates()
     self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
@@ -72,7 +72,7 @@ class CalculateCurrencySumTestCase(unittest.TestCase):
     self.mox.UnsetStubs()
 
   def testNormal(self):
-    lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
+    models.CurrencyRates.Get().AndReturn(self.fake_currency_rates_model)
 
     self.mox.ReplayAll()
     self.assertAlmostEqual(
@@ -82,7 +82,7 @@ class CalculateCurrencySumTestCase(unittest.TestCase):
     self.mox.VerifyAll()
 
   def testMainCurrencyIsNotKnown(self):
-    lookup.GetLatestCurrencyRates().AndReturn(self.fake_currency_rates_model)
+    models.CurrencyRates.Get().AndReturn(self.fake_currency_rates_model)
 
     self.mox.ReplayAll()
     self.assertIsNone(currency_rates_util.CalculateCurrencySum(

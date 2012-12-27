@@ -3,7 +3,7 @@ import os
 from google.appengine.api import users
 import webapp2
 import jinja2
-from datastore import lookup
+from datastore import lookup, models
 from util import ndb_json, currency_rates_util
 
 def currency_filter(value):
@@ -34,21 +34,25 @@ class CommonHandler(webapp2.RequestHandler):
     self.response.out.write(template.render(template_values))
 
   def WriteToJson(self, template_values):
+    self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(ndb_json.encode(template_values))
 
   def InitUserAndProfile(self, redirect_to_choose_profile=True):
     self.google_user = users.get_current_user()
     if not self.google_user:
-      self.redirect(users.create_login_url(self.request.uri))
-      return False
+      return {
+        'login_url': users.create_login_url(''),
+        'status': 'not_logged_in'
+      }
 
-    self.visitor = lookup.GetUser(self.google_user)
-    self.profile = lookup.GetActiveProfile(self.google_user)
+    self.visitor = models.User.Get(self.google_user.user_id())
+    self.profile = models.Profile.GetActive(self.visitor.key.id())
     if not self.profile and redirect_to_choose_profile:
-      self.redirect('/manage_profiles')
-      return False
+      return {
+        'status': 'profile_not_selected'
+      }
 
-    return True
+    return None
 
   def GetTotalAccountBalance(self):
     total = currency_rates_util.CalculateCurrencySum(
@@ -56,17 +60,22 @@ class CommonHandler(webapp2.RequestHandler):
        self.profile.main_currency)
     return total or 0
 
-
   def HandleGet(self):
     pass
 
   def get(self):
-    if self.InitUserAndProfile():
+    res = self.InitUserAndProfile()
+    if res:
+      self.WriteToJson(res)
+    else:
       self.HandleGet()
 
   def HandlePost(self):
     pass
 
   def post(self):
-    if self.InitUserAndProfile():
+    res = self.InitUserAndProfile()
+    if res:
+      self.WriteToJson(res)
+    else:
       self.HandlePost()

@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from google.appengine.ext import ndb
 
 
+# TODO: is this needed?
 class UserProfileSettings(ndb.Model):
   profile_id = ndb.IntegerProperty(required=True)
   cash_account_id = ndb.IntegerProperty()
@@ -10,15 +11,30 @@ class UserProfileSettings(ndb.Model):
 
 
 class User(ndb.Model):
-  google_user = ndb.UserProperty(required=True)
-  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  creation_time = ndb.DateTimeProperty(auto_now_add=True)
   active_profile_id = ndb.IntegerProperty()
-  profile_settings = ndb.LocalStructuredProperty(UserProfileSettings,
-                                                 repeated=True)
+  profile_settings = ndb.LocalStructuredProperty(UserProfileSettings, repeated=True)
 
   @staticmethod
   def MakeKey(user_id):
     return ndb.Key(User, user_id)
+
+  @classmethod
+  def Get(cls, user_id):
+    user = cls.MakeKey(user_id).get()
+    if not user:
+      user = cls(key=cls.MakeKey(user_id))
+    return user
+
+  def GetOrCreateProfileSettings(self, profile_id):
+    for settings in self.profile_settings:
+      if settings.profile_id == profile_id:
+        return settings
+
+    settings = UserProfileSettings(profile_id=profile_id)
+    self.profile_settings.append(settings)
+
+    return settings
 
 
 class ParseSchema(ndb.Model):
@@ -27,31 +43,67 @@ class ParseSchema(ndb.Model):
 
 
 class Account(ndb.Model):
-  account_id = ndb.IntegerProperty() # Used only in GET operations, filled for js
+  id = ndb.IntegerProperty(required=True)
   name = ndb.StringProperty(required=True)
   # TODO: add automatic currency converter:
   # http://www.google.com/ig/calculator?hl=en&q=1rub=?eur
   currency = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
-  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  creation_time = ndb.DateTimeProperty(auto_now_add=True)
 
 
 class Category(ndb.Model):
-  category_id = ndb.IntegerProperty() # Used only in GET operations, filled for js
+  id = ndb.IntegerProperty(required=True)
   name = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
-  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  creation_time = ndb.DateTimeProperty(auto_now_add=True)
 
 
 class Profile(ndb.Model):
   name = ndb.StringProperty(required=True)
-  owner = ndb.UserProperty(required=True)
-  users = ndb.UserProperty(repeated=True)
-  date = ndb.DateTimeProperty(required=True, auto_now_add=True)
+  owner_id = ndb.StringProperty(required=True)
+  user_ids = ndb.StringProperty(repeated=True)
+  creation_time = ndb.DateTimeProperty(auto_now_add=True)
   main_currency = ndb.StringProperty(default='USD')
   parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
   accounts = ndb.LocalStructuredProperty(Account, repeated=True)
   categories = ndb.LocalStructuredProperty(Category, repeated=True)
+
+  @classmethod
+  def GetActive(cls, user_id):
+    profile_id = User.Get(user_id).active_profile_id
+    if profile_id:
+      return cls.get_by_id(profile_id)
+    else:
+      return None
+
+  @classmethod
+  def Create(cls, owner_id, name, **kw):
+    profile = cls(owner_id=owner_id, name=name)
+    profile.populate(**kw)
+    profile.user_ids.append(owner_id)
+    profile.put()
+    return profile
+
+  def AddAccount(self, **kw):
+    if self.accounts:
+      id = self.accounts[-1].id + 1
+    else:
+      id = 0
+    account = Account(id=id, **kw)
+    self.accounts.append(account)
+    self.put()
+    return account
+
+  def AddCategory(self, **kw):
+    if self.categories:
+      id = self.categories[-1].id + 1
+    else:
+      id = 0
+    category = Category(id=id, **kw)
+    self.categories.append(category)
+    self.put()
+    return category
 
 
 class Transaction(ndb.Model):
@@ -156,3 +208,21 @@ class CurrencyRates(ndb.Model):
 
   last_updated = ndb.DateTimeProperty()
   rates = ndb.LocalStructuredProperty(Rate, repeated=True)
+
+  @classmethod
+  def Get(cls):
+    return cls.get_or_insert('global_currency_rates')
+
+  @classmethod
+  def Update(cls, new_rates):
+    """
+      Args:
+        new rates: dict like {'euro': 1.34, 'rub': 0.33}
+    """
+    ratesModel = cls.Get()
+    rates = dict([(r.currency, r.rate) for r in ratesModel.rates])
+    rates.update(new_rates)
+    ratesModel.rates = [cls.Rate(currency=c, rate=r)
+                        for c, r in rates.iteritems()]
+    ratesModel.last_updated = datetime.now()
+    ratesModel.put()

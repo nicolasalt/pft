@@ -1,28 +1,16 @@
-from google.appengine.api import users
 from common import CommonHandler
 from datastore import lookup
-from util import ndb_json, budget_util, parse, parse_csv
+from util import  budget_util, parse, parse_csv
 
-class GetProfile(CommonHandler):
+class GetActiveProfile(CommonHandler):
   def HandleGet(self):
     response = {
       'visitor': self.visitor,
-      'logout_url': users.create_logout_url(self.request.uri),
-      'profile': self.profile
+      'profile': self.profile,
+      'user_profile_settings': self.visitor.GetOrCreateProfileSettings(
+          self.profile.key.id()),
+      'total_balance': self.GetTotalAccountBalance(),
     }
-    if self.profile:
-      for i, category in enumerate(self.profile.categories):
-        category.category_id = i
-      for i, account in enumerate(self.profile.accounts):
-        account.account_id = i
-
-      response.update({
-        'user_profile_settings': lookup.GetOrCreateUserProfileSettings(
-            self.profile, self.visitor),
-        'total_balance': self.GetTotalAccountBalance(),
-        'categories_total_balance':
-            sum([c.balance for c in self.profile.categories]),
-      })
 
     self.WriteToJson(response)
 

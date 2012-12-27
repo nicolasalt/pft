@@ -23,7 +23,7 @@ def GetFreshRates():
 
 
 def GetCachedRates():
-  ratesModel = lookup.GetLatestCurrencyRates()
+  ratesModel = models.CurrencyRates.Get()
   return dict([(r.currency, r.rate) for r in ratesModel.rates])
 
 

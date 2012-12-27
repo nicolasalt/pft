@@ -1,10 +1,13 @@
-from common import CommonHandler
+import common
 from datastore import lookup
-from util import  budget_util, parse, parse_csv
+from util import  budget_util, parse, parse_csv, currency_rates_util
 
-class GetActiveProfile(CommonHandler):
+
+
+class GetActiveProfile(common.CommonHandler):
+  @common.active_profile_required
   def HandleGet(self):
-    response = {
+    return {
       'visitor': self.visitor,
       'profile': self.profile,
       'user_profile_settings': self.visitor.GetOrCreateProfileSettings(
@@ -12,48 +15,17 @@ class GetActiveProfile(CommonHandler):
       'total_balance': self.GetTotalAccountBalance(),
     }
 
-    self.WriteToJson(response)
+  def GetTotalAccountBalance(self):
+    total = currency_rates_util.CalculateCurrencySum(
+      [(a.balance, a.currency) for a in self.profile.accounts],
+      self.profile.main_currency)
+    return total or 0
 
 
-class GetBudget(CommonHandler):
-  def HandleGet(self):
-    budget = budget_util.GetBudget(self.profile, self.request.get('date'))
-
-    transactions = lookup.GetTransactionsForBudget(self.profile, budget)
-    unplanned_income, unplanned_expenses = (
-        budget_util.CalculateUnplannedExpensesAndIncome(
-            budget, transactions))
-
-    categories_total_balance = sum([c.balance for c in self.profile.categories])
-
-    budget_view_items = budget_util.GetBudgetViewItems(self.profile, budget)
-    common_savings = 9000
-    max_expense = 0
-    for item in budget.items:
-      if item.category_id is not None:
-        common_savings -= item.planned_amount
-        max_expense = max(max_expense, item.planned_amount)
-
-    budget_view_items.append({
-      'name': 'Other expenses',
-      'amount': unplanned_expenses
-    })
-    common_savings -= unplanned_expenses
-    max_expense = max(max_expense, common_savings)
-
-    response = {
-      'total_balance': self.GetTotalAccountBalance(),
-      'budget': budget,
-      'categories_total_balance': categories_total_balance,
-      'budget_items': budget_view_items,
-      'common_savings': common_savings,
-      'max_expense': max_expense
-    }
-
-    self.WriteToJson(response)
+# Not tested
 
 
-class GetTransactions(CommonHandler):
+class GetTransactions(common.CommonHandler):
   def HandleGet(self):
     """
       This page allows to view filtered transactions.
@@ -99,7 +71,7 @@ class GetTransactions(CommonHandler):
     self.WriteToJson(response)
 
 
-class GetImportedFileDescriptions(CommonHandler):
+class GetImportedFileDescriptions(common.CommonHandler):
   def HandleGet(self):
 
     response = {
@@ -110,7 +82,7 @@ class GetImportedFileDescriptions(CommonHandler):
     self.WriteToJson(response)
 
 
-class GetImportedFile(CommonHandler):
+class GetImportedFile(common.CommonHandler):
   def HandleGet(self):
     imported_file_id = int(self.request.get('id'))
     imported_file = lookup.GetImportedFileById(self.profile, imported_file_id)

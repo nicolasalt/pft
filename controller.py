@@ -8,7 +8,8 @@ from handlers import api
 
 app = webapp2.WSGIApplication([
     ('/api/get_active_profile', api.GetActiveProfile),
-    ('/api/get_budget', api.GetBudget),
+    ('/api/do/add_profile', api_do.DoAddProfile),
+
     ('/api/get_transactions', api.GetTransactions),
     ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),
     ('/api/get_imported_file', api.GetImportedFile),
@@ -37,7 +38,6 @@ app = webapp2.WSGIApplication([
     ('/do/edit_account', profile_handlers.DoEditAccount),
     ('/do/edit_category', profile_handlers.DoEditCategory),
     ('/do/edit_user_profile_settings', profile_handlers.DoEditUserProfileSettings),
-    ('/do/add_profile', profile_handlers.DoAddProfile),
     ('/do/connect_to_profile', profile_handlers.DoConnectToProfile),
     ('/do/set_active_profile', profile_handlers.DoSetActiveProfile),
     ('/do/edit_profile', profile_handlers.DoEditProfile),

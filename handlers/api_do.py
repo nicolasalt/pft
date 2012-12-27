@@ -3,6 +3,21 @@ from common import CommonHandler
 from datastore import lookup, models
 from util import ndb_json, budget_util, parse, parse_csv
 
+
+
+class DoAddProfile(CommonHandler):
+  def HandlePost(self):
+    profile_name = self.request.get('name')
+
+    self.profile = models.Profile.Create(self.visitor.key.id(), profile_name)
+    models.User.Update(self.visitor.key.id(), active_profile_id=self.profile.key.id())
+
+    return {'status': 'ok'}
+
+
+# Not tested
+
+
 class DoAddParseSchema(CommonHandler):
   def HandlePost(self):
     name = self.request.get('name')

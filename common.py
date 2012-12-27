@@ -37,45 +37,25 @@ class CommonHandler(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(ndb_json.encode(template_values))
 
-  def InitUserAndProfile(self, redirect_to_choose_profile=True):
-    self.google_user = users.get_current_user()
-    if not self.google_user:
-      return {
-        'login_url': users.create_login_url(''),
-        'status': 'not_logged_in'
-      }
-
-    self.visitor = models.User.Get(self.google_user.user_id())
-    self.profile = models.Profile.GetActive(self.visitor.key.id())
-    if not self.profile and redirect_to_choose_profile:
-      return {
-        'status': 'profile_not_selected'
-      }
-
-    return None
-
-  def GetTotalAccountBalance(self):
-    total = currency_rates_util.CalculateCurrencySum(
-       [(a.balance, a.currency) for a in self.profile.accounts],
-       self.profile.main_currency)
-    return total or 0
-
   def HandleGet(self):
     pass
 
   def get(self):
-    res = self.InitUserAndProfile()
-    if res:
-      self.WriteToJson(res)
-    else:
-      self.HandleGet()
+    self.visitor = models.User.Get(users.get_current_user().user_id())
+    self.WriteToJson(self.HandleGet())
 
   def HandlePost(self):
     pass
 
   def post(self):
-    res = self.InitUserAndProfile()
-    if res:
-      self.WriteToJson(res)
-    else:
-      self.HandlePost()
+    self.visitor = models.User.Get(users.get_current_user().user_id())
+    self.WriteToJson(self.HandlePost())
+
+def active_profile_required(fn):
+  def decorator(self, *args, **kw):
+    self.profile = models.Profile.GetActive(self.visitor.key.id())
+    if not self.profile:
+      return {'status': 'active_profile_not_selected'}
+
+    return fn(self, *args, **kw)
+  return decorator

@@ -26,6 +26,13 @@ class User(ndb.Model):
       user = cls(key=cls.MakeKey(user_id))
     return user
 
+  @classmethod
+  @ndb.transactional
+  def Update(cls, user_id, **kw):
+    user = cls.Get(user_id)
+    user.populate(**kw)
+    user.put()
+
   def GetOrCreateProfileSettings(self, profile_id):
     for settings in self.profile_settings:
       if settings.profile_id == profile_id:

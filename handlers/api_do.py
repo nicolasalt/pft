@@ -1,7 +1,6 @@
-from google.appengine.api import users
 from common import CommonHandler
-from datastore import lookup, models
-from util import ndb_json, budget_util, parse, parse_csv
+from datastore import models
+from util import  parse_csv
 
 
 
@@ -12,7 +11,21 @@ class DoAddProfile(CommonHandler):
     self.profile = models.Profile.Create(self.visitor.key.id(), profile_name)
     models.User.Update(self.visitor.key.id(), active_profile_id=self.profile.key.id())
 
-    return {'status': 'ok'}
+    return {
+      'id': self.profile.key.id(),
+      'status': 'ok'
+    }
+
+
+class DoSetActiveProfile(CommonHandler):
+  def HandlePost(self):
+    profile_id = int(self.request.get('id'))
+
+    if models.Profile.get_by_id(profile_id):
+      models.User.Update(self.visitor.key.id(), active_profile_id=profile_id)
+      return {'status': 'ok'}
+    else:
+      return {'status': 'profile_does_not_exist'}
 
 
 # Not tested

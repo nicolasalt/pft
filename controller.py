@@ -9,6 +9,7 @@ from handlers import api
 app = webapp2.WSGIApplication([
     ('/api/get_active_profile', api.GetActiveProfile),
     ('/api/do/add_profile', api_do.DoAddProfile),
+    ('/api/do/set_active_profile', api_do.DoSetActiveProfile),
 
     ('/api/get_transactions', api.GetTransactions),
     ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),

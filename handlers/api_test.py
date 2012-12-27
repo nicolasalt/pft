@@ -13,6 +13,30 @@ class GetProfileTestCase(testing.BaseTestCase):
       response.json)
 
 
+class DoSetActiveProfileTestCase(testing.BaseTestCase):
+  def testNormal(self):
+    response = self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})
+    self.profile1_id = response.json['id']
+    response = self.testapp.post('/api/do/add_profile', {'name': 'Test profile name2'})
+    self.profile2_id = response.json['id']
+
+    response = self.testapp.get('/api/get_active_profile')
+
+    self.assertEqual(self.profile2_id, response.json['user_profile_settings']['profile_id'])
+    self.assertEqual(self.profile2_id, response.json['visitor']['active_profile_id'])
+
+    response = self.testapp.post('/api/do/set_active_profile', {'id': self.profile1_id})
+    self.assertEqual('ok', response.json['status'])
+
+    response = self.testapp.get('/api/get_active_profile')
+    self.assertEqual(self.profile1_id, response.json['user_profile_settings']['profile_id'])
+    self.assertEqual(self.profile1_id, response.json['visitor']['active_profile_id'])
+
+  def testProfileDoesNotExist(self):
+    response = self.testapp.post('/api/do/set_active_profile', {'id': 123})
+    self.assertEqual('profile_does_not_exist', response.json['status'])
+
+
 class ScenarioProfileTestCase(testing.BaseTestCase):
   def testNormal(self):
     response = self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})

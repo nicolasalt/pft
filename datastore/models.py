@@ -73,6 +73,7 @@ class Profile(ndb.Model):
   creation_time = ndb.DateTimeProperty(auto_now_add=True)
   main_currency = ndb.StringProperty(default='USD')
   parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
+  # TODO: Accounts are very similar to categories: unite somehow?
   accounts = ndb.LocalStructuredProperty(Account, repeated=True)
   categories = ndb.LocalStructuredProperty(Category, repeated=True)
 
@@ -129,7 +130,18 @@ class Profile(ndb.Model):
 
   def GetCategoryById(self, category_id):
     category_dict = dict([(a.id, a) for a in self.categories])
+    assert category_id in category_dict
     return category_dict.get(category_id)
+
+  def UpdateCategory(self, category_id, **kw):
+    category = self.GetCategoryById(category_id)
+    category.populate(**kw)
+    self.put()
+    return category
+
+  def DeleteCategory(self, category_id):
+    self.categories = filter(lambda c: c.id != category_id, self.categories)
+    self.put()
 
 
 class Transaction(ndb.Model):

@@ -64,7 +64,45 @@ class DoEditAccount(common.CommonHandler):
       'status': 'ok'
     }
     if account:
-      response['account_id'] = account.id
+      response['account'] = account
+    return response
+
+
+class DoEditCategory(common.CommonHandler):
+  @common.active_profile_required
+  def HandlePost(self, command):
+    category_id = parse.ParseInt(self.request.get('category_id'))
+    name = self.request.get('name', None)
+    balance = parse.ParseFloat(self.request.get('balance'))
+
+    # TODO: use JSON request
+    kw = {}
+    if name is not None:
+      kw['name'] = name
+
+    if command == 'add':
+      category = self.profile.AddCategory(**kw)
+    elif command == 'edit':
+      assert category_id is not None
+      category = self.profile.UpdateCategory(category_id, **kw)
+    elif command == 'delete':
+      assert category_id is not None
+      self.profile.DeleteCategory(category_id)
+      category = None
+    else:
+      raise ValueError('Command %r is not supported' % command)
+
+    if category and balance is not None and abs(balance - category.balance) > 0.001:
+      transactions.AddTransaction(
+          self.profile, balance - category.balance, util.DatetimeUTCNow(),
+          description='Manual category balance adjust',
+          dest_category_id=category_id, source='manual')
+
+    response = {
+      'status': 'ok'
+    }
+    if category:
+      response['category'] = category
     return response
 
 

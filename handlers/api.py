@@ -1,4 +1,5 @@
 import common
+import converters
 from datastore import lookup
 from util import  budget_util, parse, parse_csv, currency_rates_util
 
@@ -8,10 +9,9 @@ class GetActiveProfile(common.CommonHandler):
   @common.active_profile_required
   def HandleGet(self):
     return {
-      'visitor': self.visitor,
-      'profile': self.profile,
-      'user_profile_settings': self.visitor.GetOrCreateProfileSettings(
-          self.profile.key.id()),
+      'active_profile': converters.ConvertProfileToDict(self.profile),
+      'user_profile_settings': converters.ConvertUserProfileSettingsToDict(
+        self.visitor.GetOrCreateProfileSettings(self.profile.key.id())),
       'total_balance': self.GetTotalAccountBalance(),
     }
 

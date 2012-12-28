@@ -1,4 +1,5 @@
 import common
+import converters
 from datastore import models, transactions
 from util import  parse_csv, parse, util
 
@@ -65,7 +66,8 @@ class DoEditAccount(common.CommonHandler):
       'status': 'ok'
     }
     if account:
-      response['account'] = self.profile.GetAccountById(account.id)
+      response['account'] = converters.ConvertAccountToDict(
+        self.profile.GetAccountById(account.id))
     return response
 
 
@@ -104,7 +106,8 @@ class DoEditCategory(common.CommonHandler):
       'status': 'ok'
     }
     if category:
-      response['category'] = self.profile.GetCategoryById(category.id)
+      response['category'] = converters.ConvertCategoryToDict(
+        self.profile.GetCategoryById(category.id))
     return response
 
 

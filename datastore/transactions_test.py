@@ -28,7 +28,7 @@ class AddTransactionTestCase(testing.BaseTestCase):
 
     profile = models.Profile.GetActive(self.visitor_id)
     self.assertAlmostEqual(-10.0, profile.GetAccountById(self.account1_id).balance)
-    self.assertAlmostEqual(10.0, profile.GetAccountById(self.account2_id).balance)
+    self.assertAlmostEqual(6.66666666, profile.GetAccountById(self.account2_id).balance)
 
   def testChangeCategoryBalance(self):
     transactions.AddTransaction(

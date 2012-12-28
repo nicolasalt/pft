@@ -68,6 +68,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertEqual(1, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
                         self.account1_id, 'Test account name', 'RUB', 10.0)
+    self.assertEqual(0.3, response.json['total_balance'])
 
     # Adding second account
     response = self.testapp.post(
@@ -84,6 +85,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertEqual(2, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][1],
                         self.account2_id, 'Test account name2', 'CHF', 0.0)
+    self.assertEqual(0.3, response.json['total_balance'])
 
     # Changing name of the first account
     response = self.testapp.post(
@@ -100,6 +102,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertEqual(2, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
                         self.account1_id, 'Test account name modified', 'RUB', 5.0)
+    self.assertEqual(0.15, response.json['total_balance'])
 
     # Deleting first account
     response = self.testapp.post(
@@ -112,6 +115,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertEqual(1, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
                         self.account2_id, 'Test account name2', 'CHF', 0.0)
+    self.assertEqual(0.0, response.json['total_balance'])
 
 
 class DoEditCategoryTestCase(testing.BaseTestCase):

@@ -1,5 +1,6 @@
 from google.appengine.ext import ndb
 from datastore import models
+from util import currency_rates_util
 
 
 def _UpdateTransactionRelations(profile, transaction, amount):
@@ -11,7 +12,6 @@ def _UpdateTransactionRelations(profile, transaction, amount):
          To delete transaction: -transaction.amount.
          To modify transaction: new_amount - transaction.amount.
   """
-  # TODO: correctly use currencies
   if transaction.dest_account_id is not None:
     if transaction.dest_category_id is not None:
       raise ValueError('Accounts and categories can\'t be modified within the same transaction.')
@@ -19,8 +19,10 @@ def _UpdateTransactionRelations(profile, transaction, amount):
     dest_account = profile.GetAccountById(transaction.dest_account_id)
 
     if transaction.source_account_id is not None:
-      account = profile.GetAccountById(transaction.source_account_id)
-      account.balance -= amount
+      source_account = profile.GetAccountById(transaction.source_account_id)
+      source_account.balance -= amount
+      amount = currency_rates_util.ConvertCurrency(
+        amount, source_account.currency, dest_account.currency)
 
     dest_account.balance += amount
 
@@ -28,8 +30,8 @@ def _UpdateTransactionRelations(profile, transaction, amount):
     dest_category = profile.GetCategoryById(transaction.dest_category_id)
 
     if transaction.source_category_id is not None:
-      category = profile.GetCategoryById(transaction.source_category_id)
-      category.balance -= amount
+      source_category = profile.GetCategoryById(transaction.source_category_id)
+      source_category.balance -= amount
 
     dest_category.balance += amount
 
@@ -37,7 +39,8 @@ def _UpdateTransactionRelations(profile, transaction, amount):
     raise ValueError('dest_account_id or dest_category_id must be specified')
 
 
-@ndb.transactional
+# TODO: don't use cross-group transactions, cache currency rates in advance.
+@ndb.transactional(xg=True)
 def AddTransaction(profile_id, amount, date, source_account_id=None, source_category_id=None,
                    description=None, dest_account_id=None,
                    dest_category_id=None, source='unknown'):

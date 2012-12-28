@@ -1,6 +1,7 @@
 import unittest
 import datetime
 from google.appengine.api import users
+from google.appengine.datastore import datastore_stub_util
 from google.appengine.ext import testbed, ndb
 import mox
 import controller
@@ -15,7 +16,8 @@ class BaseTestCase(unittest.TestCase):
     self.testbed = testbed.Testbed()
     self.testbed.activate()
     self.testbed.init_user_stub()
-    self.testbed.init_datastore_v3_stub()
+    self.testbed.init_datastore_v3_stub(
+      consistency_policy=datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=0))
     self.testbed.init_memcache_stub()
     self.maxDiff = None
 

@@ -1,6 +1,6 @@
 import unittest
 from google.appengine.api import urlfetch
-from datastore import models, lookup
+from datastore import models
 import mox
 from util import currency_rates_util
 

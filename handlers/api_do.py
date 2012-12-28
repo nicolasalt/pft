@@ -1,10 +1,9 @@
-from common import CommonHandler
-from datastore import models
-from util import  parse_csv
+import common
+from datastore import models, transactions
+from util import  parse_csv, parse, util
 
 
-
-class DoAddProfile(CommonHandler):
+class DoAddProfile(common.CommonHandler):
   def HandlePost(self):
     profile_name = self.request.get('name')
 
@@ -17,9 +16,9 @@ class DoAddProfile(CommonHandler):
     }
 
 
-class DoSetActiveProfile(CommonHandler):
+class DoSetActiveProfile(common.CommonHandler):
   def HandlePost(self):
-    profile_id = int(self.request.get('id'))
+    profile_id = parse.ParseInt(self.request.get('id'))
 
     if models.Profile.get_by_id(profile_id):
       models.User.Update(self.visitor.key.id(), active_profile_id=profile_id)
@@ -28,10 +27,51 @@ class DoSetActiveProfile(CommonHandler):
       return {'status': 'profile_does_not_exist'}
 
 
+class DoEditAccount(common.CommonHandler):
+  @common.active_profile_required
+  def HandlePost(self, command):
+    account_id = parse.ParseInt(self.request.get('account_id'))
+    name = self.request.get('name', None)
+    currency = self.request.get('currency', None)
+    balance = parse.ParseFloat(self.request.get('balance'))
+
+    # TODO: use JSON request
+    kw = {}
+    if name is not None:
+      kw['name'] = name
+    if currency is not None:
+      kw['currency'] = currency
+
+    if command == 'add':
+      account = self.profile.AddAccount(**kw)
+    elif command == 'edit':
+      assert account_id is not None
+      account = self.profile.UpdateAccount(account_id, **kw)
+    elif command == 'delete':
+      assert account_id is not None
+      self.profile.DeleteAccount(account_id)
+      account = None
+    else:
+      raise ValueError('Command %r is not supported' % command)
+
+    if account and balance is not None and abs(balance - account.balance) > 0.001:
+      transactions.AddTransaction(
+          self.profile, balance - account.balance, util.DatetimeUTCNow(),
+          description='Manual account balance adjust',
+          dest_account_id=account_id, source='manual')
+
+    response = {
+      'status': 'ok'
+    }
+    if account:
+      response['account_id'] = account.id
+    return response
+
+
 # Not tested
 
 
-class DoAddParseSchema(CommonHandler):
+class DoAddParseSchema(common.CommonHandler):
   def HandlePost(self):
     name = self.request.get('name')
     schema = self.request.get('schema')
@@ -43,7 +83,7 @@ class DoAddParseSchema(CommonHandler):
     self.WriteToJson({'status': 'ok'})
 
 
-class DoApplyParseSchemaToImportedFile(CommonHandler):
+class DoApplyParseSchemaToImportedFile(common.CommonHandler):
   def HandlePost(self):
     imported_file_id = int(self.request.get('id'))
     schema = self.request.get('schema')

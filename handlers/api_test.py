@@ -37,6 +37,74 @@ class DoSetActiveProfileTestCase(testing.BaseTestCase):
     self.assertEqual('profile_does_not_exist', response.json['status'])
 
 
+class DoEditAccountTestCase(testing.BaseTestCase):
+  def setUp(self):
+    super(DoEditAccountTestCase, self).setUp()
+
+    self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})
+
+  def testNormal(self):
+    # Adding first account
+    response = self.testapp.post(
+      '/api/do/account/add',
+      {
+        'name': 'Test account name',
+        'currency': 'RUB'
+      })
+    self.account1_id = response.json['account_id']
+
+    response = self.testapp.get('/api/get_active_profile')
+    self.assertEqual(1, len(response.json['profile']['accounts']))
+    self.assertEqual(self.account1_id, response.json['profile']['accounts'][0]['id'])
+    self.assertEqual('Test account name', response.json['profile']['accounts'][0]['name'])
+    self.assertEqual('RUB', response.json['profile']['accounts'][0]['currency'])
+
+    # Adding second account
+    response = self.testapp.post(
+      '/api/do/account/add',
+      {
+        'name': 'Test account name2',
+        'currency': 'CHF'
+      })
+    self.account2_id = response.json['account_id']
+
+    response = self.testapp.get('/api/get_active_profile')
+    self.assertEqual(2, len(response.json['profile']['accounts']))
+    self.assertEqual(self.account2_id, response.json['profile']['accounts'][1]['id'])
+    self.assertEqual('Test account name2', response.json['profile']['accounts'][1]['name'])
+    self.assertEqual('CHF', response.json['profile']['accounts'][1]['currency'])
+
+    # Modifying first account
+    response = self.testapp.post(
+      '/api/do/account/edit',
+      {
+        'account_id': self.account1_id,
+        'name': 'Test account name modified'
+      })
+    self.account1_id = response.json['account_id']
+
+    response = self.testapp.get('/api/get_active_profile')
+    self.assertEqual(2, len(response.json['profile']['accounts']))
+    self.assertEqual(self.account1_id, response.json['profile']['accounts'][0]['id'])
+    self.assertEqual('Test account name modified',
+                     response.json['profile']['accounts'][0]['name'])
+    self.assertEqual('RUB', response.json['profile']['accounts'][0]['currency'])
+
+    # Deleting first account
+    response = self.testapp.post(
+      '/api/do/account/delete',
+      {
+        'account_id': self.account1_id
+      })
+
+    response = self.testapp.get('/api/get_active_profile')
+    self.assertEqual(1, len(response.json['profile']['accounts']))
+    self.assertEqual(self.account2_id, response.json['profile']['accounts'][0]['id'])
+    self.assertEqual('Test account name2',
+                     response.json['profile']['accounts'][0]['name'])
+    self.assertEqual('CHF', response.json['profile']['accounts'][0]['currency'])
+
+
 class ScenarioProfileTestCase(testing.BaseTestCase):
   def testNormal(self):
     response = self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})

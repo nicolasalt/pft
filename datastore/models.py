@@ -102,6 +102,21 @@ class Profile(ndb.Model):
     self.put()
     return account
 
+  def UpdateAccount(self, account_id, **kw):
+    account = self.GetAccountById(account_id)
+    account.populate(**kw)
+    self.put()
+    return account
+
+  def GetAccountById(self, account_id):
+    account_dict = dict([(a.id, a) for a in self.accounts])
+    assert account_id in account_dict
+    return account_dict.get(account_id)
+
+  def DeleteAccount(self, account_id):
+    self.accounts = filter(lambda a: a.id != account_id, self.accounts)
+    self.put()
+
   def AddCategory(self, **kw):
     if self.categories:
       id = self.categories[-1].id + 1
@@ -111,6 +126,10 @@ class Profile(ndb.Model):
     self.categories.append(category)
     self.put()
     return category
+
+  def GetCategoryById(self, category_id):
+    category_dict = dict([(a.id, a) for a in self.categories])
+    return category_dict.get(category_id)
 
 
 class Transaction(ndb.Model):
@@ -124,6 +143,10 @@ class Transaction(ndb.Model):
   source = ndb.StringProperty(
       choices=['unknown', 'import', 'manual', 'budget'],
       default='unknown')
+
+  @classmethod
+  def Get(cls, profile, transaction_id):
+    return cls.get_by_id(transaction_id, parent=profile.key)
 
 
 class BudgetItem(ndb.Model):

@@ -37,19 +37,21 @@ class CommonHandler(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(ndb_json.encode(template_values))
 
-  def HandleGet(self):
+  def HandleGet(self, *unused_args):
     pass
 
-  def get(self):
+  def get(self, *args):
     self.visitor = models.User.Get(users.get_current_user().user_id())
-    self.WriteToJson(self.HandleGet())
+    self.profile = None
+    self.WriteToJson(self.HandleGet(*args))
 
-  def HandlePost(self):
+  def HandlePost(self, *unused_args):
     pass
 
-  def post(self):
+  def post(self, *args):
     self.visitor = models.User.Get(users.get_current_user().user_id())
-    self.WriteToJson(self.HandlePost())
+    self.profile = None
+    self.WriteToJson(self.HandlePost(*args))
 
 def active_profile_required(fn):
   def decorator(self, *args, **kw):

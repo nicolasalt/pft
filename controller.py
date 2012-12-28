@@ -10,6 +10,7 @@ app = webapp2.WSGIApplication([
     ('/api/get_active_profile', api.GetActiveProfile),
     ('/api/do/add_profile', api_do.DoAddProfile),
     ('/api/do/set_active_profile', api_do.DoSetActiveProfile),
+    ('/api/do/account/(add|edit|delete)', api_do.DoEditAccount),
 
     ('/api/get_transactions', api.GetTransactions),
     ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),
@@ -36,7 +37,6 @@ app = webapp2.WSGIApplication([
 
     ('/settings', profile_handlers.EditProfile),
     ('/manage_profiles', profile_handlers.ManageProfilesPage),
-    ('/do/edit_account', profile_handlers.DoEditAccount),
     ('/do/edit_category', profile_handlers.DoEditCategory),
     ('/do/edit_user_profile_settings', profile_handlers.DoEditUserProfileSettings),
     ('/do/connect_to_profile', profile_handlers.DoConnectToProfile),

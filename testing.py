@@ -37,6 +37,10 @@ class BaseTestCase(unittest.TestCase):
       'rub': 0.03
     })
 
+  def AddProfile(self):
+    self.profile = models.Profile.Create(self.visitor_id, 'Test profile')
+    models.User.Update(self.visitor_id, active_profile_id=self.profile.key.id())
+
   def tearDown(self):
     self.mox.UnsetStubs()
     self.testbed.deactivate()

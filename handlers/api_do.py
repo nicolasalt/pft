@@ -56,9 +56,9 @@ class DoEditAccount(common.CommonHandler):
 
     if account and balance is not None and abs(balance - account.balance) > 0.001:
       transactions.AddTransaction(
-          self.profile, balance - account.balance, util.DatetimeUTCNow(),
-          description='Manual account balance adjust',
-          dest_account_id=account.id, source='manual')
+        self.profile.key.id(), balance - account.balance, util.DatetimeUTCNow(),
+        description='Manual account balance adjust',
+        dest_account_id=account.id, source='manual')
       self.ReloadProfile()
 
     response = {
@@ -95,9 +95,9 @@ class DoEditCategory(common.CommonHandler):
 
     if category and balance is not None and abs(balance - category.balance) > 0.001:
       transactions.AddTransaction(
-          self.profile, balance - category.balance, util.DatetimeUTCNow(),
-          description='Manual category balance adjust',
-          dest_category_id=category.id, source='manual')
+        self.profile.key.id(), balance - category.balance, util.DatetimeUTCNow(),
+        description='Manual category balance adjust',
+        dest_category_id=category.id, source='manual')
       self.ReloadProfile()
 
     response = {
@@ -117,7 +117,7 @@ class DoAddParseSchema(common.CommonHandler):
     schema = self.request.get('schema')
 
     self.profile.parse_schemas.append(
-        models.ParseSchema(name=name, schema=schema))
+      models.ParseSchema(name=name, schema=schema))
     self.profile.put()
 
     self.WriteToJson({'status': 'ok'})
@@ -132,7 +132,7 @@ class DoApplyParseSchemaToImportedFile(common.CommonHandler):
     imported_file.schema = schema
     imported_file.parsed = True
     imported_file.parsed_transactions = parse_csv.ParseCsv(
-        imported_file.schema, imported_file.source_file)
+      imported_file.schema, imported_file.source_file)
 
     # For future performance
     imported_file.source_file = None

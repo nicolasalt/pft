@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from google.appengine.ext import ndb
 
 
@@ -145,16 +145,16 @@ class Profile(ndb.Model):
 
 
 class Transaction(ndb.Model):
-  account_id = ndb.IntegerProperty()
-  category_id = ndb.IntegerProperty()
+  source_account_id = ndb.IntegerProperty()
+  source_category_id = ndb.IntegerProperty()
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
   description = ndb.StringProperty(indexed=False)
   dest_account_id = ndb.IntegerProperty()
   dest_category_id = ndb.IntegerProperty()
   source = ndb.StringProperty(
-      choices=['unknown', 'import', 'manual', 'budget'],
-      default='unknown')
+    choices=['unknown', 'import', 'manual', 'budget'],
+    default='unknown')
 
   @classmethod
   def Get(cls, profile, transaction_id):
@@ -224,7 +224,7 @@ class ImportedFile(ndb.Model):
   source_file = ndb.TextProperty()
   parsed = ndb.BooleanProperty(default=False)
   parsed_transactions = ndb.LocalStructuredProperty(
-      ImportedFileTransaction, repeated=True)
+    ImportedFileTransaction, repeated=True)
 
 
 class ImportedFileDescription(ndb.Model):
@@ -235,7 +235,7 @@ class ImportedFileDescription(ndb.Model):
 # Single per user
 class ImportedFileList(ndb.Model):
   imported_files = ndb.LocalStructuredProperty(
-      ImportedFileDescription, repeated=True)
+    ImportedFileDescription, repeated=True)
 
 
 # Single in the system

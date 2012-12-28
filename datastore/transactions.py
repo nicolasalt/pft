@@ -12,40 +12,47 @@ def _UpdateTransactionRelations(profile, transaction, amount):
          To modify transaction: new_amount - transaction.amount.
   """
   # TODO: correctly use currencies
-  if transaction.account_id is not None:
-    account = profile.GetAccountById(transaction.account_id)
-    account.balance -= amount
-
-  if transaction.category_id is not None:
-    category = profile.GetCategoryById(transaction.category_id)
-    category.balance -= amount
-
   if transaction.dest_account_id is not None:
+    if transaction.dest_category_id is not None:
+      raise ValueError('Accounts and categories can\'t be modified within the same transaction.')
+
     dest_account = profile.GetAccountById(transaction.dest_account_id)
+
+    if transaction.source_account_id is not None:
+      account = profile.GetAccountById(transaction.source_account_id)
+      account.balance -= amount
+
     dest_account.balance += amount
 
-  if transaction.dest_category_id is not None:
+  elif transaction.dest_category_id is not None:
     dest_category = profile.GetCategoryById(transaction.dest_category_id)
+
+    if transaction.source_category_id is not None:
+      category = profile.GetCategoryById(transaction.source_category_id)
+      category.balance -= amount
+
     dest_category.balance += amount
+
+  else:
+    raise ValueError('dest_account_id or dest_category_id must be specified')
 
 
 @ndb.transactional
-def AddTransaction(profile, amount, date, account_id=None, category_id=None,
+def AddTransaction(profile_id, amount, date, source_account_id=None, source_category_id=None,
                    description=None, dest_account_id=None,
                    dest_category_id=None, source='unknown'):
   transaction = models.Transaction(
-    parent=profile.key,
-    account_id=account_id,
+    parent=ndb.Key(models.Profile, profile_id),
+    source_account_id=source_account_id,
     amount=amount,
     date=date,
     description=description,
-    category_id=category_id,
+    source_category_id=source_category_id,
     dest_account_id=dest_account_id,
     dest_category_id=dest_category_id,
     source=source)
 
-  # reload the latest profile
-  profile = models.Profile.get_by_id(profile.key.id())
+  profile = models.Profile.get_by_id(profile_id)
   _UpdateTransactionRelations(profile, transaction, amount)
 
   profile.put()
@@ -54,8 +61,8 @@ def AddTransaction(profile, amount, date, account_id=None, category_id=None,
 
 
 @ndb.transactional
-def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
-                      category_id=None, description=None, dest_account_id=None,
+def UpdateTransaction(profile, transaction_id, amount, date, source_account_id=None,
+                      source_category_id=None, description=None, dest_account_id=None,
                       dest_category_id=None, source='unknown'):
   transaction = models.Transaction.Get(profile, transaction_id)
 
@@ -63,11 +70,11 @@ def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
   profile = models.Profile.get_by_id(profile.key.id())
   _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 
-  transaction.account_id = account_id
+  transaction.source_account_id = source_account_id
+  transaction.source_category_id = source_category_id
   transaction.amount = amount
   transaction.date = date
   transaction.description = description
-  transaction.category_id = category_id
   transaction.dest_account_id = dest_account_id
   transaction.dest_category_id = dest_category_id
   transaction.source = source

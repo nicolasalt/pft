@@ -33,7 +33,7 @@ def GetOrCreateUserProfileSettings(profile, visitor):
 
 def GetAllProfiles(google_user):
   return models.Profile.query().filter(
-      models.Profile.users == google_user).fetch(100)
+    models.Profile.users == google_user).fetch(100)
 
 
 def GetProfileByCode(code):
@@ -53,20 +53,20 @@ def GetAllTransactions(profile):
 def GetTransactionsForBudget(profile, budget):
   start_date, end_date = budget.GetDateRange()
   return models.Transaction.query(ancestor=profile.key).filter(
-      models.Transaction.date >= start_date,
-      models.Transaction.date < end_date).fetch(1000)
+    models.Transaction.date >= start_date,
+    models.Transaction.date < end_date).fetch(1000)
 
 
 def GetTransactions(profile, category_id, account_id):
   query = models.Transaction.query(ancestor=profile.key)
   if category_id is not None:
     query = query.filter(ndb.query.OR(
-        models.Transaction.category_id == category_id,
-        models.Transaction.dest_category_id == category_id))
+      models.Transaction.source_category_id == category_id,
+      models.Transaction.dest_category_id == category_id))
   if account_id is not None:
     query = query.filter(ndb.query.OR(
-        models.Transaction.account_id == account_id,
-        models.Transaction.dest_account_id == account_id))
+      models.Transaction.source_account_id == account_id,
+      models.Transaction.dest_account_id == account_id))
   return query.fetch(1000)
 
 
@@ -92,22 +92,22 @@ def GetImportedFileById(profile, imported_file_id):
 
 def GetOrCreateImportedFileList(profile):
   imported_file_list = models.ImportedFileList.get_by_id(
-      'imported_file_list', parent=profile.key)
+    'imported_file_list', parent=profile.key)
   if not imported_file_list:
     imported_file_list = models.ImportedFileList(
-        id='imported_file_list', parent=profile.key)
+      id='imported_file_list', parent=profile.key)
   return imported_file_list
 
 
 def GetTransactionsForDay(profile, date, account_id):
   beginning_of_day = datetime.combine(date.date(), time(0))
   query = (models.Transaction.
-      query(ancestor=profile.key).
-      filter(models.Transaction.date >= beginning_of_day).
-      filter(models.Transaction.date < beginning_of_day + timedelta(days=1)).
-      order(-models.Transaction.date))
+           query(ancestor=profile.key).
+           filter(models.Transaction.date >= beginning_of_day).
+           filter(models.Transaction.date < beginning_of_day + timedelta(days=1)).
+           order(-models.Transaction.date))
   if account_id:
-    query.filter(models.Transaction.account_id == account_id)
+    query.filter(models.Transaction.source_account_id == account_id)
   return query.fetch(1000)
 
 

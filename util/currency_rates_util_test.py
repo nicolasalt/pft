@@ -2,18 +2,19 @@ import unittest
 from google.appengine.api import urlfetch
 from datastore import models
 import mox
+import testing
 from util import currency_rates_util
 
 
 class ParseFromJsonTestCase(unittest.TestCase):
   def testNormal(self):
     parsed_rate = currency_rates_util._ParseRateFromJson(
-        '{lhs: "1 Russian ruble",rhs: "0.033616 U.S. dollars",error: "",'
-        'icc: true}')
+      '{lhs: "1 Russian ruble",rhs: "0.033616 U.S. dollars",error: "",'
+      'icc: true}')
     self.assertAlmostEqual(0.033616, parsed_rate)
 
     parsed_rate = currency_rates_util._ParseRateFromJson(
-        '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}')
+      '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}')
     self.assertAlmostEqual(1.0, parsed_rate)
 
 
@@ -36,17 +37,17 @@ class GetFreshRatesTestCase(unittest.TestCase):
 
   def testNormal(self):
     urlfetch.fetch(
-        'http://www.google.com/ig/calculator?hl=en&q=1usd=?usd').AndReturn(
-            GetFreshRatesTestCase.FakeResponse(
-            '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}'))
+      'http://www.google.com/ig/calculator?hl=en&q=1usd=?usd').AndReturn(
+      GetFreshRatesTestCase.FakeResponse(
+        '{lhs: "1 U.S. dollar",rhs: "1 U.S. dollar",error: "0",icc: true}'))
     urlfetch.fetch(
-        'http://www.google.com/ig/calculator?hl=en&q=1euro=?usd').AndReturn(
-            GetFreshRatesTestCase.FakeResponse(
-            '{lhs: "1 Euro",rhs: "1.3015 U.S. dollars",error: "",icc: true}'))
+      'http://www.google.com/ig/calculator?hl=en&q=1euro=?usd').AndReturn(
+      GetFreshRatesTestCase.FakeResponse(
+        '{lhs: "1 Euro",rhs: "1.3015 U.S. dollars",error: "",icc: true}'))
     urlfetch.fetch(
-        'http://www.google.com/ig/calculator?hl=en&q=1rub=?usd').AndReturn(
-            GetFreshRatesTestCase.FakeResponse(
-                'error'))
+      'http://www.google.com/ig/calculator?hl=en&q=1rub=?usd').AndReturn(
+      GetFreshRatesTestCase.FakeResponse(
+        'error'))
 
     self.mox.ReplayAll()
     rates = currency_rates_util.GetFreshRates()
@@ -55,39 +56,53 @@ class GetFreshRatesTestCase(unittest.TestCase):
     self.assertDictEqual({'euro': 1.3015, 'usd': 1}, rates)
 
 
-class CalculateCurrencySumTestCase(unittest.TestCase):
+class CalculateCurrencySumTestCase(testing.BaseTestCase):
   def setUp(self):
-    self.mox = mox.Mox()
-    self.mox.StubOutWithMock(models.CurrencyRates, 'Get')
+    super(CalculateCurrencySumTestCase, self).setUp()
 
-    self.fake_currency_rates_model = models.CurrencyRates()
-    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
-        currency='usd', rate=1.0))
-    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
-        currency='euro', rate=1.3023))
-    self.fake_currency_rates_model.rates.append(models.CurrencyRates.Rate(
-        currency='rub', rate=0.033674))
-
-  def tearDown(self):
-    self.mox.UnsetStubs()
+    models.CurrencyRates.Update({
+      'usd': 1.0,
+      'euro': 1.3023,
+      'rub': 0.033674
+    })
 
   def testNormal(self):
-    models.CurrencyRates.Get().AndReturn(self.fake_currency_rates_model)
-
-    self.mox.ReplayAll()
     self.assertAlmostEqual(
-        832.185068598919,
-        currency_rates_util.CalculateCurrencySum(
-            [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'RUB'))
-    self.mox.VerifyAll()
+      832.18506859,
+      currency_rates_util.CalculateCurrencySum(
+        [(15, 'usd'), (10, 'EURO')], 'RUB'))
 
   def testMainCurrencyIsNotKnown(self):
-    models.CurrencyRates.Get().AndReturn(self.fake_currency_rates_model)
+    self.assertRaises(
+      ValueError, currency_rates_util.CalculateCurrencySum,
+      [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'error')
 
-    self.mox.ReplayAll()
-    self.assertIsNone(currency_rates_util.CalculateCurrencySum(
-        [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'error'))
-    self.mox.VerifyAll()
+  def testOneOfTheAccountCurrenciesUnknown(self):
+    self.assertRaises(
+      ValueError, currency_rates_util.CalculateCurrencySum,
+      [(15, 'usd'), (10, 'EURO'), (1, 'error')], 'RUB')
 
-if __name__ == '__main__':
-  unittest.main()
+
+class ConvertCurrencyTestCase(testing.BaseTestCase):
+  def setUp(self):
+    super(ConvertCurrencyTestCase, self).setUp()
+
+    models.CurrencyRates.Update({
+      'euro': 1.3023,
+      'rub': 0.033674
+    })
+
+  def testNormal(self):
+    self.assertAlmostEqual(
+      386.7375423,
+      currency_rates_util.ConvertCurrency(10.0, 'euro', 'RUB'))
+
+  def testUnknownSourceCurrency(self):
+    self.assertRaises(
+      ValueError, currency_rates_util.ConvertCurrency,
+      10.0, 'error', 'RUB')
+
+  def testUnknownDestCurrency(self):
+    self.assertRaises(
+      ValueError, currency_rates_util.ConvertCurrency,
+      10.0, 'euro', 'error')

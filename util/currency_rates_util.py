@@ -1,6 +1,7 @@
 import re
 from google.appengine.api import urlfetch
-from datastore import models, lookup
+from datastore import models
+
 
 def _ParseRateFromJson(text):
   matchObject = re.search('rhs:\s*"(\d+\.?\d*)', text)
@@ -32,16 +33,20 @@ def CalculateCurrencySum(amount_list, main_currency):
     Args:
       amount_list: list like [(3.4, 'usd'), (5.6, 'euro')]
   """
-  rates = GetCachedRates()
-  main_currency = main_currency.lower()
-  if main_currency not in rates:
-    return None
-
-  main_currency_rate = rates[main_currency]
   total_sum = 0
   for amount, currency in amount_list:
-    currency = currency.lower()
-    if currency in rates:
-      total_sum += amount * rates[currency] / main_currency_rate
+    total_sum += ConvertCurrency(amount, currency, main_currency)
 
   return total_sum
+
+
+def ConvertCurrency(amount, source_currency, dest_currency):
+  rates = GetCachedRates()
+  source_currency = source_currency.lower()
+  dest_currency = dest_currency.lower()
+  if source_currency not in rates:
+    raise ValueError('Unsupported source_currency %r' % source_currency)
+  if dest_currency not in rates:
+    raise ValueError('Unsupported dest_currency %r' % dest_currency)
+
+  return amount * rates[source_currency] / rates[dest_currency]

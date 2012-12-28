@@ -11,6 +11,7 @@ def _UpdateTransactionRelations(profile, transaction, amount):
          To delete transaction: -transaction.amount.
          To modify transaction: new_amount - transaction.amount.
   """
+  # TODO: correctly use currencies
   if transaction.account_id is not None:
     account = profile.GetAccountById(transaction.account_id)
     account.balance -= amount
@@ -24,10 +25,8 @@ def _UpdateTransactionRelations(profile, transaction, amount):
     dest_account.balance += amount
 
   if transaction.dest_category_id is not None:
-    dest_category = profile.GetAccountById(profile, transaction.dest_category_id)
+    dest_category = profile.GetCategoryById(transaction.dest_category_id)
     dest_category.balance += amount
-
-  profile.put()
 
 
 @ndb.transactional
@@ -49,6 +48,7 @@ def AddTransaction(profile, amount, date, account_id=None, category_id=None,
   profile = models.Profile.get_by_id(profile.key.id())
   _UpdateTransactionRelations(profile, transaction, amount)
 
+  profile.put()
   transaction.put()
   return transaction
 
@@ -74,6 +74,7 @@ def UpdateTransaction(profile, transaction_id, amount, date, account_id=None,
 
   _UpdateTransactionRelations(profile, transaction, amount)
 
+  profile.put()
   transaction.put()
   return transaction
 
@@ -90,4 +91,5 @@ def DeleteTransactions(profile, transaction_ids):
   for transaction in transactions:
     _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 
+  profile.put()
   ndb.delete_multi(keys)

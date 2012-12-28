@@ -39,10 +39,10 @@ class DoEditAccount(common.CommonHandler):
     kw = {}
     if name is not None:
       kw['name'] = name
-    if currency is not None:
-      kw['currency'] = currency
 
     if command == 'add':
+      if currency is not None:
+        kw['currency'] = currency
       account = self.profile.AddAccount(**kw)
     elif command == 'edit':
       assert account_id is not None
@@ -58,13 +58,14 @@ class DoEditAccount(common.CommonHandler):
       transactions.AddTransaction(
           self.profile, balance - account.balance, util.DatetimeUTCNow(),
           description='Manual account balance adjust',
-          dest_account_id=account_id, source='manual')
+          dest_account_id=account.id, source='manual')
+      self.ReloadProfile()
 
     response = {
       'status': 'ok'
     }
     if account:
-      response['account'] = account
+      response['account'] = self.profile.GetAccountById(account.id)
     return response
 
 
@@ -96,13 +97,14 @@ class DoEditCategory(common.CommonHandler):
       transactions.AddTransaction(
           self.profile, balance - category.balance, util.DatetimeUTCNow(),
           description='Manual category balance adjust',
-          dest_category_id=category_id, source='manual')
+          dest_category_id=category.id, source='manual')
+      self.ReloadProfile()
 
     response = {
       'status': 'ok'
     }
     if category:
-      response['category'] = category
+      response['category'] = self.profile.GetCategoryById(category.id)
     return response
 
 

@@ -37,6 +37,9 @@ class CommonHandler(webapp2.RequestHandler):
     self.response.headers['Content-Type'] = 'application/json'
     self.response.out.write(ndb_json.encode(template_values))
 
+  def ReloadProfile(self):
+    self.profile = models.Profile.GetActive(self.visitor.key.id())
+
   def HandleGet(self, *unused_args):
     pass
 
@@ -55,7 +58,7 @@ class CommonHandler(webapp2.RequestHandler):
 
 def active_profile_required(fn):
   def decorator(self, *args, **kw):
-    self.profile = models.Profile.GetActive(self.visitor.key.id())
+    self.ReloadProfile()
     if not self.profile:
       return {'status': 'active_profile_not_selected'}
 

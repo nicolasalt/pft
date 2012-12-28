@@ -43,10 +43,11 @@ class DoEditAccountTestCase(testing.BaseTestCase):
 
     self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})
 
-  def _AssertAccount(self, account_dict, account_id, name, currency):
+  def _AssertAccount(self, account_dict, account_id, name, currency, balance):
     self.assertEqual(account_id, account_dict['id'])
     self.assertEqual(name, account_dict['name'])
     self.assertEqual(currency, account_dict['currency'])
+    self.assertAlmostEqual(balance, account_dict['balance'])
 
   # TODO: add more tests
   # TODO: check transactions
@@ -56,16 +57,17 @@ class DoEditAccountTestCase(testing.BaseTestCase):
       '/api/do/account/add',
       {
         'name': 'Test account name',
-        'currency': 'RUB'
+        'currency': 'RUB',
+        'balance': 10.0
       })
     self.account1_id = response.json['account']['id']
     self._AssertAccount(response.json['account'],
-                        self.account1_id, 'Test account name', 'RUB')
+                        self.account1_id, 'Test account name', 'RUB', 10.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(1, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
-                        self.account1_id, 'Test account name', 'RUB')
+                        self.account1_id, 'Test account name', 'RUB', 10.0)
 
     # Adding second account
     response = self.testapp.post(
@@ -76,42 +78,28 @@ class DoEditAccountTestCase(testing.BaseTestCase):
       })
     self.account2_id = response.json['account']['id']
     self._AssertAccount(response.json['account'],
-                        self.account2_id, 'Test account name2', 'CHF')
+                        self.account2_id, 'Test account name2', 'CHF', 0.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(2, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][1],
-                        self.account2_id, 'Test account name2', 'CHF')
+                        self.account2_id, 'Test account name2', 'CHF', 0.0)
 
     # Changing name of the first account
     response = self.testapp.post(
       '/api/do/account/edit',
       {
         'account_id': self.account1_id,
-        'name': 'Test account name modified'
+        'name': 'Test account name modified',
+        'balance': 5.0
       })
     self._AssertAccount(response.json['account'],
-                        self.account1_id, 'Test account name modified', 'RUB')
+                        self.account1_id, 'Test account name modified', 'RUB', 5.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(2, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
-                        self.account1_id, 'Test account name modified', 'RUB')
-
-    # Changing currency of the first account
-    response = self.testapp.post(
-      '/api/do/account/edit',
-      {
-        'account_id': self.account1_id,
-        'currency': 'USD'
-      })
-    self._AssertAccount(response.json['account'],
-                        self.account1_id, 'Test account name modified', 'USD')
-
-    response = self.testapp.get('/api/get_active_profile')
-    self.assertEqual(2, len(response.json['profile']['accounts']))
-    self._AssertAccount(response.json['profile']['accounts'][0],
-                        self.account1_id, 'Test account name modified', 'USD')
+                        self.account1_id, 'Test account name modified', 'RUB', 5.0)
 
     # Deleting first account
     response = self.testapp.post(
@@ -123,7 +111,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(1, len(response.json['profile']['accounts']))
     self._AssertAccount(response.json['profile']['accounts'][0],
-                        self.account2_id, 'Test account name2', 'CHF')
+                        self.account2_id, 'Test account name2', 'CHF', 0.0)
 
 
 class DoEditCategoryTestCase(testing.BaseTestCase):
@@ -132,9 +120,10 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
 
     self.testapp.post('/api/do/add_profile', {'name': 'Test profile name'})
 
-  def _AssertCategory(self, category_dict, category_id, name):
+  def _AssertCategory(self, category_dict, category_id, name, balance):
     self.assertEqual(category_id, category_dict['id'])
     self.assertEqual(name, category_dict['name'])
+    self.assertAlmostEqual(balance, category_dict['balance'])
 
   # TODO: add more tests
   # TODO: check transactions
@@ -143,16 +132,17 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
     response = self.testapp.post(
       '/api/do/category/add',
       {
-        'name': 'Test category name'
+        'name': 'Test category name',
+        'balance': 10.0
       })
     self.category1_id = response.json['category']['id']
     self._AssertCategory(response.json['category'],
-                         self.category1_id, 'Test category name')
+                         self.category1_id, 'Test category name', 10.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(1, len(response.json['profile']['categories']))
     self._AssertCategory(response.json['profile']['categories'][0],
-                         self.category1_id, 'Test category name')
+                         self.category1_id, 'Test category name', 10.0)
 
     # Adding second category
     response = self.testapp.post(
@@ -162,27 +152,28 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
       })
     self.category2_id = response.json['category']['id']
     self._AssertCategory(response.json['category'],
-                         self.category2_id, 'Test category name2')
+                         self.category2_id, 'Test category name2', 0.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(2, len(response.json['profile']['categories']))
     self._AssertCategory(response.json['profile']['categories'][1],
-                         self.category2_id, 'Test category name2')
+                         self.category2_id, 'Test category name2', 0.0)
 
     # Modifying first category
     response = self.testapp.post(
       '/api/do/category/edit',
       {
         'category_id': self.category1_id,
-        'name': 'Test category name modified'
+        'name': 'Test category name modified',
+        'balance': 20.0
       })
     self._AssertCategory(response.json['category'],
-                         self.category1_id, 'Test category name modified')
+                         self.category1_id, 'Test category name modified', 20.0)
 
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(2, len(response.json['profile']['categories']))
     self._AssertCategory(response.json['profile']['categories'][0],
-                         self.category1_id, 'Test category name modified')
+                         self.category1_id, 'Test category name modified', 20.0)
 
     # Deleting first category
     response = self.testapp.post(
@@ -194,7 +185,7 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
     response = self.testapp.get('/api/get_active_profile')
     self.assertEqual(1, len(response.json['profile']['categories']))
     self._AssertCategory(response.json['profile']['categories'][0],
-                         self.category2_id, 'Test category name2')
+                         self.category2_id, 'Test category name2', 0.0)
 
 
 class ScenarioProfileTestCase(testing.BaseTestCase):
@@ -209,11 +200,6 @@ class ScenarioProfileTestCase(testing.BaseTestCase):
     profile.AddAccount(name='Test account2', currency='CHF', balance=20.0)
     profile.AddCategory(name='Test category1', balance=5.0)
     profile.AddCategory(name='Test category2', balance=6.0)
-
-    models.CurrencyRates.Update({
-      'usd': 1.0,
-      'chf': 1.5
-    })
 
     response = self.testapp.get('/api/get_active_profile')
 

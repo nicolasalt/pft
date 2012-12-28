@@ -5,6 +5,7 @@ from google.appengine.ext import testbed, ndb
 import mox
 import controller
 import webtest
+from datastore import models
 
 
 class BaseTestCase(unittest.TestCase):
@@ -29,6 +30,12 @@ class BaseTestCase(unittest.TestCase):
       USER_EMAIL=self.google_user.email(),
       USER_ID=self.google_user.user_id(),
       overwrite=True)
+
+    models.CurrencyRates.Update({
+      'usd': 1.0,
+      'chf': 1.5,
+      'rub': 0.03
+    })
 
   def tearDown(self):
     self.mox.UnsetStubs()

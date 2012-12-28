@@ -30,20 +30,38 @@ class AddTransactionTestCase(testing.BaseTestCase):
     self.assertAlmostEqual(-10.0, profile.GetAccountById(self.account1_id).balance)
     self.assertAlmostEqual(10.0, profile.GetAccountById(self.account2_id).balance)
 
-  def testOnlySourceAccountIsSpecified(self):
-    self.assertRaises(
-      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now,
-      source_account_id=self.account1_id)
-
-  def testDestCategoryId_TogetherWithAccountId(self):
-    self.assertRaises(
-      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now,
-      dest_account_id=self.account1_id, dest_category_id=self.category1_id)
-
   def testChangeCategoryBalance(self):
     transactions.AddTransaction(
       self.profile_id, 10.0, self.now, dest_category_id=self.category1_id)
 
     profile = models.Profile.GetActive(self.visitor_id)
     self.assertAlmostEqual(10.0, profile.GetCategoryById(self.category1_id).balance)
+
+  def testTransferBetweenCategories(self):
+    transactions.AddTransaction(
+      self.profile_id, 10.0, self.now,
+      source_category_id=self.category1_id, dest_category_id=self.category2_id)
+
+    profile = models.Profile.GetActive(self.visitor_id)
+    self.assertAlmostEqual(-10.0, profile.GetCategoryById(self.category1_id).balance)
+    self.assertAlmostEqual(10.0, profile.GetCategoryById(self.category2_id).balance)
+
+  def testOnlySourceAccountIsSpecified(self):
+    self.assertRaises(
+      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now,
+      source_account_id=self.account1_id)
+
+  def testOnlySourceCategoryIsSpecified(self):
+    self.assertRaises(
+      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now,
+      source_category_id=self.category1_id)
+
+  def testDestCategoryId_TogetherWithDestAccountId(self):
+    self.assertRaises(
+      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now,
+      dest_account_id=self.account1_id, dest_category_id=self.category1_id)
+
+  def testNeitherAccountNorCategoryIdsAreSpecified(self):
+    self.assertRaises(
+      ValueError, transactions.AddTransaction, self.profile_id, 10.0, self.now)
 

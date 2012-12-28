@@ -43,7 +43,7 @@ def _UpdateTransactionRelations(profile, transaction, amount):
 @ndb.transactional(xg=True)
 def AddTransaction(profile_id, amount, date, source_account_id=None, source_category_id=None,
                    description=None, dest_account_id=None,
-                   dest_category_id=None, source='unknown'):
+                   dest_category_id=None, source=None):
   transaction = models.Transaction(
     parent=ndb.Key(models.Profile, profile_id),
     source_account_id=source_account_id,
@@ -63,41 +63,32 @@ def AddTransaction(profile_id, amount, date, source_account_id=None, source_cate
   return transaction
 
 
-@ndb.transactional
-def UpdateTransaction(profile, transaction_id, amount, date, source_account_id=None,
-                      source_category_id=None, description=None, dest_account_id=None,
-                      dest_category_id=None, source='unknown'):
-  transaction = models.Transaction.Get(profile, transaction_id)
+@ndb.transactional(xg=True)
+def UpdateTransaction(profile_id, transaction_id, amount, date, description=None):
+  transaction = models.Transaction.Get(profile_id, transaction_id)
 
-  # reload the latest profile
-  profile = models.Profile.get_by_id(profile.key.id())
+  profile = models.Profile.get_by_id(profile_id)
   _UpdateTransactionRelations(profile, transaction, -transaction.amount)
+  _UpdateTransactionRelations(profile, transaction, amount)
 
-  transaction.source_account_id = source_account_id
-  transaction.source_category_id = source_category_id
   transaction.amount = amount
   transaction.date = date
   transaction.description = description
-  transaction.dest_account_id = dest_account_id
-  transaction.dest_category_id = dest_category_id
-  transaction.source = source
-
-  _UpdateTransactionRelations(profile, transaction, amount)
 
   profile.put()
   transaction.put()
   return transaction
 
 
-@ndb.transactional
-def DeleteTransactions(profile, transaction_ids):
+@ndb.transactional(xg=True)
+def DeleteTransactions(profile_id, transaction_ids):
   keys = []
   for transaction_id in transaction_ids:
-    keys.append(ndb.Key(models.Transaction, transaction_id, parent=profile.key))
+    keys.append(ndb.Key(models.Transaction, transaction_id,
+                        parent=ndb.Key(models.Profile, profile_id)))
   transactions = ndb.get_multi(keys)
 
-  # reload the latest profile
-  profile = models.Profile.get_by_id(profile.key.id())
+  profile = models.Profile.get_by_id(profile_id)
   for transaction in transactions:
     _UpdateTransactionRelations(profile, transaction, -transaction.amount)
 

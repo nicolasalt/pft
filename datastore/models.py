@@ -152,13 +152,11 @@ class Transaction(ndb.Model):
   description = ndb.StringProperty(indexed=False)
   dest_account_id = ndb.IntegerProperty()
   dest_category_id = ndb.IntegerProperty()
-  source = ndb.StringProperty(
-    choices=['unknown', 'import', 'manual', 'budget'],
-    default='unknown')
+  source = ndb.StringProperty(choices=['import', 'manual'])
 
   @classmethod
-  def Get(cls, profile, transaction_id):
-    return cls.get_by_id(transaction_id, parent=profile.key)
+  def Get(cls, profile_id, transaction_id):
+    return cls.get_by_id(transaction_id, parent=ndb.Key(Profile, profile_id))
 
 
 class BudgetItem(ndb.Model):

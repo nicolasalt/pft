@@ -27,17 +27,18 @@ class BaseTestCase(unittest.TestCase):
     self.mox = mox.Mox()
 
     self.google_user = users.User(email='foo@example.com', _user_id='10001')
-    self.visitor_id = self.google_user.user_id()
-    self.testbed.setup_env(
-      USER_EMAIL=self.google_user.email(),
-      USER_ID=self.google_user.user_id(),
-      overwrite=True)
+    self.google_user2 = users.User(email='foo2@example.com', _user_id='10002')
+    self.LogIn(self.google_user)
 
     models.CurrencyRates.Update({
       'usd': 1.0,
       'chf': 1.5,
       'rub': 0.03
     })
+
+  def LogIn(self, user):
+    self.visitor_id = user.user_id()
+    self.testbed.setup_env(USER_EMAIL=user.email(), USER_ID=user.user_id(), overwrite=True)
 
   def AddProfile(self):
     self.profile = models.Profile.Create(self.visitor_id, name='Test profile')

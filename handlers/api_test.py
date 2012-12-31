@@ -1,3 +1,4 @@
+from google.appengine.ext import ndb
 from datastore import models
 import testing
 
@@ -79,6 +80,39 @@ class DoAddEditDeleteProfileTestCase(testing.BaseTestCase):
     self.assertEqual(
       {'status': 'active_profile_not_selected'},
       response.json)
+
+
+class DoConnectToProfileTestCase(testing.BaseTestCase):
+  def setUp(self):
+    super(DoConnectToProfileTestCase, self).setUp()
+
+    response = self.testapp.post('/api/do/profile/add', {'name': 'Test profile name'})
+    self.profile1_id = response.json['profile']['id']
+    self.profile1_code = response.json['profile']['profile_code']
+
+    self.LogIn(self.google_user2)
+
+    response = self.testapp.get('/api/profile/get_active')
+    self.assertEqual(
+      {'status': 'active_profile_not_selected'},
+      response.json)
+
+  def testNormal(self):
+    response = self.testapp.post('/api/do/profile/connect', {'profile_code': self.profile1_code})
+    self.assertEqual('ok', response.json['status'])
+
+    response = self.testapp.get('/api/profile/get_active')
+    self.assertEqual(self.profile1_id, response.json['active_profile']['id'])
+
+  def testProfileCodeIsNotSpecified(self):
+    self.testapp.post('/api/do/profile/connect', status=400)
+
+  def testProfileCodeCannotBeParsed(self):
+    self.testapp.post('/api/do/profile/connect', {'profile_code': 'fake code'}, status=400)
+
+  def testProfileWithTheGivenCodeDoesNotExist(self):
+    ndb.Key(models.Profile, self.profile1_id).delete()
+    self.testapp.post('/api/do/profile/connect', {'profile_code': 'fake code'}, status=400)
 
 
 class DoEditAccountTestCase(testing.BaseTestCase):
@@ -286,7 +320,8 @@ class ScenarioProfileTestCase(testing.BaseTestCase):
           'creation_time': '2010-12-27T00:00:00',
           'id': 1,
           'main_currency': 'USD',
-          'name': 'Test profile name'
+          'name': 'Test profile name',
+          'profile_code': 'agx0ZXN0YmVkLXRlc3RyDQsSB1Byb2ZpbGUYAQw'
         },
         'total_balance': 40.0,
         'user_profile_settings': {

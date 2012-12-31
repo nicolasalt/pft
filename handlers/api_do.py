@@ -1,4 +1,6 @@
 from google.appengine.ext import ndb
+from google.net.proto import ProtocolBuffer
+from webob import exc
 import common
 import converters
 from datastore import models, transactions
@@ -7,6 +9,7 @@ from util import  parse_csv, parse, util
 
 class DoEditProfile(common.CommonHandler):
   def HandlePost(self, command):
+    # TODO: check permissions
     profile_id = parse.ParseInt(self.request.get('profile_id'))
     name = self.request.get('name', None)
     main_currency = self.request.get('main_currency', None)
@@ -49,6 +52,28 @@ class DoSetActiveProfile(common.CommonHandler):
       return {'status': 'ok'}
     else:
       return {'status': 'profile_does_not_exist'}
+
+
+class DoConnectToProfile(common.CommonHandler):
+  def HandlePost(self):
+    profile_code = self.request.get('profile_code')
+    if not profile_code:
+      raise exc.HTTPBadRequest('Profile code is not specified')
+
+    try:
+      profile = models.Profile.GetByCode(profile_code)
+    except ProtocolBuffer.ProtocolBufferDecodeError:
+      raise exc.HTTPBadRequest('Profile code %r can\'t be parsed' % profile_code)
+    if not profile:
+      raise exc.HTTPBadRequest('Profile for code %r does not exist' % profile_code)
+
+    # TODO: ask the owner's permission.
+    profile.AddUser(self.visitor.key.id())
+    # TODO: create a helper function for this
+    models.User.Update(
+      self.visitor.key.id(), active_profile_id=profile.key.id())
+
+    return {'status': 'ok'}
 
 
 class DoEditAccount(common.CommonHandler):

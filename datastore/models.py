@@ -87,11 +87,19 @@ class Profile(ndb.Model):
       return None
 
   @classmethod
+  def GetByCode(cls, code):
+    return ndb.Key(urlsafe=code).get()
+
+  @classmethod
   def Create(cls, owner_id, **kw):
     profile = cls(owner_id=owner_id, **kw)
     profile.user_ids.append(owner_id)
     profile.put()
     return profile
+
+  def AddUser(self, user_id):
+    self.user_ids.append(user_id)
+    self.put()
 
   @classmethod
   @ndb.transactional

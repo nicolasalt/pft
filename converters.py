@@ -1,4 +1,3 @@
-
 def ConvertDatetime(date):
   return date.isoformat()
 
@@ -29,7 +28,8 @@ def ConvertProfileToDict(profile):
     'creation_time': ConvertDatetime(profile.creation_time),
     'id': profile.key.id(),
     'main_currency': profile.main_currency,
-    'name': profile.name
+    'name': profile.name,
+    'profile_code': profile.key.urlsafe()
   }
 
 

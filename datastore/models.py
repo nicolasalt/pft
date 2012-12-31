@@ -145,12 +145,18 @@ class Profile(ndb.Model):
 
 
 class Transaction(ndb.Model):
+  class Sources(object):
+    MANUAL = 'manual'
+    IMPORT = 'import'
+
+    ALL = [MANUAL, IMPORT]
+
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
   description = ndb.TextProperty()
   source_account_id = ndb.IntegerProperty()
   dest_account_id = ndb.IntegerProperty()
-  source = ndb.StringProperty(choices=['import', 'manual'])
+  source = ndb.StringProperty(choices=Sources.ALL)
 
   @classmethod
   def Get(cls, profile_id, transaction_id):

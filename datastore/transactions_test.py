@@ -73,13 +73,14 @@ class UpdateTransactionTestCase(BaseTransactionTestCase):
       self.profile_id, 10.0, self.now,
       source_account_id=self.account1_id, dest_account_id=self.account2_id).key.id()
 
-    transactions.UpdateTransaction(self.profile_id, transaction_id, 5.0, self.new_date)
+    transactions.UpdateTransaction(self.profile_id, transaction_id, 5.0, self.new_date, 'Transfer')
 
     transaction = models.Transaction.Get(self.profile_id, transaction_id)
     self.assertEqual(5.0, transaction.amount)
     self.assertEqual(self.account1_id, transaction.source_account_id)
     self.assertEqual(self.account2_id, transaction.dest_account_id)
     self.assertEqual(self.new_date, transaction.date)
+    self.assertEqual('Transfer', transaction.description)
 
     profile = models.Profile.GetActive(self.visitor_id)
     self.assertAlmostEqual(-5.0, profile.GetAccountById(self.account1_id).balance)

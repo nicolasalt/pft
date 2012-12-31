@@ -1,3 +1,4 @@
+import datetime
 from google.appengine.ext import ndb
 from google.net.proto import ProtocolBuffer
 from webob import exc
@@ -124,6 +125,40 @@ class DoEditAccount(common.CommonHandler):
     if account:
       response['account'] = converters.ConvertAccount(
         self.profile.GetAccountById(account.id))
+    return response
+
+
+class DoEditTransaction(common.CommonHandler):
+  @common.active_profile_required
+  def HandlePost(self, command):
+    amount = parse.ParseFloat(self.request.get('amount'))
+    description = self.request.get('description')
+    # TODO: use consistent date formats.
+    raw_date = self.request.get('date')
+    date = raw_date and datetime.datetime.strptime(raw_date, '%d.%m.%Y')
+    transaction_id = parse.ParseInt(self.request.get('id'))
+
+    if command == 'add':
+      source_account_id = parse.ParseInt(self.request.get('source_account_id'))
+      dest_account_id = parse.ParseInt(self.request.get('dest_account_id'))
+      transaction = transactions.AddTransaction(
+        self.profile.key.id(), amount, date, description=description,
+        source_account_id=source_account_id, dest_account_id=dest_account_id,
+        source=models.Transaction.Sources.MANUAL)
+    elif command == 'edit':
+      assert transaction_id is not None
+      transaction = transactions.UpdateTransaction(
+        self.profile.key.id(), transaction_id, amount, date, description=description)
+    elif command == 'delete':
+      assert transaction_id is not None
+      transactions.DeleteTransaction(self.profile.key.id(), transaction_id)
+      transaction = None
+    else:
+      raise ValueError('Command %r is not supported' % command)
+
+    response = {'status': 'ok'}
+    if transaction:
+      response['transaction'] = converters.ConvertTransaction(transaction)
     return response
 
 

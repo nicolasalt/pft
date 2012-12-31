@@ -109,7 +109,7 @@ class DoConnectToProfileTestCase(testing.BaseTestCase):
   def setUp(self):
     super(DoConnectToProfileTestCase, self).setUp()
 
-    response = self.testapp.post('/api/do/profile/add', {'name': 'Test profile name'})
+    response = self.testapp.post('/api/do/profile/add')
     self.profile1_id = response.json['profile']['id']
     self.profile1_code = response.json['profile']['profile_code']
 
@@ -141,11 +141,84 @@ class DoConnectToProfileTestCase(testing.BaseTestCase):
     self.testapp.post('/api/do/profile/connect', {'profile_code': 'fake code'}, status=400)
 
 
+class DoEditTransactionTestCase(testing.BaseTestCase):
+  def setUp(self):
+    super(DoEditTransactionTestCase, self).setUp()
+
+    self.testapp.post('/api/do/profile/add')
+
+    response = self.testapp.post('/api/do/account/add', {'currency': 'USD'})
+    self.account1_id = response.json['account']['id']
+    response = self.testapp.post('/api/do/account/add', {'currency': 'CHF'})
+    self.account2_id = response.json['account']['id']
+
+  def _AddTransaction(self):
+    response = self.testapp.post(
+      '/api/do/transaction/add',
+      {
+        'amount': 123.0,
+        'description': 'Test transaction',
+        'date': '27.12.2010',
+        'source_account_id': self.account1_id,
+        'dest_account_id': self.account2_id,
+      })
+    return response.json['transaction']
+
+  def _AssertSingleTransaction(
+      self, transaction, amount, description, date, source_account_id, dest_account_id):
+    self.assertAlmostEqual(amount, transaction['amount'])
+    self.assertEqual(description, transaction['description'])
+    self.assertEqual(date, transaction['date'])
+    self.assertEqual(source_account_id, transaction['source_account_id'])
+    self.assertEqual(dest_account_id, transaction['dest_account_id'])
+
+    response = self.testapp.get('/api/transaction/query')
+    transactions = response.json['transactions']
+    self.assertEqual(1, len(transactions))
+    self.assertAlmostEqual(amount, transactions[0]['amount'])
+    self.assertEqual(description, transactions[0]['description'])
+    self.assertEqual(date, transactions[0]['date'])
+    self.assertEqual(source_account_id, transactions[0]['source_account_id'])
+    self.assertEqual(dest_account_id, transactions[0]['dest_account_id'])
+
+  def testAdd(self):
+    transaction = self._AddTransaction()
+    self._AssertSingleTransaction(transaction, 123.0, 'Test transaction', '2010-12-27T00:00:00',
+      self.account1_id, self.account2_id)
+
+  def testEdit(self):
+    transaction = self._AddTransaction()
+
+    response = self.testapp.post(
+      '/api/do/transaction/edit',
+      {
+        'id': transaction['id'],
+        'amount': 200.0,
+        'description': 'Test modified transaction',
+        'date': '27.12.2012'
+      })
+    self._AssertSingleTransaction(
+      response.json['transaction'], 200.0, 'Test modified transaction', '2012-12-27T00:00:00',
+      self.account1_id, self.account2_id)
+
+  def testDelete(self):
+    transaction1 = self._AddTransaction()
+    transaction2 = self._AddTransaction()
+
+    response = self.testapp.get('/api/transaction/query')
+    self.assertEqual(2, len(response.json['transactions']))
+
+    response = self.testapp.post('/api/do/transaction/delete', {'id': transaction1['id']})
+
+    response = self.testapp.get('/api/transaction/query')
+    self.assertEqual(1, len(response.json['transactions']))
+
+
 class DoEditAccountTestCase(testing.BaseTestCase):
   def setUp(self):
     super(DoEditAccountTestCase, self).setUp()
 
-    self.testapp.post('/api/do/profile/add', {'name': 'Test profile name'})
+    self.testapp.post('/api/do/profile/add')
 
   def _AssertAccount(self, account_dict, account_id, name, currency, balance):
     self.assertEqual(account_id, account_dict['id'])

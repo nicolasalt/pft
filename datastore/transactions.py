@@ -48,8 +48,9 @@ def AddTransaction(profile_id, amount, date, source_account_id=None,
   return transaction
 
 
+# TODO: allow to edit only parts of a transaction
 @ndb.transactional(xg=True)
-def UpdateTransaction(profile_id, transaction_id, amount, date, description=None):
+def UpdateTransaction(profile_id, transaction_id, amount, date, description):
   transaction = models.Transaction.Get(profile_id, transaction_id)
 
   profile = models.Profile.get_by_id(profile_id)
@@ -79,3 +80,7 @@ def DeleteTransactions(profile_id, transaction_ids):
 
   profile.put()
   ndb.delete_multi(keys)
+
+
+def DeleteTransaction(profile_id, transaction_id):
+  DeleteTransactions(profile_id, [transaction_id])

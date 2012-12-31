@@ -14,17 +14,13 @@ app = webapp2.WSGIApplication(
     ('/api/do/profile/connect', api_do.DoConnectToProfile),
     ('/api/do/profile/set_active', api_do.DoSetActiveProfile),
     ('/api/do/account/(add|edit|delete)', api_do.DoEditAccount),
+    ('/api/do/transaction/(add|edit|delete)', api_do.DoEditTransaction),
 
-    ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),
-    ('/api/get_imported_file', api.GetImportedFile),
+    #    ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),
+    #    ('/api/get_imported_file', api.GetImportedFile),
 
-    ('/api/do/add_parse_schema', api_do.DoAddParseSchema),
-    ('/api/do/apply_parse_schema_to_import_file', api_do.DoApplyParseSchemaToImportedFile),
-
-    #    ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
-    #
-    #    ('/edit_budget', planning_handlers.EditBudgetPage), # D
-    #    ('/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),
+    #    ('/api/do/add_parse_schema', api_do.DoAddParseSchema),
+    #    ('/api/do/apply_parse_schema_to_import_file', api_do.DoApplyParseSchemaToImportedFile),
     #
     #    ('/import_from_file', import_from_file_handlers.ImportFromFilePage),
     #    ('/edit_imported_file',

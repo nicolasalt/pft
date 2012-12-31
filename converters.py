@@ -34,6 +34,7 @@ def ConvertUserProfileSettings(profile_settings):
 
 def ConvertTransaction(transaction):
   return {
+    'id': transaction.key.id(),
     'amount': transaction.amount,
     'date': ConvertDatetime(transaction.date),
     'description': transaction.description,

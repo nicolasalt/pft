@@ -15,7 +15,7 @@ app = webapp2.WSGIApplication(
     ('/api/transaction/query', api.GetTransactions),
     ('/api/do/profile/(add|edit|delete)', api_do.DoEditProfile),
     ('/api/do/profile/connect', api_do.DoConnectToProfile),
-    ('/api/do/set_active_profile', api_do.DoSetActiveProfile),
+    ('/api/do/profile/set_active', api_do.DoSetActiveProfile),
     ('/api/do/account/(add|edit|delete)', api_do.DoEditAccount),
     ('/api/do/category/(add|edit|delete)', api_do.DoEditCategory),
 

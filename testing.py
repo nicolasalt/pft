@@ -39,3 +39,7 @@ class BaseTestCase(unittest.TestCase):
   def LogIn(self, user):
     self.visitor_id = user.user_id()
     self.testbed.setup_env(USER_EMAIL=user.email(), USER_ID=user.user_id(), overwrite=True)
+
+  def tearDown(self):
+    self.mox.UnsetStubs()
+    self.testbed.deactivate()

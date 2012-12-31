@@ -8,7 +8,8 @@ from handlers import api
 
 app = webapp2.WSGIApplication(
   [
-    ('/api/profile/get_active', api.GetActiveProfile),
+    ('/api/profile/all', api.GetProfiles),
+    ('/api/profile/active', api.GetActiveProfile),
     ('/api/do/profile/(add|edit|delete)', api_do.DoEditProfile),
     ('/api/do/profile/connect', api_do.DoConnectToProfile),
     ('/api/do/set_active_profile', api_do.DoSetActiveProfile),
@@ -46,7 +47,6 @@ app = webapp2.WSGIApplication(
     ('/settings', profile_handlers.EditProfile),
     ('/manage_profiles', profile_handlers.ManageProfilesPage),
     ('/do/edit_user_profile_settings', profile_handlers.DoEditUserProfileSettings),
-    ('/do/connect_to_profile', profile_handlers.DoConnectToProfile),
 
     # Taskqueues
     ('/task/update_currency_rates', taskqueue_handlers.UpdateCurrencyRates)],

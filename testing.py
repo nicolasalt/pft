@@ -17,7 +17,7 @@ class BaseTestCase(unittest.TestCase):
     self.testbed.activate()
     self.testbed.init_user_stub()
     self.testbed.init_datastore_v3_stub(
-      consistency_policy=datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=0))
+      consistency_policy=datastore_stub_util.PseudoRandomHRConsistencyPolicy(probability=1))
     self.testbed.init_memcache_stub()
     self.maxDiff = None
 

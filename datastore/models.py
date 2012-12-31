@@ -91,6 +91,10 @@ class Profile(ndb.Model):
     return ndb.Key(urlsafe=code).get()
 
   @classmethod
+  def GetAllForUser(cls, user_id):
+    return cls.query().fetch(1000)
+
+  @classmethod
   def Create(cls, owner_id, **kw):
     profile = cls(owner_id=owner_id, **kw)
     profile.user_ids.append(owner_id)

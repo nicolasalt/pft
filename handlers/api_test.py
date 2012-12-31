@@ -4,11 +4,31 @@ import testing
 
 class GetProfileTestCase(testing.BaseTestCase):
   def testNoProfile(self):
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
 
     self.assertEqual(
       {'status': 'active_profile_not_selected'},
       response.json)
+
+
+class GetProfilesTestCase(testing.BaseTestCase):
+  def testNoProfiles(self):
+    response = self.testapp.get('/api/profile/all')
+    self.assertEqual(0, len(response.json['profiles']))
+
+  def testNormal(self):
+    response = self.testapp.post('/api/do/profile/add', {'name': 'Test profile name'})
+    self.profile1_id = response.json['profile']['id']
+    response = self.testapp.post('/api/do/profile/add', {'name': 'Test profile name2'})
+    self.profile2_id = response.json['profile']['id']
+
+    response = self.testapp.get('/api/profile/all')
+    profiles = response.json['profiles']
+    self.assertEqual(2, len(profiles))
+    self.assertEqual(self.profile1_id, profiles[0]['id'])
+    self.assertEqual('Test profile name', profiles[0]['name'])
+    self.assertEqual(self.profile2_id, profiles[1]['id'])
+    self.assertEqual('Test profile name2', profiles[1]['name'])
 
 
 class DoSetActiveProfileTestCase(testing.BaseTestCase):
@@ -18,13 +38,13 @@ class DoSetActiveProfileTestCase(testing.BaseTestCase):
     response = self.testapp.post('/api/do/profile/add', {'name': 'Test profile name2'})
     self.profile2_id = response.json['profile']['id']
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(self.profile2_id, response.json['active_profile']['id'])
 
     response = self.testapp.post('/api/do/set_active_profile', {'id': self.profile1_id})
     self.assertEqual('ok', response.json['status'])
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(self.profile1_id, response.json['active_profile']['id'])
 
   def testProfileDoesNotExist(self):
@@ -44,7 +64,7 @@ class DoAddEditDeleteProfileTestCase(testing.BaseTestCase):
       'main_currency': 'CHF'})
     self.profile1_id = response.json['profile']['id']
     self._AssertProfile(response.json['profile'], self.profile1_id, 'Test profile name', 'CHF')
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self._AssertProfile(response.json['active_profile'], self.profile1_id, 'Test profile name',
                         'CHF')
 
@@ -63,7 +83,7 @@ class DoAddEditDeleteProfileTestCase(testing.BaseTestCase):
       'profile_id': self.profile1_id,
       'main_currency': 'RUB'})
     self._AssertProfile(response.json['profile'], self.profile1_id, 'Test profile name', 'RUB')
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self._AssertProfile(response.json['active_profile'], self.profile1_id,
                         'Test profile name', 'RUB')
 
@@ -75,7 +95,7 @@ class DoAddEditDeleteProfileTestCase(testing.BaseTestCase):
 
     response = self.testapp.post('/api/do/profile/delete', {'profile_id': self.profile2_id})
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(
       {'status': 'active_profile_not_selected'},
       response.json)
@@ -91,7 +111,7 @@ class DoConnectToProfileTestCase(testing.BaseTestCase):
 
     self.LogIn(self.google_user2)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(
       {'status': 'active_profile_not_selected'},
       response.json)
@@ -100,7 +120,7 @@ class DoConnectToProfileTestCase(testing.BaseTestCase):
     response = self.testapp.post('/api/do/profile/connect', {'profile_code': self.profile1_code})
     self.assertEqual('ok', response.json['status'])
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(self.profile1_id, response.json['active_profile']['id'])
 
   def testProfileCodeIsNotSpecified(self):
@@ -144,7 +164,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self._AssertAccount(response.json['account'],
                         self.account1_id, 'Test account name', 'RUB', 10.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(1, len(response.json['active_profile']['accounts']))
     self._AssertAccount(response.json['active_profile']['accounts'][0],
                         self.account1_id, 'Test account name', 'RUB', 10.0)
@@ -161,7 +181,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self._AssertAccount(response.json['account'],
                         self.account2_id, 'Test account name2', 'CHF', 0.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(2, len(response.json['active_profile']['accounts']))
     self._AssertAccount(response.json['active_profile']['accounts'][1],
                         self.account2_id, 'Test account name2', 'CHF', 0.0)
@@ -178,7 +198,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self._AssertAccount(response.json['account'],
                         self.account1_id, 'Test account name modified', 'RUB', 5.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(2, len(response.json['active_profile']['accounts']))
     self._AssertAccount(response.json['active_profile']['accounts'][0],
                         self.account1_id, 'Test account name modified', 'RUB', 5.0)
@@ -191,7 +211,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
         'account_id': self.account1_id
       })
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(1, len(response.json['active_profile']['accounts']))
     self._AssertAccount(response.json['active_profile']['accounts'][0],
                         self.account2_id, 'Test account name2', 'CHF', 0.0)
@@ -223,7 +243,7 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
     self._AssertCategory(response.json['category'],
                          self.category1_id, 'Test category name', 10.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(1, len(response.json['active_profile']['categories']))
     self._AssertCategory(response.json['active_profile']['categories'][0],
                          self.category1_id, 'Test category name', 10.0)
@@ -238,7 +258,7 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
     self._AssertCategory(response.json['category'],
                          self.category2_id, 'Test category name2', 0.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(2, len(response.json['active_profile']['categories']))
     self._AssertCategory(response.json['active_profile']['categories'][1],
                          self.category2_id, 'Test category name2', 0.0)
@@ -254,7 +274,7 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
     self._AssertCategory(response.json['category'],
                          self.category1_id, 'Test category name modified', 20.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(2, len(response.json['active_profile']['categories']))
     self._AssertCategory(response.json['active_profile']['categories'][0],
                          self.category1_id, 'Test category name modified', 20.0)
@@ -266,7 +286,7 @@ class DoEditCategoryTestCase(testing.BaseTestCase):
         'category_id': self.category1_id
       })
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
     self.assertEqual(1, len(response.json['active_profile']['categories']))
     self._AssertCategory(response.json['active_profile']['categories'][0],
                          self.category2_id, 'Test category name2', 0.0)
@@ -285,7 +305,7 @@ class ScenarioProfileTestCase(testing.BaseTestCase):
     profile.AddCategory(name='Test category1', balance=5.0)
     profile.AddCategory(name='Test category2', balance=6.0)
 
-    response = self.testapp.get('/api/profile/get_active')
+    response = self.testapp.get('/api/profile/active')
 
     self.assertEqual(
       {

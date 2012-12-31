@@ -1,8 +1,7 @@
 import common
 import converters
-from datastore import lookup
+from datastore import lookup, models
 from util import  budget_util, parse, parse_csv, currency_rates_util
-
 
 
 class GetActiveProfile(common.CommonHandler):
@@ -20,6 +19,14 @@ class GetActiveProfile(common.CommonHandler):
       [(a.balance, a.currency) for a in self.profile.accounts],
       self.profile.main_currency)
     return total or 0
+
+
+class GetProfiles(common.CommonHandler):
+  def HandleGet(self):
+    return {
+      'profiles': [converters.ConvertProfileToDict(p)
+                   for p in models.Profile.GetAllForUser(self.visitor.key.id())],
+    }
 
 
 # Not tested
@@ -48,14 +55,14 @@ class GetTransactions(common.CommonHandler):
       if account_id is not None:
         account = self.profile.accounts[account_id]
       transactions = lookup.GetTransactions(
-          self.profile, category_id=category_id, account_id=account_id)
+        self.profile, category_id=category_id, account_id=account_id)
     else:
       budget = budget_util.GetBudget(self.profile, budget_date)
       transactions = lookup.GetTransactionsForBudget(self.profile, budget)
 
     for transaction in transactions:
       if transaction.category_id is not None:
-        transaction.category =  self.profile.categories[transaction.category_id]
+        transaction.category = self.profile.categories[transaction.category_id]
       if transaction.account_id is not None:
         transaction.account = self.profile.accounts[transaction.account_id]
 
@@ -73,10 +80,9 @@ class GetTransactions(common.CommonHandler):
 
 class GetImportedFileDescriptions(common.CommonHandler):
   def HandleGet(self):
-
     response = {
       'imported_file_descriptions':
-          lookup.GetOrCreateImportedFileList(self.profile).imported_files
+        lookup.GetOrCreateImportedFileList(self.profile).imported_files
     }
 
     self.WriteToJson(response)
@@ -95,6 +101,6 @@ class GetImportedFile(common.CommonHandler):
       if imported_file.schema:
         source_file_lines = [imported_file.schema] + source_file_lines
       response['formatted_parsed_lines'] = parse_csv.ParseCsvToPreview(
-          source_file_lines)[:13]
+        source_file_lines)[:13]
 
     self.WriteToJson(response)

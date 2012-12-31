@@ -39,19 +39,3 @@ class BaseTestCase(unittest.TestCase):
   def LogIn(self, user):
     self.visitor_id = user.user_id()
     self.testbed.setup_env(USER_EMAIL=user.email(), USER_ID=user.user_id(), overwrite=True)
-
-  def AddProfile(self):
-    self.profile = models.Profile.Create(self.visitor_id, name='Test profile')
-    models.User.Update(self.visitor_id, active_profile_id=self.profile.key.id())
-
-  def AddAccountsAndCategories(self):
-    profile = models.Profile.GetActive(self.visitor_id)
-    self.profile_id = profile.key.id()
-    self.account1_id = profile.AddAccount(name='Test account1', currency='USD').id
-    self.account2_id = profile.AddAccount(name='Test account2', currency='CHF').id
-    self.category1_id = profile.AddCategory(name='Test category1').id
-    self.category2_id = profile.AddCategory(name='Test category2').id
-
-  def tearDown(self):
-    self.mox.UnsetStubs()
-    self.testbed.deactivate()

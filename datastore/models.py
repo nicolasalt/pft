@@ -51,18 +51,18 @@ class ParseSchema(ndb.Model):
 
 
 class Account(ndb.Model):
+  class Types(object):
+    PHYSICAL = 'physical'
+    VIRTUAL = 'virtual'
+
+    ALL = [PHYSICAL, VIRTUAL]
+
   id = ndb.IntegerProperty(required=True)
   name = ndb.StringProperty(required=True)
   currency = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
   creation_time = ndb.DateTimeProperty(auto_now_add=True)
-
-
-class Category(ndb.Model):
-  id = ndb.IntegerProperty(required=True)
-  name = ndb.StringProperty(required=True)
-  balance = ndb.FloatProperty(default=0.0)
-  creation_time = ndb.DateTimeProperty(auto_now_add=True)
+  type = ndb.StringProperty(required=True, choices=Types.ALL)
 
 
 class Profile(ndb.Model):
@@ -72,9 +72,7 @@ class Profile(ndb.Model):
   creation_time = ndb.DateTimeProperty(auto_now_add=True)
   main_currency = ndb.StringProperty(default='USD')
   parse_schemas = ndb.LocalStructuredProperty(ParseSchema, repeated=True)
-  # TODO: Accounts are very similar to categories: unite somehow?
   accounts = ndb.LocalStructuredProperty(Account, repeated=True)
-  categories = ndb.LocalStructuredProperty(Category, repeated=True)
 
   @classmethod
   def GetActive(cls, user_id):
@@ -136,30 +134,14 @@ class Profile(ndb.Model):
     self.accounts = filter(lambda a: a.id != account_id, self.accounts)
     self.put()
 
-  def AddCategory(self, **kw):
-    if self.categories:
-      id = self.categories[-1].id + 1
-    else:
-      id = 0
-    category = Category(id=id, **kw)
-    self.categories.append(category)
-    self.put()
-    return category
+  def GetAccounts(self, type):
+    return [a for a in self.accounts if a.type == type]
 
-  def GetCategoryById(self, category_id):
-    category_dict = dict([(a.id, a) for a in self.categories])
-    assert category_id in category_dict
-    return category_dict.get(category_id)
+  def GetPhysicalAccounts(self):
+    return self.GetAccounts(Account.Types.PHYSICAL)
 
-  def UpdateCategory(self, category_id, **kw):
-    category = self.GetCategoryById(category_id)
-    category.populate(**kw)
-    self.put()
-    return category
-
-  def DeleteCategory(self, category_id):
-    self.categories = filter(lambda c: c.id != category_id, self.categories)
-    self.put()
+  def GetVirtualAccounts(self):
+    return self.GetAccounts(Account.Types.VIRTUAL)
 
 
 class Transaction(ndb.Model):
@@ -168,8 +150,6 @@ class Transaction(ndb.Model):
   description = ndb.TextProperty()
   source_account_id = ndb.IntegerProperty()
   dest_account_id = ndb.IntegerProperty()
-  source_category_id = ndb.IntegerProperty()
-  dest_category_id = ndb.IntegerProperty()
   source = ndb.StringProperty(choices=['import', 'manual'])
 
   @classmethod
@@ -177,59 +157,13 @@ class Transaction(ndb.Model):
     return cls.get_by_id(transaction_id, parent=ndb.Key(Profile, profile_id))
 
   @classmethod
-  def GetTransactions(cls, profile_id, limit=None, offset=None, category_id=None, account_id=None):
+  def GetTransactions(cls, profile_id, limit=None, offset=None, account_id=None):
     query = cls.query(ancestor=ndb.Key(Profile, profile_id)).order(cls.date)
-    if category_id is not None:
-      query = query.filter(ndb.query.OR(
-        cls.source_category_id == category_id,
-        cls.dest_category_id == category_id))
     if account_id is not None:
       query = query.filter(ndb.query.OR(
         cls.source_account_id == account_id,
         cls.dest_account_id == account_id))
     return query.fetch(limit=limit, offset=offset)
-
-
-class BudgetItem(ndb.Model):
-  date = ndb.DateTimeProperty()
-  description = ndb.StringProperty()
-  category_id = ndb.IntegerProperty()
-  planned_amount = ndb.FloatProperty()
-  transaction_id = ndb.IntegerProperty()
-
-
-class Budget(ndb.Model):
-  date = ndb.DateTimeProperty(required=True)
-  items = ndb.LocalStructuredProperty(BudgetItem, repeated=True)
-
-  DATE_FORMAT = '%m.%Y'
-
-  def GetDateRange(self):
-    start = datetime(self.date.year, self.date.month, 1)
-    return start, self.GetNextBudgetDate()
-
-  def GetNextBudgetDate(self):
-    if self.date.month == 12:
-      return datetime(self.date.year + 1, 1, 1)
-    else:
-      return datetime(self.date.year, self.date.month + 1, 1)
-
-  def GetPreviousBudgetDate(self):
-    if self.date.month == 1:
-      return datetime(self.date.year - 1, 12, 1)
-    else:
-      return datetime(self.date.year, self.date.month - 1, 1)
-
-  @staticmethod
-  def DateToStr(date):
-    return date.strftime(Budget.DATE_FORMAT)
-
-  def GetStrDate(self):
-    return Budget.DateToStr(self.date)
-
-  @staticmethod
-  def ParseDate(str_date):
-    return datetime.strptime(str_date, Budget.DATE_FORMAT)
 
 
 class ImportedFileTransaction(ndb.Model):

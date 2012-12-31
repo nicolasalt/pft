@@ -4,7 +4,7 @@ from webob import exc
 import common
 import converters
 from datastore import models, transactions
-from util import  parse_csv, parse, util
+from util import  parse_csv, parse, util, currency_rates_util
 
 
 class DoEditProfile(common.CommonHandler):
@@ -18,11 +18,12 @@ class DoEditProfile(common.CommonHandler):
     kw = {}
     if name is not None:
       kw['name'] = name
-    if main_currency is not None:
-      kw['main_currency'] = main_currency
 
     if command == 'add':
       kw['name'] = kw.get('name') or 'Untitled'
+      main_currency = main_currency or 'USD'
+      assert currency_rates_util.IsCurrencySupported(main_currency)
+      kw['main_currency'] = main_currency
       profile = models.Profile.Create(self.visitor.key.id(), **kw)
       models.User.Update(
         self.visitor.key.id(), active_profile_id=profile.key.id())
@@ -82,6 +83,7 @@ class DoEditAccount(common.CommonHandler):
     account_id = parse.ParseInt(self.request.get('account_id'))
     name = self.request.get('name', None)
     currency = self.request.get('currency', None)
+    type = self.request.get('type', None)
     balance = parse.ParseFloat(self.request.get('balance'))
 
     # TODO: use JSON request
@@ -90,8 +92,16 @@ class DoEditAccount(common.CommonHandler):
       kw['name'] = name
 
     if command == 'add':
-      if currency is not None:
-        kw['currency'] = currency
+      kw['name'] = kw.get('name') or 'Untitled'
+      if type == models.Account.Types.VIRTUAL and not currency:
+        currency = self.profile.main_currency
+      assert currency_rates_util.IsCurrencySupported(currency)
+      kw['currency'] = currency
+      if not type:
+        type = models.Account.Types.PHYSICAL
+      assert type in models.Account.Types.ALL
+      kw['type'] = type
+
       account = self.profile.AddAccount(**kw)
     elif command == 'edit':
       assert account_id is not None
@@ -114,44 +124,6 @@ class DoEditAccount(common.CommonHandler):
     if account:
       response['account'] = converters.ConvertAccount(
         self.profile.GetAccountById(account.id))
-    return response
-
-
-class DoEditCategory(common.CommonHandler):
-  @common.active_profile_required
-  def HandlePost(self, command):
-    category_id = parse.ParseInt(self.request.get('category_id'))
-    name = self.request.get('name', None)
-    balance = parse.ParseFloat(self.request.get('balance'))
-
-    # TODO: use JSON request
-    kw = {}
-    if name is not None:
-      kw['name'] = name
-
-    if command == 'add':
-      category = self.profile.AddCategory(**kw)
-    elif command == 'edit':
-      assert category_id is not None
-      category = self.profile.UpdateCategory(category_id, **kw)
-    elif command == 'delete':
-      assert category_id is not None
-      self.profile.DeleteCategory(category_id)
-      category = None
-    else:
-      raise ValueError('Command %r is not supported' % command)
-
-    if category and balance is not None and abs(balance - category.balance) > 0.001:
-      transactions.AddTransaction(
-        self.profile.key.id(), balance - category.balance, util.DatetimeUTCNow(),
-        description='Manual category balance adjust',
-        dest_category_id=category.id, source='manual')
-      self.ReloadProfile()
-
-    response = {'status': 'ok'}
-    if category:
-      response['category'] = converters.ConvertCategory(
-        self.profile.GetCategoryById(category.id))
     return response
 
 

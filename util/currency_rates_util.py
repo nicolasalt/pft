@@ -28,6 +28,10 @@ def GetCachedRates():
   return dict([(r.currency, r.rate) for r in ratesModel.rates])
 
 
+def IsCurrencySupported(currency):
+  return currency and currency.lower() in GetCachedRates().iterkeys()
+
+
 def CalculateCurrencySum(amount_list, main_currency):
   """
     Args:

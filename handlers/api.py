@@ -16,7 +16,7 @@ class GetActiveProfile(common.CommonHandler):
 
   def GetTotalAccountBalance(self):
     total = currency_rates_util.CalculateCurrencySum(
-      [(a.balance, a.currency) for a in self.profile.accounts],
+      [(a.balance, a.currency) for a in self.profile.GetPhysicalAccounts()],
       self.profile.main_currency)
     return total or 0
 
@@ -35,15 +35,13 @@ class GetTransactions(common.CommonHandler):
     """
       This page allows to view filtered transactions.
       Possible filters:
-       - for a category
        - for an account
     """
     # TODO: add sort options
-    category_id = parse.ParseInt(self.request.get('category_id'))
     account_id = parse.ParseInt(self.request.get('account_id'))
 
     transactions = models.Transaction.GetTransactions(
-      self.profile.key.id(), category_id=category_id, account_id=account_id)
+      self.profile.key.id(), account_id=account_id)
 
     return {
       'transactions': [converters.ConvertTransaction(t) for t in transactions]

@@ -53,8 +53,6 @@ class ParseSchema(ndb.Model):
 class Account(ndb.Model):
   id = ndb.IntegerProperty(required=True)
   name = ndb.StringProperty(required=True)
-  # TODO: add automatic currency converter:
-  # http://www.google.com/ig/calculator?hl=en&q=1rub=?eur
   currency = ndb.StringProperty(required=True)
   balance = ndb.FloatProperty(default=0.0)
   creation_time = ndb.DateTimeProperty(auto_now_add=True)
@@ -92,7 +90,7 @@ class Profile(ndb.Model):
 
   @classmethod
   def GetAllForUser(cls, user_id):
-    return cls.query().fetch(1000)
+    return cls.query().filter(cls.user_ids == user_id).fetch()
 
   @classmethod
   def Create(cls, owner_id, **kw):
@@ -165,18 +163,31 @@ class Profile(ndb.Model):
 
 
 class Transaction(ndb.Model):
-  source_account_id = ndb.IntegerProperty()
-  source_category_id = ndb.IntegerProperty()
   amount = ndb.FloatProperty(required=True)
   date = ndb.DateTimeProperty(required=True)
-  description = ndb.StringProperty(indexed=False)
+  description = ndb.TextProperty()
+  source_account_id = ndb.IntegerProperty()
   dest_account_id = ndb.IntegerProperty()
+  source_category_id = ndb.IntegerProperty()
   dest_category_id = ndb.IntegerProperty()
   source = ndb.StringProperty(choices=['import', 'manual'])
 
   @classmethod
   def Get(cls, profile_id, transaction_id):
     return cls.get_by_id(transaction_id, parent=ndb.Key(Profile, profile_id))
+
+  @classmethod
+  def GetTransactions(cls, profile_id, limit=None, offset=None, category_id=None, account_id=None):
+    query = cls.query(ancestor=ndb.Key(Profile, profile_id)).order(cls.date)
+    if category_id is not None:
+      query = query.filter(ndb.query.OR(
+        cls.source_category_id == category_id,
+        cls.dest_category_id == category_id))
+    if account_id is not None:
+      query = query.filter(ndb.query.OR(
+        cls.source_account_id == account_id,
+        cls.dest_account_id == account_id))
+    return query.fetch(limit=limit, offset=offset)
 
 
 class BudgetItem(ndb.Model):

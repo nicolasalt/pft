@@ -1,15 +1,15 @@
 import common
 import converters
 from datastore import lookup, models
-from util import  budget_util, parse, parse_csv, currency_rates_util
+from util import   parse, parse_csv, currency_rates_util
 
 
 class GetActiveProfile(common.CommonHandler):
   @common.active_profile_required
   def HandleGet(self):
     return {
-      'active_profile': converters.ConvertProfileToDict(self.profile),
-      'user_profile_settings': converters.ConvertUserProfileSettingsToDict(
+      'active_profile': converters.ConvertProfile(self.profile),
+      'user_profile_settings': converters.ConvertUserProfileSettings(
         self.visitor.GetOrCreateProfileSettings(self.profile.key.id())),
       'total_balance': self.GetTotalAccountBalance(),
     }
@@ -24,58 +24,33 @@ class GetActiveProfile(common.CommonHandler):
 class GetProfiles(common.CommonHandler):
   def HandleGet(self):
     return {
-      'profiles': [converters.ConvertProfileToDict(p)
+      'profiles': [converters.ConvertProfile(p)
                    for p in models.Profile.GetAllForUser(self.visitor.key.id())],
     }
 
 
-# Not tested
-
-
 class GetTransactions(common.CommonHandler):
+  @common.active_profile_required
   def HandleGet(self):
     """
       This page allows to view filtered transactions.
       Possible filters:
-       - for a budget month
        - for a category
        - for an account
     """
+    # TODO: add sort options
     category_id = parse.ParseInt(self.request.get('category_id'))
     account_id = parse.ParseInt(self.request.get('account_id'))
-    budget_date = self.request.get('budget_date')
 
-    budget = None
-    account = None
-    category = None
-    # TODO: fill this info in js
-    if category_id is not None or account_id is not None:
-      if category_id is not None:
-        category = self.profile.categories[category_id]
-      if account_id is not None:
-        account = self.profile.accounts[account_id]
-      transactions = lookup.GetTransactions(
-        self.profile, category_id=category_id, account_id=account_id)
-    else:
-      budget = budget_util.GetBudget(self.profile, budget_date)
-      transactions = lookup.GetTransactionsForBudget(self.profile, budget)
+    transactions = models.Transaction.GetTransactions(
+      self.profile.key.id(), category_id=category_id, account_id=account_id)
 
-    for transaction in transactions:
-      if transaction.category_id is not None:
-        transaction.category = self.profile.categories[transaction.category_id]
-      if transaction.account_id is not None:
-        transaction.account = self.profile.accounts[transaction.account_id]
-
-    response = {
-      'budget': budget,
-      'next_month': budget.GetNextBudgetDate() if budget else None,
-      'previous_month': budget.GetPreviousBudgetDate() if budget else None,
-      'category': category,
-      'account': account,
-      'transactions': transactions
+    return {
+      'transactions': [converters.ConvertTransaction(t) for t in transactions]
     }
 
-    self.WriteToJson(response)
+
+# Not tested
 
 
 class GetImportedFileDescriptions(common.CommonHandler):

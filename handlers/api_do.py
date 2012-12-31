@@ -39,7 +39,7 @@ class DoEditProfile(common.CommonHandler):
 
     response = {'status': 'ok'}
     if profile:
-      response['profile'] = converters.ConvertProfileToDict(profile)
+      response['profile'] = converters.ConvertProfile(profile)
     return response
 
 
@@ -112,7 +112,7 @@ class DoEditAccount(common.CommonHandler):
 
     response = {'status': 'ok'}
     if account:
-      response['account'] = converters.ConvertAccountToDict(
+      response['account'] = converters.ConvertAccount(
         self.profile.GetAccountById(account.id))
     return response
 
@@ -150,7 +150,7 @@ class DoEditCategory(common.CommonHandler):
 
     response = {'status': 'ok'}
     if category:
-      response['category'] = converters.ConvertCategoryToDict(
+      response['category'] = converters.ConvertCategory(
         self.profile.GetCategoryById(category.id))
     return response
 

@@ -1,15 +1,18 @@
 import webapp2
 
-from handlers import import_from_file_handlers, transaction_handlers, taskqueue_handlers, other_handlers, api_do
+from handlers import import_from_file_handlers, taskqueue_handlers
+from handlers import transaction_handlers
 from handlers import profile_handlers
 from handlers import planning_handlers
 from handlers import api
+from handlers import api_do
 
 
 app = webapp2.WSGIApplication(
   [
     ('/api/profile/all', api.GetProfiles),
     ('/api/profile/active', api.GetActiveProfile),
+    ('/api/transaction/query', api.GetTransactions),
     ('/api/do/profile/(add|edit|delete)', api_do.DoEditProfile),
     ('/api/do/profile/connect', api_do.DoConnectToProfile),
     ('/api/do/set_active_profile', api_do.DoSetActiveProfile),
@@ -23,11 +26,7 @@ app = webapp2.WSGIApplication(
     ('/api/do/add_parse_schema', api_do.DoAddParseSchema),
     ('/api/do/apply_parse_schema_to_import_file', api_do.DoApplyParseSchemaToImportedFile),
 
-    ('/', other_handlers.MainPage), # D
-    ('/admin', other_handlers.AdminPage),
-
     ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
-    ('/transaction_report', transaction_handlers.TransactionReportPage), # D
 
     ('/edit_budget', planning_handlers.EditBudgetPage), # D
     ( '/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),
@@ -44,8 +43,6 @@ app = webapp2.WSGIApplication(
     ('/do/add_transactions_from_csv',
      import_from_file_handlers.DoAddTransactionsFromCsv),
 
-    ('/settings', profile_handlers.EditProfile),
-    ('/manage_profiles', profile_handlers.ManageProfilesPage),
     ('/do/edit_user_profile_settings', profile_handlers.DoEditUserProfileSettings),
 
     # Taskqueues

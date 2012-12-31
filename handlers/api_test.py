@@ -1,4 +1,3 @@
-from google.appengine.ext import ndb
 from datastore import models
 import testing
 
@@ -111,7 +110,10 @@ class DoConnectToProfileTestCase(testing.BaseTestCase):
     self.testapp.post('/api/do/profile/connect', {'profile_code': 'fake code'}, status=400)
 
   def testProfileWithTheGivenCodeDoesNotExist(self):
-    ndb.Key(models.Profile, self.profile1_id).delete()
+    self.LogIn(self.google_user)
+    self.testapp.post('/api/do/profile/delete', {'profile_id': self.profile1_id})
+    self.LogIn(self.google_user2)
+
     self.testapp.post('/api/do/profile/connect', {'profile_code': 'fake code'}, status=400)
 
 

@@ -19,7 +19,6 @@ app = webapp2.WSGIApplication(
     ('/api/do/account/(add|edit|delete)', api_do.DoEditAccount),
     ('/api/do/category/(add|edit|delete)', api_do.DoEditCategory),
 
-    ('/api/get_transactions', api.GetTransactions),
     ('/api/get_imported_file_descriptions', api.GetImportedFileDescriptions),
     ('/api/get_imported_file', api.GetImportedFile),
 
@@ -29,7 +28,7 @@ app = webapp2.WSGIApplication(
     ('/do/edit_transaction', transaction_handlers.DoEditTransaction),
 
     ('/edit_budget', planning_handlers.EditBudgetPage), # D
-    ( '/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),
+    ('/do/edit_budget_category', planning_handlers.DoEditBudgetCategory),
 
     ('/import_from_file', import_from_file_handlers.ImportFromFilePage),
     ('/edit_imported_file',

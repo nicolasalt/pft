@@ -154,9 +154,7 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertAlmostEqual(balance, account_dict['balance'])
 
   # TODO: add more tests
-  # TODO: check transactions
-  def testNormal(self):
-    # Adding first account
+  def testAdd(self):
     response = self.testapp.post(
       '/api/do/account/add',
       {
@@ -175,23 +173,6 @@ class DoEditAccountTestCase(testing.BaseTestCase):
       self.account1_id, 'Test account name', 'RUB', 10.0)
     self.assertEqual(0.3, response.json['total_balance'])
 
-    # Adding second account
-    response = self.testapp.post(
-      '/api/do/account/add',
-      {
-        'name': 'Test account name2',
-        'currency': 'CHF'
-      })
-    self.account2_id = response.json['account']['id']
-    self._AssertAccount(response.json['account'],
-      self.account2_id, 'Test account name2', 'CHF', 0.0)
-
-    response = self.testapp.get('/api/profile/active')
-    self.assertEqual(2, len(response.json['active_profile']['accounts']))
-    self._AssertAccount(response.json['active_profile']['accounts'][1],
-      self.account2_id, 'Test account name2', 'CHF', 0.0)
-    self.assertEqual(0.3, response.json['total_balance'])
-
     # Check transactions
     response = self.testapp.get('/api/transaction/query')
     transactions = response.json['transactions']
@@ -199,7 +180,10 @@ class DoEditAccountTestCase(testing.BaseTestCase):
     self.assertEqual(self.account1_id, transactions[0]['dest_account_id'])
     self.assertAlmostEqual(10.0, transactions[0]['amount'])
 
-    # Changing name of the first account
+  def testEdit(self):
+    response = self.testapp.post(
+      '/api/do/account/add', {'name': 'Test account name', 'currency': 'RUB', 'balance': 10.0})
+    self.account1_id = response.json['account']['id']
     response = self.testapp.post(
       '/api/do/account/edit',
       {
@@ -211,17 +195,27 @@ class DoEditAccountTestCase(testing.BaseTestCase):
       self.account1_id, 'Test account name modified', 'RUB', 5.0)
 
     response = self.testapp.get('/api/profile/active')
-    self.assertEqual(2, len(response.json['active_profile']['accounts']))
+    self.assertEqual(1, len(response.json['active_profile']['accounts']))
     self._AssertAccount(response.json['active_profile']['accounts'][0],
       self.account1_id, 'Test account name modified', 'RUB', 5.0)
     self.assertEqual(0.15, response.json['total_balance'])
 
-    # Deleting first account
+  def testDelete(self):
     response = self.testapp.post(
-      '/api/do/account/delete',
-      {
-        'account_id': self.account1_id
-      })
+      '/api/do/account/add', {'name': 'Test account name', 'currency': 'CHF'})
+    self.account1_id = response.json['account']['id']
+    response = self.testapp.post(
+      '/api/do/account/add', {'name': 'Test account name2', 'currency': 'CHF'})
+    self.account2_id = response.json['account']['id']
+
+    response = self.testapp.get('/api/profile/active')
+    self.assertEqual(2, len(response.json['active_profile']['accounts']))
+    self._AssertAccount(response.json['active_profile']['accounts'][1],
+      self.account2_id, 'Test account name2', 'CHF', 0.0)
+    self.assertEqual(0.0, response.json['total_balance'])
+
+    response = self.testapp.post(
+      '/api/do/account/delete', {'account_id': self.account1_id})
 
     response = self.testapp.get('/api/profile/active')
     self.assertEqual(1, len(response.json['active_profile']['accounts']))

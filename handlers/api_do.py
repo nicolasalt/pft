@@ -1,20 +1,43 @@
+from google.appengine.ext import ndb
 import common
 import converters
 from datastore import models, transactions
 from util import  parse_csv, parse, util
 
 
-class DoAddProfile(common.CommonHandler):
-  def HandlePost(self):
-    profile_name = self.request.get('name')
+class DoEditProfile(common.CommonHandler):
+  def HandlePost(self, command):
+    profile_id = parse.ParseInt(self.request.get('profile_id'))
+    name = self.request.get('name', None)
+    main_currency = self.request.get('main_currency', None)
 
-    self.profile = models.Profile.Create(self.visitor.key.id(), profile_name)
-    models.User.Update(self.visitor.key.id(), active_profile_id=self.profile.key.id())
+    # TODO: use JSON request
+    kw = {}
+    if name is not None:
+      kw['name'] = name
+    if main_currency is not None:
+      kw['main_currency'] = main_currency
 
-    return {
-      'id': self.profile.key.id(),
-      'status': 'ok'
-    }
+    if command == 'add':
+      kw['name'] = kw.get('name') or 'Untitled'
+      profile = models.Profile.Create(self.visitor.key.id(), **kw)
+      models.User.Update(
+        self.visitor.key.id(), active_profile_id=profile.key.id())
+    elif command == 'edit':
+      profile = models.Profile.Update(profile_id, **kw)
+    elif command == 'delete':
+      assert profile_id is not None
+      if profile_id == self.visitor.active_profile_id:
+        models.User.Update(self.visitor.key.id(), active_profile_id=None)
+      ndb.Key(models.Profile, profile_id).delete()
+      profile = None
+    else:
+      raise ValueError('Command %r is not supported' % command)
+
+    response = {'status': 'ok'}
+    if profile:
+      response['profile'] = converters.ConvertProfileToDict(profile)
+    return response
 
 
 class DoSetActiveProfile(common.CommonHandler):
@@ -62,9 +85,7 @@ class DoEditAccount(common.CommonHandler):
         dest_account_id=account.id, source='manual')
       self.ReloadProfile()
 
-    response = {
-      'status': 'ok'
-    }
+    response = {'status': 'ok'}
     if account:
       response['account'] = converters.ConvertAccountToDict(
         self.profile.GetAccountById(account.id))
@@ -102,9 +123,7 @@ class DoEditCategory(common.CommonHandler):
         dest_category_id=category.id, source='manual')
       self.ReloadProfile()
 
-    response = {
-      'status': 'ok'
-    }
+    response = {'status': 'ok'}
     if category:
       response['category'] = converters.ConvertCategoryToDict(
         self.profile.GetCategoryById(category.id))

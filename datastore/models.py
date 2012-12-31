@@ -32,6 +32,7 @@ class User(ndb.Model):
     user = cls.Get(user_id)
     user.populate(**kw)
     user.put()
+    return user
 
   def GetOrCreateProfileSettings(self, profile_id):
     for settings in self.profile_settings:
@@ -86,10 +87,17 @@ class Profile(ndb.Model):
       return None
 
   @classmethod
-  def Create(cls, owner_id, name, **kw):
-    profile = cls(owner_id=owner_id, name=name)
-    profile.populate(**kw)
+  def Create(cls, owner_id, **kw):
+    profile = cls(owner_id=owner_id, **kw)
     profile.user_ids.append(owner_id)
+    profile.put()
+    return profile
+
+  @classmethod
+  @ndb.transactional
+  def Update(cls, profile_id, **kw):
+    profile = cls.get_by_id(profile_id)
+    profile.populate(**kw)
     profile.put()
     return profile
 

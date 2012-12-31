@@ -40,7 +40,7 @@ class BaseTestCase(unittest.TestCase):
     })
 
   def AddProfile(self):
-    self.profile = models.Profile.Create(self.visitor_id, 'Test profile')
+    self.profile = models.Profile.Create(self.visitor_id, name='Test profile')
     models.User.Update(self.visitor_id, active_profile_id=self.profile.key.id())
 
   def AddAccountsAndCategories(self):
